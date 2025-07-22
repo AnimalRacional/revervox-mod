@@ -59,6 +59,10 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    maven {
+        name = "henkelmax.public"
+        url = 'https://maven.maxhenkel.de/repository/public'
+    }
     mavenLocal()
 }
 
@@ -68,6 +72,8 @@ dependencies {
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+
+    implementation 'de.maxhenkel.opus4j:opus4j:2.0.4'
 
     runtimeOnly fg.deobf("maven.modrinth:simple-voice-chat:forge-${voicechat_dependency}")
 }
