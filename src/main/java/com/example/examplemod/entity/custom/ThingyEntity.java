@@ -88,6 +88,6 @@ public class ThingyEntity extends Monster {
 
     @Override
     protected SoundEvent getHurtSound(@NotNull DamageSource dmgSrc) {
-        return SoundEvents.AMETHYST_CLUSTER_BREAK;
+        return SoundRegistry.THINGY_HURT.get();
     }
 }

@@ -1,6 +1,6 @@
 package com.example.examplemod;
 
-import com.example.examplemod.entity.ModEntities;
+import com.example.examplemod.registries.EntityRegistry;
 import com.example.examplemod.registries.SoundRegistry;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
@@ -19,7 +19,6 @@ import java.nio.file.Files;
 
 @Mod(ExampleMod.MOD_ID)
 public class ExampleMod {
-
     public static final String MOD_ID = "example_mod";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final LevelResource AUDIOS = new LevelResource("faggot_audios");
@@ -29,8 +28,8 @@ public class ExampleMod {
     public ExampleMod(FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
-        ModEntities.register(context.getModEventBus());
-        SoundRegistry.REGISTRY.register(context.getModEventBus());
+        EntityRegistry.register(context.getModEventBus());
+        SoundRegistry.register(context.getModEventBus());
     }
 
     private void setup(FMLCommonSetupEvent event) {

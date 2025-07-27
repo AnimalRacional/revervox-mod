@@ -3,5 +3,10 @@
     "subtitle": "example_mod.subtitle.thingy_death",
     "category": "hostile",
     "sounds": [ "example_mod:jumpscare" ]
+  },
+  "thingy_hurt": {
+    "subtitle": "example_mod.subtitle.sounds.json",
+    "category": "hostile",
+    "sounds": [ "example_mod:thingy_hurt" ]
   }
 }

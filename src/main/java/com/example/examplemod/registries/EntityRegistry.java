@@ -1,4 +1,4 @@
-package com.example.examplemod.entity;
+package com.example.examplemod.registries;
 
 import com.example.examplemod.ExampleMod;
 import com.example.examplemod.entity.custom.ThingyEntity;
@@ -9,7 +9,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-public class ModEntities {
+public class EntityRegistry {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, ExampleMod.MOD_ID);
     

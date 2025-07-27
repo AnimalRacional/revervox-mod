@@ -1,7 +1,7 @@
 package com.example.examplemod.events;
 
 import com.example.examplemod.ExampleMod;
-import com.example.examplemod.entity.ModEntities;
+import com.example.examplemod.registries.EntityRegistry;
 import com.example.examplemod.entity.client.ModModelLayers;
 import com.example.examplemod.entity.client.ThingyModel;
 import com.example.examplemod.entity.client.ThingyRenderer;
@@ -21,7 +21,7 @@ public class ModEventBusClientEvents {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        EntityRenderers.register(ModEntities.THINGY.get(), ThingyRenderer::new);
+        EntityRenderers.register(EntityRegistry.THINGY.get(), ThingyRenderer::new);
     }
 
 }
