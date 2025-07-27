@@ -1,0 +1,6 @@
+{
+  "thingy_death": {
+    "subtitle": "example_mod.subtitle.thingy_death",
+    "sounds": [ "example_mod:jumpscare" ]
+  }
+}

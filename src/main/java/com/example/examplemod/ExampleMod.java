@@ -1,7 +1,10 @@
 package com.example.examplemod;
 
+import com.example.examplemod.entity.ModEntities;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -9,6 +12,10 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -21,10 +28,15 @@ public class ExampleMod {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final LevelResource AUDIOS = new LevelResource("faggot_audios");
     public static VoicechatApi vcApi = null;
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, ExampleMod.MOD_ID);
+    public static final RegistryObject<SoundEvent> JUMPSCARE = SOUND_EVENTS.register("jumpscare", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(ExampleMod.MOD_ID, "jumpscare")));
 
-    public ExampleMod() {
+
+    public ExampleMod(FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
+        ModEntities.register(context.getModEventBus());
+        SOUND_EVENTS.register(context.getModEventBus());
     }
 
     private void setup(FMLCommonSetupEvent event) {
@@ -51,4 +63,5 @@ public class ExampleMod {
         StopRecordingCommand.register(event.getDispatcher());
         isRecordingCommand.register(event.getDispatcher());
     }
+
 }
