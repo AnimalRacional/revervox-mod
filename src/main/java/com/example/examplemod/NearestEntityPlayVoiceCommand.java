@@ -61,7 +61,6 @@ public class NearestEntityPlayVoiceCommand {
                     EntityAudioChannel channel = createChannel(api, channelID, category, nearestEntity);
                     ExampleMod.LOGGER.info("Created new channel: " + channel);
                     new AudioPlayer(getAudioPath(target.getId(), idx), api, channel).start();
-                    nearestEntity.playSound(SoundRegistry.JUMPSCARE.get());
                     ExampleMod.LOGGER.info("silent: " + nearestEntity.isSilent());
                 }
 
