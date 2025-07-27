@@ -1,6 +1,5 @@
 package com.example.examplemod;
 
-import com.example.examplemod.registries.SoundRegistry;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -53,7 +52,7 @@ public class NearestEntityPlayVoiceCommand {
                     null, srcPos.x, srcPos.y, srcPos.z, aabb);
             if (nearestEntity != null){
                 ExampleMod.LOGGER.info("Entity: " + nearestEntity.getName());
-                String category = ExampleVoicechatPlugin.FAGGOT_CATEGORY;
+                String category = ExampleVoicechatPlugin.REVERVOX_CATEGORY;
                 Collection<GameProfile> targets = GameProfileArgument.getGameProfiles(cmdSrc, "targets");
                 int idx = IntegerArgumentType.getInteger(cmdSrc, "index");
                 for (GameProfile target : targets) {

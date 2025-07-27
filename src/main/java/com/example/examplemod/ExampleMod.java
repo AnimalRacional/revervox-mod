@@ -23,7 +23,7 @@ import java.nio.file.Files;
 public class ExampleMod {
     public static final String MOD_ID = "example_mod";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final LevelResource AUDIOS = new LevelResource("faggot_audios");
+    public static final LevelResource AUDIOS = new LevelResource("player_audios");
     public static VoicechatApi vcApi = null;
 
 

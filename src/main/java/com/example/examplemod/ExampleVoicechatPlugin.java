@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @ForgeVoicechatPlugin
 public class ExampleVoicechatPlugin implements VoicechatPlugin {
-    public static String FAGGOT_CATEGORY = "faggots";
+    public static String REVERVOX_CATEGORY = "revervox";
     private static HashMap<UUID, RecordedPlayer> recordedPlayers;
     private static ConcurrentHashMap<Path, short[]> audioCache;
 
@@ -66,14 +66,14 @@ public class ExampleVoicechatPlugin implements VoicechatPlugin {
     private void onServerStarted(VoicechatServerStartedEvent event) {
         VoicechatServerApi api = event.getVoicechat();
 
-        VolumeCategory faggots = api.volumeCategoryBuilder()
-                .setId(FAGGOT_CATEGORY)
-                .setName("Faggots")
-                .setDescription("The volume of all faggots...")
+        VolumeCategory revervoxCategory = api.volumeCategoryBuilder()
+                .setId(REVERVOX_CATEGORY)
+                .setName("Revervox")
+                .setDescription("The volume of monsters")
                 .setIcon(null)
                 .build();
 
-        api.registerVolumeCategory(faggots);
+        api.registerVolumeCategory(revervoxCategory);
         recordedPlayers = new HashMap<>();
         audioCache = new ConcurrentHashMap<>();
     }
