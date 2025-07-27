@@ -1,11 +1,11 @@
 {
   "jumpscare": {
-    "subtitle": "example_mod.subtitle.thingy_death",
+    "subtitle": "example_mod.subtitle.sound.thingy_death",
     "category": "hostile",
     "sounds": [ "example_mod:jumpscare" ]
   },
   "thingy_hurt": {
-    "subtitle": "example_mod.subtitle.sounds.json",
+    "subtitle": "example_mod.subtitle.sound.thingy_hurt",
     "category": "hostile",
     "sounds": [ "example_mod:thingy_hurt" ]
   }

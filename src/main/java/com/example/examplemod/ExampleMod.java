@@ -1,6 +1,8 @@
 package com.example.examplemod;
 
+import com.example.examplemod.registries.CreativeTabRegistry;
 import com.example.examplemod.registries.EntityRegistry;
+import com.example.examplemod.registries.ItemRegistry;
 import com.example.examplemod.registries.SoundRegistry;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
@@ -30,6 +32,8 @@ public class ExampleMod {
         MinecraftForge.EVENT_BUS.register(this);
         EntityRegistry.register(context.getModEventBus());
         SoundRegistry.register(context.getModEventBus());
+        ItemRegistry.register(context.getModEventBus());
+        CreativeTabRegistry.register(context.getModEventBus());
     }
 
     private void setup(FMLCommonSetupEvent event) {
