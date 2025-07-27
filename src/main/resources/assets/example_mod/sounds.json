@@ -1,6 +1,7 @@
 {
-  "thingy_death": {
+  "jumpscare": {
     "subtitle": "example_mod.subtitle.thingy_death",
+    "category": "hostile",
     "sounds": [ "example_mod:jumpscare" ]
   }
 }

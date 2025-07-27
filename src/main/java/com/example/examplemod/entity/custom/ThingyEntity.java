@@ -1,7 +1,9 @@
 package com.example.examplemod.entity.custom;
 
-import com.example.examplemod.ExampleMod;
+import com.example.examplemod.registries.SoundRegistry;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
@@ -17,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 public class ThingyEntity extends Monster {
 
@@ -80,6 +83,11 @@ public class ThingyEntity extends Monster {
 
     @Override
     protected SoundEvent getDeathSound() {
-        return ExampleMod.JUMPSCARE.get();
+        return SoundRegistry.JUMPSCARE.get();
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(@NotNull DamageSource dmgSrc) {
+        return SoundEvents.AMETHYST_CLUSTER_BREAK;
     }
 }
