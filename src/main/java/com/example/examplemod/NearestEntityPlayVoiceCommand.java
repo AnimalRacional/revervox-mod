@@ -9,6 +9,7 @@ import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.GameProfileArgument;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -33,27 +34,24 @@ public class NearestEntityPlayVoiceCommand {
                 Commands.literal("playVoice").requires((src) -> {
                     return src.hasPermission(PERMISSION_LEVEL);
                 }).then(
-                        Commands.argument("targets", GameProfileArgument.gameProfile())
+                        Commands.argument("player", GameProfileArgument.gameProfile())
                                 .then(Commands.argument("index", IntegerArgumentType.integer())
                                         .executes(NearestEntityPlayVoiceCommand::runCommand)
-                                )
+                                        .then(Commands.argument("entity", EntityArgument.entities())
+                                                .executes(NearestEntityPlayVoiceCommand::runCommandEntity)))
                 )
         );
     }
 
-    public static int runCommand(CommandContext<CommandSourceStack> cmdSrc) throws CommandSyntaxException {
+    public static int runCommandEntity(CommandContext<CommandSourceStack> cmdSrc) throws CommandSyntaxException {
         if (ExampleMod.vcApi instanceof VoicechatServerApi api){
 
-            ServerLevel level = cmdSrc.getSource().getLevel();
-            Vec3 srcPos = cmdSrc.getSource().getPosition();
-            AABB aabb = new AABB(srcPos.x + bbX, srcPos.y + bbY, srcPos.z + bbZ,
-                    srcPos.x - bbX,  srcPos.y -bbY,  srcPos.z -bbZ);
-            Entity nearestEntity = level.getNearestEntity(LivingEntity.class, TargetingConditions.DEFAULT,
-                    null, srcPos.x, srcPos.y, srcPos.z, aabb);
-            if (nearestEntity != null){
+            Collection<? extends Entity> entities = EntityArgument.getEntities(cmdSrc, "entity");
+
+            for(Entity nearestEntity : entities){
                 ExampleMod.LOGGER.info("Entity: " + nearestEntity.getName());
                 String category = ExampleVoicechatPlugin.REVERVOX_CATEGORY;
-                Collection<GameProfile> targets = GameProfileArgument.getGameProfiles(cmdSrc, "targets");
+                Collection<GameProfile> targets = GameProfileArgument.getGameProfiles(cmdSrc, "player");
                 int idx = IntegerArgumentType.getInteger(cmdSrc, "index");
                 for (GameProfile target : targets) {
                     UUID channelID = UUID.randomUUID();
@@ -62,12 +60,42 @@ public class NearestEntityPlayVoiceCommand {
                     new AudioPlayer(getAudioPath(target.getId(), idx), api, channel).start();
                     ExampleMod.LOGGER.info("silent: " + nearestEntity.isSilent());
                 }
-
-            } else{
-                ExampleMod.LOGGER.warn("No Entity Found");
             }
-
             return 1;
+        }
+        return 0;
+    }
+
+    public static int runCommand(CommandContext<CommandSourceStack> cmdSrc) {
+        try {
+            if (ExampleMod.vcApi instanceof VoicechatServerApi api) {
+                ServerLevel level = cmdSrc.getSource().getLevel();
+                Vec3 srcPos = cmdSrc.getSource().getPosition();
+                AABB aabb = new AABB(srcPos.x + bbX, srcPos.y + bbY, srcPos.z + bbZ,
+                        srcPos.x - bbX, srcPos.y - bbY, srcPos.z - bbZ);
+                Entity nearestEntity = level.getNearestEntity(LivingEntity.class, TargetingConditions.DEFAULT,
+                        null, srcPos.x, srcPos.y, srcPos.z, aabb);
+                if (nearestEntity != null) {
+                    ExampleMod.LOGGER.info("Entity: " + nearestEntity.getName());
+                    String category = ExampleVoicechatPlugin.REVERVOX_CATEGORY;
+                    Collection<GameProfile> targets = GameProfileArgument.getGameProfiles(cmdSrc, "player");
+                    int idx = IntegerArgumentType.getInteger(cmdSrc, "index");
+                    for (GameProfile target : targets) {
+                        UUID channelID = UUID.randomUUID();
+                        EntityAudioChannel channel = createChannel(api, channelID, category, nearestEntity);
+                        ExampleMod.LOGGER.info("Created new channel: " + channel);
+                        new AudioPlayer(getAudioPath(target.getId(), idx), api, channel).start();
+                        ExampleMod.LOGGER.info("silent: " + nearestEntity.isSilent());
+                    }
+
+                } else {
+                    ExampleMod.LOGGER.warn("No Entity Found");
+                }
+
+                return 1;
+            }
+        } catch(Exception e){
+            ExampleMod.LOGGER.error("Error on playvoice: {}", e.getMessage());
         }
         return 0;
     }

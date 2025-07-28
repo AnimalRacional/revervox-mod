@@ -7,12 +7,13 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 @ForgeVoicechatPlugin
 public class ExampleVoicechatPlugin implements VoicechatPlugin {
     public static String REVERVOX_CATEGORY = "revervox";
     private static HashMap<UUID, RecordedPlayer> recordedPlayers;
-    private static ConcurrentHashMap<Path, short[]> audioCache;
+    private static ConcurrentHashMap<Path, Future<short[]>> audioCache;
 
     /**
      * @return the unique ID for this voice chat plugin
@@ -92,7 +93,7 @@ public class ExampleVoicechatPlugin implements VoicechatPlugin {
         return recordedPlayers.get(uuid);
     }
 
-    public static ConcurrentHashMap<Path, short[]> getAudioCache() {
+    public static ConcurrentHashMap<Path, Future<short[]>> getAudioCache() {
         return audioCache;
     }
 
