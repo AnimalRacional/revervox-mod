@@ -2,7 +2,6 @@ package com.example.examplemod.entity.custom;
 
 import com.example.examplemod.registries.SoundRegistry;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntityType;
@@ -12,12 +11,10 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.TemptGoal;
+import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,9 +62,11 @@ public class ThingyEntity extends Monster {
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
 
-        this.goalSelector.addGoal(1, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
+        //this.goalSelector.addGoal(1, new TemptGoal(this, 0.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
+        this.goalSelector.addGoal(1, new RandomStrollGoal(this, 5D));
         this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 3.0F));
         this.goalSelector.addGoal(3, new RandomLookAroundGoal(this));
+
 
     }
 

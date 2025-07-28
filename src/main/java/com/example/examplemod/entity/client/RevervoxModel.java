@@ -247,6 +247,7 @@ public class RevervoxModel<T extends Entity> extends HierarchicalModel<T> {
 		this.root().getAllParts().forEach(ModelPart::resetPose);
 		this.applyHeadRotation(netHeadYaw, headPitch, ageInTicks);
 
+		this.animateWalk(ModAnimationDefinitions.REVERVOX_CHASE, limbSwing, limbSwingAmount, 2f, 2.5f);
 		this.animate(((RevervoxEntity) entity).idleAnimationState, ModAnimationDefinitions.REVERVOX_IDLE, ageInTicks, 1f);
 
 	}
