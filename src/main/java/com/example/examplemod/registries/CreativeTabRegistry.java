@@ -16,8 +16,10 @@ public class CreativeTabRegistry {
         return CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup.exampleMod"))
                 .icon(ItemRegistry.THINGY_SPAWN_EGG.get()::getDefaultInstance)
+                .icon(ItemRegistry.REVERVOX_SPAWN_EGG.get()::getDefaultInstance)
                 .displayItems((displayParam, output) -> {
                     output.accept(ItemRegistry.THINGY_SPAWN_EGG.get());
+                    output.accept(ItemRegistry.REVERVOX_SPAWN_EGG.get());
                 }).build();
     });
     public static void register(IEventBus eventBus) {

@@ -10,8 +10,10 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ThingyRenderer extends MobRenderer<ThingyEntity, ThingyModel<ThingyEntity>> {
 
+    private static final float SHADOW_SIZE = 0.2f;
+
     public ThingyRenderer(EntityRendererProvider.Context pContext) {
-        super(pContext, new ThingyModel<>(pContext.bakeLayer(ModModelLayers.THINGY_LAYER)), 0.2f);
+        super(pContext, new ThingyModel<>(pContext.bakeLayer(ModModelLayers.THINGY_LAYER)), SHADOW_SIZE);
     }
 
     @Override

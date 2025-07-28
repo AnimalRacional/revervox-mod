@@ -3,5 +3,7 @@
   "example_mod.subtitle.sound.thingy_hurt": "Thingy hurts",
   "entity.example_mod.thingy": "Thingy",
   "itemGroup.exampleMod": "Example Mod",
-  "item.example_mod.thingy_spawn_egg": "Thingy Spawn Egg"
+  "item.example_mod.thingy_spawn_egg": "Thingy Spawn Egg",
+  "entity.example_mod.revervox": "Revervox",
+  "item.example_mod.revervox_spawn_egg": "Revervox Spawn Egg"
 }

@@ -1,6 +1,7 @@
 package com.example.examplemod.registries;
 
 import com.example.examplemod.ExampleMod;
+import com.example.examplemod.entity.custom.RevervoxEntity;
 import com.example.examplemod.entity.custom.ThingyEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -10,13 +11,18 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class EntityRegistry {
+    public static final float THINGY_HITBOX_SIZE = 0.8F;
+    public static final float REVERVOX_HITBOX_WIDTH = 2F;
+    public static final float REVERVOX_HITBOX_HEIGHT = 4F;
+
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, ExampleMod.MOD_ID);
-    
     public static final RegistryObject<EntityType<ThingyEntity>> THINGY =
             ENTITY_TYPES.register("thingy", () -> EntityType.Builder.of(ThingyEntity::new, MobCategory.CREATURE)
-                    .sized(0.8F, 0.8F).build("thingy"));
-
+                    .sized(THINGY_HITBOX_SIZE, THINGY_HITBOX_SIZE).build("thingy"));
+    public static final RegistryObject<EntityType<RevervoxEntity>> REVERVOX =
+            ENTITY_TYPES.register("revervox", () -> EntityType.Builder.of(RevervoxEntity::new, MobCategory.CREATURE)
+                    .sized(REVERVOX_HITBOX_WIDTH, REVERVOX_HITBOX_HEIGHT).build("revervox"));
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);
     }
