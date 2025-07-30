@@ -1,6 +1,9 @@
 package com.example.examplemod.entity.custom;
 
 import com.example.examplemod.registries.SoundRegistry;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -33,14 +36,28 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
+        //controllers.add(new AnimationController<>(this, "attackController", 5, this::attackPredicate));
     }
 
-    protected <T extends GeoAnimatable> PlayState predicate(AnimationState<T> tAnimationState) {
-        if (tAnimationState.isMoving()){
-            tAnimationState.getController().setAnimation(RUN);
+    /*
+    private PlayState attackPredicate(AnimationState event) {
+        if (this.swinging && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
+            event.getController().forceAnimationReset(); // substitui markneedsreload????
+            event.getController().setAnimation(ATTACK);
+            this.swinging = false;
+        }
+        return PlayState.CONTINUE;
+    }
+
+     */
+
+    protected <T extends GeoAnimatable> PlayState predicate(AnimationState<T> event) {
+        if (event.isMoving()){
+            event.getController().setAnimation(RUN);
         return PlayState.CONTINUE;
         }
-        tAnimationState.getController().setAnimation(IDLE);
+
+        event.getController().setAnimation(IDLE);
         return PlayState.CONTINUE;
     }
 
