@@ -48,7 +48,7 @@ public class ExampleVoicechatPlugin implements VoicechatPlugin {
     }
 
     private void onMicrophonePacket(MicrophonePacketEvent e){
-        if (e.getSenderConnection() != null){
+        if (e.getSenderConnection() != null){ // If it's a player and not an entity
             RecordedPlayer recordedPlayer = recordedPlayers.get(e.getSenderConnection().getPlayer().getUuid());
             recordedPlayer.recordPacket(e.getPacket().getOpusEncodedData());
         }

@@ -1,7 +1,7 @@
 package com.example.examplemod.registries;
 
 import com.example.examplemod.ExampleMod;
-import com.example.examplemod.entity.custom.RevervoxEntity;
+import com.example.examplemod.entity.custom.RevervoxGeoEntity;
 import com.example.examplemod.entity.custom.ThingyEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -20,9 +20,9 @@ public class EntityRegistry {
     public static final RegistryObject<EntityType<ThingyEntity>> THINGY =
             ENTITY_TYPES.register("thingy", () -> EntityType.Builder.of(ThingyEntity::new, MobCategory.CREATURE)
                     .sized(THINGY_HITBOX_SIZE, THINGY_HITBOX_SIZE).build("thingy"));
-    public static final RegistryObject<EntityType<RevervoxEntity>> REVERVOX =
-            ENTITY_TYPES.register("revervox", () -> EntityType.Builder.of(RevervoxEntity::new, MobCategory.CREATURE)
-                    .sized(REVERVOX_HITBOX_WIDTH, REVERVOX_HITBOX_HEIGHT).build("revervox"));
+    public static final RegistryObject<EntityType<RevervoxGeoEntity>> REVERVOX_GEO =
+            ENTITY_TYPES.register("revervox_geo", () -> EntityType.Builder.of(RevervoxGeoEntity::new, MobCategory.MONSTER)
+                    .sized(REVERVOX_HITBOX_WIDTH, REVERVOX_HITBOX_HEIGHT).build("revervox_geo"));
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);
     }
