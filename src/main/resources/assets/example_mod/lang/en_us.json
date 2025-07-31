@@ -1,9 +1,0 @@
-{
-  "example_mod.subtitle.sound.thingy_death": "Thingy dies",
-  "example_mod.subtitle.sound.thingy_hurt": "Thingy hurts",
-  "entity.example_mod.thingy": "Thingy",
-  "itemGroup.exampleMod": "Example Mod",
-  "item.example_mod.thingy_spawn_egg": "Thingy Spawn Egg",
-  "entity.example_mod.revervox_geo": "Revervox",
-  "item.example_mod.revervox_spawn_egg": "Revervox Spawn Egg"
-}

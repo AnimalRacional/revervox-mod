@@ -1,0 +1,12 @@
+{
+  "jumpscare": {
+    "subtitle": "revervox_mod.subtitle.sound.thingy_death",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:jumpscare" ]
+  },
+  "thingy_hurt": {
+    "subtitle": "revervox_mod.subtitle.sound.thingy_hurt",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:thingy_hurt" ]
+  }
+}
