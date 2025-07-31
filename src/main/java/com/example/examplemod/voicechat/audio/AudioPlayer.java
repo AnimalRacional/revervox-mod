@@ -1,5 +1,6 @@
-package com.example.examplemod;
+package com.example.examplemod.voicechat.audio;
 
+import com.example.examplemod.ExampleMod;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 

@@ -1,5 +1,8 @@
-package com.example.examplemod;
+package com.example.examplemod.entity.goals;
 
+import com.example.examplemod.voicechat.audio.AudioPlayer;
+import com.example.examplemod.ExampleMod;
+import com.example.examplemod.voicechat.ExampleVoicechatPlugin;
 import com.example.examplemod.entity.custom.RevervoxGeoEntity;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;

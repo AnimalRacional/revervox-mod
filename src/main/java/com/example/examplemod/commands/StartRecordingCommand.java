@@ -1,5 +1,6 @@
-package com.example.examplemod;
+package com.example.examplemod.commands;
 
+import com.example.examplemod.voicechat.ExampleVoicechatPlugin;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

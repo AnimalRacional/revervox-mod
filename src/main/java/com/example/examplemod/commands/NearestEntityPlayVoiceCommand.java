@@ -1,5 +1,9 @@
-package com.example.examplemod;
+package com.example.examplemod.commands;
 
+import com.example.examplemod.voicechat.audio.AudioPlayer;
+import com.example.examplemod.ExampleMod;
+import com.example.examplemod.voicechat.ExampleVoicechatPlugin;
+import com.example.examplemod.voicechat.RecordedPlayer;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;

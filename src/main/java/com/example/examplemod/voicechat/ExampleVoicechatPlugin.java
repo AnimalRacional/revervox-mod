@@ -1,5 +1,6 @@
-package com.example.examplemod;
+package com.example.examplemod.voicechat;
 
+import com.example.examplemod.ExampleMod;
 import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
 

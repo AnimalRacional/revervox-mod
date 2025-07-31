@@ -1,9 +1,14 @@
 package com.example.examplemod;
 
+import com.example.examplemod.commands.NearestEntityPlayVoiceCommand;
+import com.example.examplemod.commands.StartRecordingCommand;
+import com.example.examplemod.commands.StopRecordingCommand;
+import com.example.examplemod.commands.isRecordingCommand;
 import com.example.examplemod.registries.CreativeTabRegistry;
 import com.example.examplemod.registries.EntityRegistry;
 import com.example.examplemod.registries.ItemRegistry;
 import com.example.examplemod.registries.SoundRegistry;
+import com.example.examplemod.voicechat.RecordedPlayer;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import net.minecraft.world.level.storage.LevelResource;

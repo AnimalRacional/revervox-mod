@@ -1,5 +1,6 @@
-package com.example.examplemod;
+package com.example.examplemod.entity.goals;
 
+import com.example.examplemod.ExampleMod;
 import com.example.examplemod.entity.custom.RevervoxGeoEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -8,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.function.Predicate;
 
-public class TargetSpokeGoal<T extends LivingEntity> extends NearestAttackableTargetGoal<Player> {
+public class TargetSpokeGoal extends NearestAttackableTargetGoal<Player> {
     protected LivingEntity target;
     private final RevervoxGeoEntity revervox;
     private int aggroTime;

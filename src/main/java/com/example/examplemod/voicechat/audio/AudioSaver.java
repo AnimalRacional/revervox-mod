@@ -1,4 +1,6 @@
-package com.example.examplemod;
+package com.example.examplemod.voicechat.audio;
+
+import com.example.examplemod.ExampleMod;
 
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;

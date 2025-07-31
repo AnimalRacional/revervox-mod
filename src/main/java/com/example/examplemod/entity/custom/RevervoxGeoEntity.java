@@ -1,9 +1,9 @@
 package com.example.examplemod.entity.custom;
 
 import com.example.examplemod.ExampleMod;
-import com.example.examplemod.ExampleVoicechatPlugin;
-import com.example.examplemod.RandomRepeatGoal;
-import com.example.examplemod.TargetSpokeGoal;
+import com.example.examplemod.voicechat.ExampleVoicechatPlugin;
+import com.example.examplemod.entity.goals.RandomRepeatGoal;
+import com.example.examplemod.entity.goals.TargetSpokeGoal;
 import com.example.examplemod.registries.SoundRegistry;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.TimeUtil;
@@ -95,7 +95,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal(this, this::isAngryAt));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
