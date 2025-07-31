@@ -142,6 +142,7 @@ public class RecordedPlayer {
     }
 
     public Path getRandomAudio(){
+        if (recordsCount <= 1) return null;
         Path audioPath = RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + (new Random().nextInt(1, recordsCount)) + ".pcm");
         RevervoxMod.LOGGER.info("Audio Path: " + audioPath);
         return audioPath;
