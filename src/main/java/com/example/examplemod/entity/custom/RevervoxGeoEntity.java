@@ -1,15 +1,20 @@
 package com.example.examplemod.entity.custom;
 
+import com.example.examplemod.ExampleMod;
+import com.example.examplemod.ExampleVoicechatPlugin;
+import com.example.examplemod.RandomRepeatGoal;
+import com.example.examplemod.TargetSpokeGoal;
 import com.example.examplemod.registries.SoundRegistry;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.TimeUtil;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
@@ -25,10 +30,18 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class RevervoxGeoEntity extends Monster implements GeoEntity {
+import javax.annotation.Nullable;
+import java.util.UUID;
+
+public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
     protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.revervox.idle");
     protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.revervox.chase");
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
+    private int remainingPersistentAngerTime;
+    @Nullable
+    private UUID persistentAngerTarget;
+
     public RevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -70,22 +83,26 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity {
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
 
-        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
-        this.goalSelector.addGoal(3, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 6.0F));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
+        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.5D));
+        this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+
         this.addBehaviourGoals();
 
     }
 
     protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.5D, false));
-        this.targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt));
+        this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createLivingAttributes()
-                .add(Attributes.MAX_HEALTH, 50.0D)
+                .add(Attributes.MAX_HEALTH, 100.0D)
                 .add(Attributes.FOLLOW_RANGE, 24.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 5.0D)
@@ -93,7 +110,38 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity {
     }
 
     @Override
+    public int getRemainingPersistentAngerTime() {
+        return remainingPersistentAngerTime;
+    }
+
+    @Override
+    public void setRemainingPersistentAngerTime(int pTime) {
+        this.remainingPersistentAngerTime = pTime;
+    }
+
+    @Nullable
+    @Override
+    public UUID getPersistentAngerTarget() {
+        return this.persistentAngerTarget;
+    }
+    public void setPersistentAngerTarget(@Nullable UUID pTarget) {
+        this.persistentAngerTarget = pTarget;
+    }
+
+    @Override
+    public void startPersistentAngerTimer() {
+        ExampleMod.LOGGER.info("Starting persistent anger timer!");
+        this.setRemainingPersistentAngerTime(PERSISTENT_ANGER_TIME.sample(this.random));
+    }
+
+    @Override
     protected SoundEvent getDeathSound() {
         return SoundRegistry.JUMPSCARE.get();
+    }
+
+    public boolean isSpeakingAtMe(Player player) {
+        if (ExampleVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
+            return ExampleVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
+        } else return false;
     }
 }

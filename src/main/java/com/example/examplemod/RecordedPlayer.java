@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Date;
+import java.util.Random;
 import java.util.UUID;
 
 public class RecordedPlayer {
@@ -13,10 +15,11 @@ public class RecordedPlayer {
     private OpusDecoder decoder = null;
     private final short[] recording;
     private int currentRecordingIndex;
-    private long recordsCount;
+    private int recordsCount;
     private boolean isRecording = false;
     private final UUID uuid;
     private final Path userPath;
+    private Date lastSpoke;
     public static Path audiosPath;
     public static final int RECORDING_LIMIT = 50;
 
@@ -125,4 +128,28 @@ public class RecordedPlayer {
         return isRecording;
     }
 
+    public boolean isSpeaking() {
+        if (this.getLastSpoke() == null) return false;
+        return System.currentTimeMillis() - this.getLastSpoke().getTime() < 5000;
+    }
+
+    public Path getAudioPath(int index){
+        Path audioPath = RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + index + ".pcm");
+        ExampleMod.LOGGER.info("Audio Path: " + audioPath);
+        return audioPath;
+    }
+
+    public Path getRandomAudio(){
+        Path audioPath = RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + (new Random().nextInt(1, recordsCount)) + ".pcm");
+        ExampleMod.LOGGER.info("Audio Path: " + audioPath);
+        return audioPath;
+    }
+
+    public Date getLastSpoke() {
+        return lastSpoke;
+    }
+
+    public void setLastSpoke(Date lastSpoke) {
+        this.lastSpoke = lastSpoke;
+    }
 }

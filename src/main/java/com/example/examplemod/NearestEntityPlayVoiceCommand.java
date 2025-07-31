@@ -106,6 +106,7 @@ public class NearestEntityPlayVoiceCommand {
         return audioPath;
     }
 
+
     private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, String category, Entity nearestEntity) {
         EntityAudioChannel channel = api.createEntityAudioChannel(channelID, api.fromEntity(nearestEntity));
         if (channel == null) {

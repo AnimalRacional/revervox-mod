@@ -76,6 +76,8 @@ minecraft {
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
 
+
+
             mods {
                 "${mod_id}" {
                     source sourceSets.main
@@ -122,6 +124,7 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+    mavenCentral()
     exclusiveContent {
         forRepository {
             maven {

@@ -4,6 +4,7 @@ import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
 
 import java.nio.file.Path;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,6 +52,9 @@ public class ExampleVoicechatPlugin implements VoicechatPlugin {
         if (e.getSenderConnection() != null){ // If it's a player and not an entity
             RecordedPlayer recordedPlayer = recordedPlayers.get(e.getSenderConnection().getPlayer().getUuid());
             recordedPlayer.recordPacket(e.getPacket().getOpusEncodedData());
+
+            recordedPlayer.setLastSpoke(new Date(System.currentTimeMillis()));
+
         }
     }
 
@@ -70,7 +74,7 @@ public class ExampleVoicechatPlugin implements VoicechatPlugin {
         VolumeCategory revervoxCategory = api.volumeCategoryBuilder()
                 .setId(REVERVOX_CATEGORY)
                 .setName("Revervox")
-                .setDescription("The volume of monsters")
+                .setDescription("The volume of all monsters")
                 .setIcon(null)
                 .build();
 
@@ -91,6 +95,10 @@ public class ExampleVoicechatPlugin implements VoicechatPlugin {
 
     public static RecordedPlayer getRecordedPlayer(UUID uuid) {
         return recordedPlayers.get(uuid);
+    }
+
+    public static HashMap<UUID, RecordedPlayer> getRecordedPlayers() {
+        return recordedPlayers;
     }
 
     public static ConcurrentHashMap<Path, Future<short[]>> getAudioCache() {

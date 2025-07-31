@@ -20,15 +20,17 @@ public class AudioPlayer extends Thread{
         short[] recording;
         try {
             recording = new AudioReader(path).read().get();
+            if (recording != null) {
+                de.maxhenkel.voicechat.api.audiochannel.AudioPlayer playerAudioPlayer = api.createAudioPlayer(channel, api.createEncoder(), recording);
+                ExampleMod.LOGGER.info("AudioPlayer Created");
+
+                playerAudioPlayer.startPlaying();
+                ExampleMod.LOGGER.info("Playing Audio...");
+            }
         } catch (Exception e) {
             ExampleMod.LOGGER.error(e.getMessage());
             throw new RuntimeException(e);
         }
 
-        de.maxhenkel.voicechat.api.audiochannel.AudioPlayer playerAudioPlayer = api.createAudioPlayer(channel, api.createEncoder(), recording);
-        ExampleMod.LOGGER.info("AudioPlayer Created");
-
-        playerAudioPlayer.startPlaying();
-        ExampleMod.LOGGER.info("Playing Audio...");
     }
 }
