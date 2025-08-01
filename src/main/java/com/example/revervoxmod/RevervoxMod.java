@@ -4,6 +4,7 @@ import com.example.revervoxmod.commands.NearestEntityPlayVoiceCommand;
 import com.example.revervoxmod.commands.StartRecordingCommand;
 import com.example.revervoxmod.commands.StopRecordingCommand;
 import com.example.revervoxmod.commands.isRecordingCommand;
+import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.registries.CreativeTabRegistry;
 import com.example.revervoxmod.registries.EntityRegistry;
 import com.example.revervoxmod.registries.ItemRegistry;
@@ -11,9 +12,13 @@ import com.example.revervoxmod.registries.SoundRegistry;
 import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
+import de.maxhenkel.voicechat.api.VoicechatServerApi;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -64,6 +69,21 @@ public class RevervoxMod {
         StartRecordingCommand.register(event.getDispatcher());
         StopRecordingCommand.register(event.getDispatcher());
         isRecordingCommand.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public void onEntityDeath(LivingDeathEvent e){
+        if(e.getEntity() instanceof Player player){
+            if(e.getSource().getEntity() instanceof RevervoxGeoEntity revervox){
+                if(player.level().isClientSide()){
+                    // TODO isto não acontece, partículas só funcionam client-side
+                    // então é preciso descobrir ou porque não acontece ou outra forma de detetar kills
+                    revervox.addParticlesAroundSelf(ParticleTypes.ANGRY_VILLAGER);
+                } else if(RevervoxMod.vcApi instanceof VoicechatServerApi api){
+                    revervox.disappear(player, api);
+                }
+            }
+        }
     }
 
 }

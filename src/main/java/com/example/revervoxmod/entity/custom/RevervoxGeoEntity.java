@@ -1,10 +1,15 @@
 package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
 import com.example.revervoxmod.registries.SoundRegistry;
+import com.example.revervoxmod.voicechat.audio.AudioPlayer;
+import de.maxhenkel.voicechat.api.VoicechatServerApi;
+import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -20,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -31,6 +37,9 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
+import java.nio.file.Path;
+import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 // TODO - ATTACK ANIMATION, JUMP ANIMATION, JUMP ATTACK
@@ -106,7 +115,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
                 .add(Attributes.MAX_HEALTH, 100.0D)
                 .add(Attributes.FOLLOW_RANGE, 24.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
-                .add(Attributes.ATTACK_KNOCKBACK, 5.0D)
+                .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
                 .add(Attributes.ATTACK_DAMAGE, 7D);
     }
 
@@ -144,5 +153,39 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         if (RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
             return RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
         } else return false;
+    }
+
+    public void disappear(Player player, VoicechatServerApi api){
+        Vec3 loc = this.getEyePosition();
+        AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
+        if(channel == null){
+            RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
+            return;
+        }
+        channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+        // TODO tanto aqui como no RandomRepeatGoal, é possível o áudio aleatório ser null mesmo quando há audios pois só verificamos o player do evento e um outro player aleatório, que podem ambos ter 0 audios mesmo outros players tendo audios
+        RecordedPlayer record = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
+        Path audio = record.getRandomAudio();
+        if(audio == null){
+            RevervoxMod.LOGGER.error("No audio found for {}, choosing random player", player.getName());
+            Set<UUID> keyset = RevervoxVoicechatPlugin.getRecordedPlayers().keySet();
+            if (keyset.isEmpty()) return;
+            UUID randomUUID = keyset.stream().skip(new Random().nextInt(keyset.size())).findFirst().orElse(null);
+
+            audio = RevervoxVoicechatPlugin.getRecordedPlayer(randomUUID).getRandomAudio();
+            if (audio == null) return;
+        }
+        RevervoxMod.LOGGER.info("Playing kill audio: {}", audio);
+        AudioPlayer audioPlayer = new AudioPlayer(audio, api, channel);
+        audioPlayer.start();
+        this.remove(RemovalReason.DISCARDED);
+    }
+    public void addParticlesAroundSelf(ParticleOptions pParticleOption) {
+        for(int i = 0; i < 5; ++i) {
+            double d0 = this.random.nextGaussian() * 0.02D;
+            double d1 = this.random.nextGaussian() * 0.02D;
+            double d2 = this.random.nextGaussian() * 0.02D;
+            this.level().addParticle(pParticleOption, this.getRandomX(1.0D), this.getRandomY() + 1.0D, this.getRandomZ(1.0D), d0, d1, d2);
+        }
     }
 }

@@ -2,16 +2,16 @@ package com.example.revervoxmod.voicechat.audio;
 
 import com.example.revervoxmod.RevervoxMod;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
+import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 
 import java.nio.file.Path;
 
 public class AudioPlayer extends Thread{
     private final Path path;
     private final VoicechatServerApi api;
-    private final EntityAudioChannel channel;
+    private final AudioChannel channel;
     private de.maxhenkel.voicechat.api.audiochannel.AudioPlayer playerAudioPlayer;
-    public AudioPlayer(Path path, VoicechatServerApi api, EntityAudioChannel channel) {
+    public AudioPlayer(Path path, VoicechatServerApi api, AudioChannel channel) {
         this.path = path;
         this.api = api;
         this.channel = channel;
