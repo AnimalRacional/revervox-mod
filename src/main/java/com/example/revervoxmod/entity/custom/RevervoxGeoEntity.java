@@ -33,6 +33,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
+// TODO - ATTACK ANIMATION, JUMP ANIMATION, JUMP ATTACK
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
     protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.revervox.idle");
     protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.revervox.chase");
@@ -86,7 +87,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
         this.goalSelector.addGoal(3, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        this.goalSelector.addGoal(5, new LeapAtTargetGoal(this, 0.3F));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
