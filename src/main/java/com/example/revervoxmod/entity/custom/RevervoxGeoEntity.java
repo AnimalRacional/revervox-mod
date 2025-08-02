@@ -1,15 +1,16 @@
 package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
-import com.example.revervoxmod.voicechat.RecordedPlayer;
-import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
 import com.example.revervoxmod.registries.SoundRegistry;
+import com.example.revervoxmod.voicechat.RecordedPlayer;
+import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import com.example.revervoxmod.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -74,15 +75,24 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
      */
 
+    @Override
+    public void onRemovedFromWorld() {
+        super.onRemovedFromWorld();
+        this.addParticlesAroundSelf(ParticleTypes.ANGRY_VILLAGER);
+    }
+
     protected <T extends GeoAnimatable> PlayState predicate(AnimationState<T> event) {
+
         if (event.isMoving()){
             event.getController().setAnimation(RUN);
         return PlayState.CONTINUE;
         }
 
+
         event.getController().setAnimation(IDLE);
         return PlayState.CONTINUE;
     }
+
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
@@ -93,10 +103,9 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
 
-        this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
-        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(5, new LeapAtTargetGoal(this, 0.3F));
+        this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
+        this.goalSelector.addGoal(4, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5D));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
@@ -105,6 +114,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
+        this.goalSelector.addGoal(2, new LeapAtTargetGoal(this, 3.0F));
         this.targetSelector.addGoal(1, new TargetSpokeGoal(this, this::isAngryAt));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
@@ -146,7 +156,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundRegistry.JUMPSCARE.get();
+        return SoundRegistry.THINGY_HURT.get();
     }
 
     public boolean isSpeakingAtMe(Player player) {
@@ -188,4 +198,5 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             this.level().addParticle(pParticleOption, this.getRandomX(1.0D), this.getRandomY() + 1.0D, this.getRandomZ(1.0D), d0, d1, d2);
         }
     }
+
 }

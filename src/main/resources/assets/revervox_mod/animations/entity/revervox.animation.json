@@ -1,6 +1,28 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
+		"animation.revervox.die": {
+			"animation_length": 1.0417,
+			"bones": {
+				"revervox": {
+					"scale": {
+						"0.0417": {
+							"vector": [1, 1, 1]
+						},
+						"0.125": {
+							"vector": [0, 0, 0],
+							"easing": "easeInExpo"
+						}
+					}
+				}
+			},
+			"particle_effects": {
+				"0.125": {
+					"effect": "death_particle",
+					"locator": "locator"
+				}
+			}
+		},
 		"animation.revervox.chase": {
 			"loop": true,
 			"animation_length": 0.5,
@@ -2146,6 +2168,5 @@
 				}
 			}
 		}
-	},
-	"geckolib_format_version": 2
+	}
 }

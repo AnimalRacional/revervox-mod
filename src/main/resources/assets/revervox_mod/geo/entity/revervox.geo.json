@@ -7,8 +7,8 @@
 				"texture_width": 256,
 				"texture_height": 256,
 				"visible_bounds_width": 7,
-				"visible_bounds_height": 6.5,
-				"visible_bounds_offset": [0, 2.75, 0]
+				"visible_bounds_height": 4.5,
+				"visible_bounds_offset": [0, 1.75, 0]
 			},
 			"bones": [
 				{
@@ -156,8 +156,7 @@
 				{
 					"name": "head",
 					"parent": "torso",
-					"pivot": [0, 65, -1],
-					"rotation": [-15, 0, 0]
+					"pivot": [0, 65, -1]
 				},
 				{
 					"name": "lower_jaw",

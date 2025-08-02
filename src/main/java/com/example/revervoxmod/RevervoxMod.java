@@ -13,7 +13,7 @@ import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.common.MinecraftForge;
@@ -71,15 +71,22 @@ public class RevervoxMod {
         isRecordingCommand.register(event.getDispatcher());
     }
 
+
+    @SubscribeEvent
+    public void onRevervoxDeath(LivingDeathEvent event) {
+        Entity entity = event.getEntity();
+        if (entity instanceof RevervoxGeoEntity revervox) {
+            event.setCanceled(true); // Prevent default death behavior
+            revervox.remove(Entity.RemovalReason.KILLED); // Dissapear instantly
+        }
+    }
+
+
     @SubscribeEvent
     public void onEntityDeath(LivingDeathEvent e){
         if(e.getEntity() instanceof Player player){
             if(e.getSource().getEntity() instanceof RevervoxGeoEntity revervox){
-                if(player.level().isClientSide()){
-                    // TODO isto não acontece, partículas só funcionam client-side
-                    // então é preciso descobrir ou porque não acontece ou outra forma de detetar kills
-                    revervox.addParticlesAroundSelf(ParticleTypes.ANGRY_VILLAGER);
-                } else if(RevervoxMod.vcApi instanceof VoicechatServerApi api){
+                if(!player.level().isClientSide() && RevervoxMod.vcApi instanceof VoicechatServerApi api){
                     revervox.disappear(player, api);
                 }
             }

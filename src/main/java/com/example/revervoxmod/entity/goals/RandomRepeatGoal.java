@@ -25,7 +25,7 @@ public class RandomRepeatGoal extends Goal {
     }
     @Override
     public boolean canUse() {
-        return new Random().nextFloat() < 0.006F;
+        return new Random().nextFloat() < 0.006F && mob.getTarget() == null;
     }
 
     public boolean canContinueToUse() {
