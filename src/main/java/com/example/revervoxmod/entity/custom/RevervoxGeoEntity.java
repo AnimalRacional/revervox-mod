@@ -47,6 +47,7 @@ import java.util.UUID;
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
     protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.revervox.idle");
     protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.revervox.chase");
+    protected static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("animation.revervox.attack");
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
     private int remainingPersistentAngerTime;
@@ -60,20 +61,19 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
-        //controllers.add(new AnimationController<>(this, "attackController", 5, this::attackPredicate));
+        controllers.add(new AnimationController<>(this, "attackController", 5, this::attackPredicate));
     }
 
-    /*
+
     private PlayState attackPredicate(AnimationState event) {
         if (this.swinging && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
-            event.getController().forceAnimationReset(); // substitui markneedsreload????
+            event.getController().forceAnimationReset();
             event.getController().setAnimation(ATTACK);
             this.swinging = false;
         }
         return PlayState.CONTINUE;
     }
 
-     */
 
     @Override
     public void onRemovedFromWorld() {
