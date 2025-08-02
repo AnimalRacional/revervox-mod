@@ -3,6 +3,7 @@ package com.example.revervoxmod.entity.custom;
 import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
+import com.example.revervoxmod.registries.ParticleRegistry;
 import com.example.revervoxmod.registries.SoundRegistry;
 import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
@@ -10,7 +11,6 @@ import com.example.revervoxmod.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -43,7 +43,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-// TODO - ATTACK ANIMATION, JUMP ANIMATION, JUMP ATTACK
+// TODO - ATTACK ANIMATION
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
     protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.revervox.idle");
     protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.revervox.chase");
@@ -78,7 +78,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     @Override
     public void onRemovedFromWorld() {
         super.onRemovedFromWorld();
-        this.addParticlesAroundSelf(ParticleTypes.ANGRY_VILLAGER);
+        this.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 2);
     }
 
     protected <T extends GeoAnimatable> PlayState predicate(AnimationState<T> event) {
@@ -114,7 +114,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
-        this.goalSelector.addGoal(2, new LeapAtTargetGoal(this, 3.0F));
         this.targetSelector.addGoal(1, new TargetSpokeGoal(this, this::isAngryAt));
         this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
@@ -190,12 +189,32 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         audioPlayer.start();
         this.remove(RemovalReason.DISCARDED);
     }
+
+
     public void addParticlesAroundSelf(ParticleOptions pParticleOption) {
-        for(int i = 0; i < 5; ++i) {
-            double d0 = this.random.nextGaussian() * 0.02D;
-            double d1 = this.random.nextGaussian() * 0.02D;
-            double d2 = this.random.nextGaussian() * 0.02D;
-            this.level().addParticle(pParticleOption, this.getRandomX(1.0D), this.getRandomY() + 1.0D, this.getRandomZ(1.0D), d0, d1, d2);
+        addParticlesAroundSelf(pParticleOption, 1.0);
+    }
+
+    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius) {
+        addParticlesAroundSelf(pParticleOption, radius, 30);
+    }
+
+    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius, int particleCount) {
+        for(int i = 0; i < particleCount; i++) {
+            double offsetX = (this.random.nextDouble() - 0.5) * 2.0 * radius;
+            double offsetY = (this.random.nextDouble() - 0.5) * 2.0 * radius;
+            double offsetZ = (this.random.nextDouble() - 0.5) * 2.0 * radius;
+
+            double particleX = this.getX() + offsetX;
+            double particleY = this.getY() + 1.0 + offsetY;
+            double particleZ = this.getZ() + offsetZ;
+
+            double velocityScale = radius * 0.1;
+            double velX = (this.random.nextDouble() - 0.5) * velocityScale;
+            double velY = (this.random.nextDouble() - 0.5) * velocityScale;
+            double velZ = (this.random.nextDouble() - 0.5) * velocityScale;
+
+            this.level().addParticle(pParticleOption, particleX, particleY, particleZ, velX, velY, velZ);
         }
     }
 

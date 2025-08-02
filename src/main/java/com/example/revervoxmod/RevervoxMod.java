@@ -5,10 +5,7 @@ import com.example.revervoxmod.commands.StartRecordingCommand;
 import com.example.revervoxmod.commands.StopRecordingCommand;
 import com.example.revervoxmod.commands.isRecordingCommand;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
-import com.example.revervoxmod.registries.CreativeTabRegistry;
-import com.example.revervoxmod.registries.EntityRegistry;
-import com.example.revervoxmod.registries.ItemRegistry;
-import com.example.revervoxmod.registries.SoundRegistry;
+import com.example.revervoxmod.registries.*;
 import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
@@ -40,10 +37,12 @@ public class RevervoxMod {
     public RevervoxMod(FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
+
         EntityRegistry.register(context.getModEventBus());
         SoundRegistry.register(context.getModEventBus());
         ItemRegistry.register(context.getModEventBus());
         CreativeTabRegistry.register(context.getModEventBus());
+        ParticleRegistry.register(context.getModEventBus());
     }
 
     private void setup(FMLCommonSetupEvent event) {
@@ -62,6 +61,7 @@ public class RevervoxMod {
             }
         }
     }
+
 
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
