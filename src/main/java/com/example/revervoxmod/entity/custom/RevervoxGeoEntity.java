@@ -164,7 +164,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         } else return false;
     }
 
-    public void disappear(Player player, VoicechatServerApi api){
+    private void playAudio(Player player, VoicechatServerApi api){
         Vec3 loc = this.getEyePosition();
         AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
         if(channel == null){
@@ -187,6 +187,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         RevervoxMod.LOGGER.info("Playing kill audio: {}", audio);
         AudioPlayer audioPlayer = new AudioPlayer(audio, api, channel);
         audioPlayer.start();
+    }
+
+    public void disappear(Player player, VoicechatServerApi api){
+        playAudio(player, api);
         this.remove(RemovalReason.DISCARDED);
     }
 
