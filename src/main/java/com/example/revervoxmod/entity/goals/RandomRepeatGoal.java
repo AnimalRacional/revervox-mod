@@ -47,7 +47,6 @@ public class RandomRepeatGoal extends Goal {
                     getNearbyPlayers(TargetingConditions.DEFAULT, this.mob, this.mob.getBoundingBox()
                     .inflate(CHANNEL_DISTANCE)));
 
-
             if (nearbyPlayers.isEmpty()) {
                 RevervoxMod.LOGGER.info("No players nearby");
                 Player nearestPlayer = this.mob.level().getNearestPlayer(this.mob, CHANNEL_DISTANCE * 4);
@@ -57,7 +56,7 @@ public class RandomRepeatGoal extends Goal {
                     audiosPlayed = 0;
                 }
             } else {
-                if (nearbyPlayers.size() < 4 && nearbyPlayers.size() >1) {
+                if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {
                     for (int i = 0; i < nearbyPlayers.size() - 1; i++) {
                         Player player1 = nearbyPlayers.get(i);
                         Player player2 = nearbyPlayers.get(i + 1);
