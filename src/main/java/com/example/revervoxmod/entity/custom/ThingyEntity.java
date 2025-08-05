@@ -1,6 +1,5 @@
 package com.example.revervoxmod.entity.custom;
 
-import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.registries.SoundRegistry;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -88,7 +87,6 @@ public class ThingyEntity extends Monster {
 
     @Override
     protected SoundEvent getHurtSound(@NotNull DamageSource dmgSrc) {
-        RevervoxMod.LOGGER.info("THINGY_HURT sound: {}", SoundRegistry.THINGY_HURT.get().getLocation());
         return SoundRegistry.THINGY_HURT.get();
     }
 }

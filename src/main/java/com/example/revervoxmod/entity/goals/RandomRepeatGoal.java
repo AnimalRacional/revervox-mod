@@ -24,7 +24,7 @@ public class RandomRepeatGoal extends Goal {
     }
     @Override
     public boolean canUse() {
-        return new Random().nextFloat() < 0.006F && mob.getTarget() == null;
+        return new Random().nextInt(166) == 1 && mob.getTarget() == null;
     }
 
     public boolean canContinueToUse() {
@@ -82,7 +82,9 @@ public class RandomRepeatGoal extends Goal {
                                 Player furthestPlayer = player1.distanceToSqr(this.mob) > player2.distanceToSqr(this.mob) ? player1 : player2;
                                 this.mob.playAudio(furthestPlayer, api, channel);
                                 audiosPlayed++;
-                                //TODO dar set a canBeAngry para true depois de 1 segundo
+                                if (!this.mob.isCanBeAngry()){
+                                    RevervoxMod.TASKS.schedule(() -> this.mob.setCanBeAngry(true), 20L);
+                                }
                                 return;
                             }
                         }
@@ -98,7 +100,9 @@ public class RandomRepeatGoal extends Goal {
                     UUID randomUUID = new ArrayList<>(otherPlayers).get(new Random().nextInt(otherPlayers.size()));
                     this.mob.playAudio(Objects.requireNonNull(this.mob.level().getPlayerByUUID(randomUUID)), api, channel);
                     audiosPlayed++;
-                    //TODO dar set a canBeAngry para true depois de 1 segundo
+                    if (!this.mob.isCanBeAngry()){
+                        RevervoxMod.TASKS.schedule(() -> this.mob.setCanBeAngry(true), 20L);
+                    }
                 } else {
                     RevervoxMod.LOGGER.info("No other players to play sounds from");
                 }

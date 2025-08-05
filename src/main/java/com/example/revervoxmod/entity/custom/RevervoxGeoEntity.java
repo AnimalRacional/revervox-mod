@@ -51,6 +51,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
+    private boolean canBeAngry = false;
     @Nullable
     private UUID persistentAngerTarget;
 
@@ -60,9 +61,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(DefaultAnimations.genericWalkIdleController(this),
-                DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING));
+        controllers.add(DefaultAnimations.genericWalkIdleController(this).transitionLength(5),
+                DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5));
     }
+
 
     @Override
     public void onRemovedFromWorld() {
@@ -102,6 +104,11 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
                 .add(Attributes.ATTACK_DAMAGE, 7D);
+    }
+
+    @Override
+    public int getCurrentSwingDuration() {
+        return 5 + 5 + 1;
     }
 
     @Override
@@ -246,4 +253,11 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         return currentAudioPlayer;
     }
 
+    public boolean isCanBeAngry() {
+        return canBeAngry;
+    }
+
+    public void setCanBeAngry(boolean canBeAngry) {
+        this.canBeAngry = canBeAngry;
+    }
 }
