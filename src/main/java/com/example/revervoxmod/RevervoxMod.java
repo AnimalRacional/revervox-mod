@@ -1,11 +1,10 @@
 package com.example.revervoxmod;
 
-import com.example.revervoxmod.commands.NearestEntityPlayVoiceCommand;
-import com.example.revervoxmod.commands.StartRecordingCommand;
-import com.example.revervoxmod.commands.StopRecordingCommand;
-import com.example.revervoxmod.commands.isRecordingCommand;
+import com.example.revervoxmod.commands.*;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
+import com.example.revervoxmod.events.ForgeEventBus;
 import com.example.revervoxmod.registries.*;
+import com.example.revervoxmod.taskscheduler.TaskScheduler;
 import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
@@ -32,11 +31,13 @@ public class RevervoxMod {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final LevelResource AUDIOS = new LevelResource("player_audios");
     public static VoicechatApi vcApi = null;
+    public static TaskScheduler TASKS = new TaskScheduler();
 
 
     public RevervoxMod(FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.register(new ForgeEventBus());
 
         EntityRegistry.register(context.getModEventBus());
         SoundRegistry.register(context.getModEventBus());
@@ -69,6 +70,7 @@ public class RevervoxMod {
         StartRecordingCommand.register(event.getDispatcher());
         StopRecordingCommand.register(event.getDispatcher());
         isRecordingCommand.register(event.getDispatcher());
+        ScheduleLogCommand.register(event.getDispatcher());
     }
 
 
@@ -92,5 +94,4 @@ public class RevervoxMod {
             }
         }
     }
-
 }
