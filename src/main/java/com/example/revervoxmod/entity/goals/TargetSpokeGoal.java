@@ -33,7 +33,7 @@ public class TargetSpokeGoal extends NearestAttackableTargetGoal<Player> {
     @Override
     public boolean canUse() {
         this.pendingTarget = this.revervox.level().getNearestPlayer(this.startAggroTargetConditions, this.revervox);
-        return this.pendingTarget != null;
+        return this.pendingTarget != null && this.revervox.isCanBeAngry();
     }
 
 
