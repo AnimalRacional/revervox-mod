@@ -83,7 +83,7 @@ public class RandomRepeatGoal extends Goal {
                                 this.mob.playAudio(furthestPlayer, api, channel);
                                 audiosPlayed++;
                                 if (!this.mob.isCanBeAngry()){
-                                    RevervoxMod.TASKS.schedule(() -> this.mob.setCanBeAngry(true), 20L);
+                                    RevervoxMod.TASKS.schedule(() -> this.mob.setCanBeAngry(true), 30L);
                                 }
                                 return;
                             }
@@ -97,16 +97,21 @@ public class RandomRepeatGoal extends Goal {
                 otherPlayers.removeAll(nearbyPlayerUUIDs);
 
                 if (!otherPlayers.isEmpty()) {
-                    UUID randomUUID = new ArrayList<>(otherPlayers).get(new Random().nextInt(otherPlayers.size()));
-                    this.mob.playAudio(Objects.requireNonNull(this.mob.level().getPlayerByUUID(randomUUID)), api, channel);
-                    audiosPlayed++;
-                    if (!this.mob.isCanBeAngry()){
-                        RevervoxMod.TASKS.schedule(() -> this.mob.setCanBeAngry(true), 20L);
-                    }
+                    playRandomAudioFromSet(api, otherPlayers);
                 } else {
                     RevervoxMod.LOGGER.info("No other players to play sounds from");
+                    playRandomAudioFromSet(api, nearbyPlayerUUIDs);
                 }
             }
+        }
+    }
+
+    private void playRandomAudioFromSet(VoicechatServerApi api, Set<UUID> nearbyPlayerUUIDs) {
+        UUID randomUUID = new ArrayList<>(nearbyPlayerUUIDs).get(new Random().nextInt(nearbyPlayerUUIDs.size()));
+        this.mob.playAudio(Objects.requireNonNull(this.mob.level().getPlayerByUUID(randomUUID)), api, channel);
+        audiosPlayed++;
+        if (!this.mob.isCanBeAngry()){
+            RevervoxMod.TASKS.schedule(() -> this.mob.setCanBeAngry(true), 30L);
         }
     }
 

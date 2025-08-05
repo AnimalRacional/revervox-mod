@@ -81,6 +81,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
 
+        //TODO resolver counter a construir 3 blocos
         this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
         this.goalSelector.addGoal(4, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5D));
