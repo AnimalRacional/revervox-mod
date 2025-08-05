@@ -9,6 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,40 +48,56 @@ public class RandomRepeatGoal extends Goal {
                     getNearbyPlayers(TargetingConditions.DEFAULT, this.mob, this.mob.getBoundingBox()
                     .inflate(CHANNEL_DISTANCE)));
 
+            RevervoxMod.LOGGER.info("Nearby Players: " + Arrays.toString(nearbyPlayers.toArray()));
+
             if (nearbyPlayers.isEmpty()) {
                 RevervoxMod.LOGGER.info("No players nearby");
-                Player nearestPlayer = this.mob.level().getNearestPlayer(this.mob, CHANNEL_DISTANCE * 4);
+
+                Level level = this.mob.level();
+                Player nearestPlayer = null;
+                for (Player player : Objects.requireNonNull(level.getServer()).getPlayerList().getPlayers()){
+                    if (!player.level().equals(this.mob.level())) continue; //TODO VERIFICAR SE PODE SE COMPARAR DIMENSOES ASSIM
+                    if (nearestPlayer != null){
+                        nearestPlayer = this.mob.distanceToSqr(player) < this.mob.distanceToSqr(nearestPlayer) ? player : nearestPlayer;
+                    } else {
+                        nearestPlayer = player;
+                    }
+                }
+
                 if (nearestPlayer != null) {
-                    RevervoxMod.LOGGER.info("Teleporting towards nearest player");
-                    this.mob.teleportTowards(nearestPlayer);
+                    RevervoxMod.LOGGER.info("Teleporting towards nearest player: " + nearestPlayer.getName());
+                    RevervoxMod.LOGGER.info("TeleportTowards: " + this.mob.teleportTowards(nearestPlayer));
                     audiosPlayed = 0;
                 }
             } else {
                 if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {
+                    RevervoxMod.LOGGER.info("Atleast 2 players nearby");
                     for (int i = 0; i < nearbyPlayers.size() - 1; i++) {
                         Player player1 = nearbyPlayers.get(i);
                         Player player2 = nearbyPlayers.get(i + 1);
-                        if (player1.distanceToSqr(player2) > CHANNEL_DISTANCE) {
-                            this.mob.playAudio(player1, api, channel);
+                        if (player1.distanceToSqr(player2) > CHANNEL_DISTANCE * 2) {
+                            RevervoxMod.LOGGER.info("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE *2);
+                            Player nearestPlayer = player1.distanceToSqr(this.mob) < player2.distanceToSqr(this.mob) ? player1 : player2;
+                            this.mob.playAudio(nearestPlayer, api, channel);
                             audiosPlayed++;
                             //TODO dar set a canBeAngry para true depois de 1 segundo
                             return;
                         }
                     }
-                } else {
-                    Set<UUID> recordedPlayers = RevervoxVoicechatPlugin.getRecordedPlayers().keySet();
-                    Set<UUID> nearbyPlayerUUIDs = nearbyPlayers.stream().map(Player::getUUID).collect(Collectors.toSet());
-                    Set<UUID> otherPlayers = new HashSet<>(recordedPlayers);
-                    otherPlayers.removeAll(nearbyPlayerUUIDs);
+                }
+                RevervoxMod.LOGGER.info("Players too close, playing audio from random player that is not near...");
+                Set<UUID> recordedPlayers = RevervoxVoicechatPlugin.getRecordedPlayers().keySet();
+                Set<UUID> nearbyPlayerUUIDs = nearbyPlayers.stream().map(Player::getUUID).collect(Collectors.toSet());
+                Set<UUID> otherPlayers = new HashSet<>(recordedPlayers);
+                otherPlayers.removeAll(nearbyPlayerUUIDs);
 
-                    if (!otherPlayers.isEmpty()) {
-                        UUID randomUUID = new ArrayList<>(otherPlayers).get(new Random().nextInt(otherPlayers.size()));
-                        this.mob.playAudio(Objects.requireNonNull(this.mob.level().getPlayerByUUID(randomUUID)), api, channel);
-                        audiosPlayed++;
-                        //TODO dar set a canBeAngry para true depois de 1 segundo
-                    } else {
-                        RevervoxMod.LOGGER.info("No other players to play sounds from");
-                    }
+                if (!otherPlayers.isEmpty()) {
+                    UUID randomUUID = new ArrayList<>(otherPlayers).get(new Random().nextInt(otherPlayers.size()));
+                    this.mob.playAudio(Objects.requireNonNull(this.mob.level().getPlayerByUUID(randomUUID)), api, channel);
+                    audiosPlayed++;
+                    //TODO dar set a canBeAngry para true depois de 1 segundo
+                } else {
+                    RevervoxMod.LOGGER.info("No other players to play sounds from");
                 }
             }
         }
