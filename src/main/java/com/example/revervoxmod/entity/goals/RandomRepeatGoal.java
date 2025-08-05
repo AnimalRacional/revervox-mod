@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class RandomRepeatGoal extends Goal {
     private final RevervoxGeoEntity mob;
-    private static final int CHANNEL_DISTANCE = 30;
+    private static final int CHANNEL_DISTANCE = 50;
     private EntityAudioChannel channel;
     private int audiosPlayed = 0;
     public RandomRepeatGoal(RevervoxGeoEntity revervoxGeoEntity) {
@@ -56,7 +56,7 @@ public class RandomRepeatGoal extends Goal {
                 Level level = this.mob.level();
                 Player nearestPlayer = null;
                 for (Player player : Objects.requireNonNull(level.getServer()).getPlayerList().getPlayers()){
-                    if (!player.level().equals(this.mob.level())) continue; //TODO VERIFICAR SE PODE SE COMPARAR DIMENSOES ASSIM
+                    if (!player.level().equals(this.mob.level())) continue;
                     if (nearestPlayer != null){
                         nearestPlayer = this.mob.distanceToSqr(player) < this.mob.distanceToSqr(nearestPlayer) ? player : nearestPlayer;
                     } else {
@@ -72,20 +72,23 @@ public class RandomRepeatGoal extends Goal {
             } else {
                 if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {
                     RevervoxMod.LOGGER.info("Atleast 2 players nearby");
-                    for (int i = 0; i < nearbyPlayers.size() - 1; i++) {
-                        Player player1 = nearbyPlayers.get(i);
-                        Player player2 = nearbyPlayers.get(i + 1);
-                        if (player1.distanceToSqr(player2) > CHANNEL_DISTANCE * 2) {
-                            RevervoxMod.LOGGER.info("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE *2);
-                            Player nearestPlayer = player1.distanceToSqr(this.mob) < player2.distanceToSqr(this.mob) ? player1 : player2;
-                            this.mob.playAudio(nearestPlayer, api, channel);
-                            audiosPlayed++;
-                            //TODO dar set a canBeAngry para true depois de 1 segundo
-                            return;
+
+                    for (int i = 0; i < nearbyPlayers.size(); i++) {
+                        for (int k = i + 1; k < nearbyPlayers.size(); k++) {
+                            Player player1 = nearbyPlayers.get(i);
+                            Player player2 = nearbyPlayers.get(k);
+                            if (player1.distanceToSqr(player2) > (double) CHANNEL_DISTANCE /2) {
+                                RevervoxMod.LOGGER.info("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE/2);
+                                Player furthestPlayer = player1.distanceToSqr(this.mob) > player2.distanceToSqr(this.mob) ? player1 : player2;
+                                this.mob.playAudio(furthestPlayer, api, channel);
+                                audiosPlayed++;
+                                //TODO dar set a canBeAngry para true depois de 1 segundo
+                                return;
+                            }
                         }
                     }
                 }
-                RevervoxMod.LOGGER.info("Players too close, playing audio from random player that is not near...");
+                RevervoxMod.LOGGER.info("Playing audio from random player that is not near...");
                 Set<UUID> recordedPlayers = RevervoxVoicechatPlugin.getRecordedPlayers().keySet();
                 Set<UUID> nearbyPlayerUUIDs = nearbyPlayers.stream().map(Player::getUUID).collect(Collectors.toSet());
                 Set<UUID> otherPlayers = new HashSet<>(recordedPlayers);

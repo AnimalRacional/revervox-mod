@@ -1,7 +1,7 @@
 {
 	"format_version": "1.8.0",
 	"animations": {
-		"animation.revervox.chase": {
+		"move.walk": {
 			"loop": true,
 			"animation_length": 0.5,
 			"bones": {
@@ -840,7 +840,7 @@
 				}
 			}
 		},
-		"animation.revervox.idle": {
+		"misc.idle": {
 			"loop": true,
 			"animation_length": 2,
 			"bones": {
@@ -1472,7 +1472,7 @@
 				}
 			}
 		},
-		"animation.revervox.attack": {
+		"attack.swing": {
 			"animation_length": 0.5,
 			"bones": {
 				"revervox": {

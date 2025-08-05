@@ -35,13 +35,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.animation.AnimationState;
-import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
@@ -51,9 +47,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
-    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.revervox.idle");
-    protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.revervox.chase");
-    protected static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("animation.revervox.attack");
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
     private int remainingPersistentAngerTime;
@@ -67,39 +60,15 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
-        controllers.add(new AnimationController<>(this, "attackController", 5, this::attackPredicate));
+        controllers.add(DefaultAnimations.genericWalkIdleController(this),
+                DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING));
     }
-
-
-    private PlayState attackPredicate(AnimationState event) {
-        if (this.swinging && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
-            event.getController().forceAnimationReset();
-            event.getController().setAnimation(ATTACK);
-            this.swinging = false;
-        }
-        return PlayState.CONTINUE;
-    }
-
 
     @Override
     public void onRemovedFromWorld() {
         super.onRemovedFromWorld();
         this.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 2);
     }
-
-    protected <T extends GeoAnimatable> PlayState predicate(AnimationState<T> event) {
-
-        if (event.isMoving()){
-            event.getController().setAnimation(RUN);
-        return PlayState.CONTINUE;
-        }
-
-
-        event.getController().setAnimation(IDLE);
-        return PlayState.CONTINUE;
-    }
-
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
@@ -184,12 +153,12 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     private boolean teleport(double pX, double pY, double pZ) {
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(pX, pY, pZ);
 
-        while(blockpos$mutableblockpos.getY() > this.level().getMinBuildHeight() && !this.level().getBlockState(blockpos$mutableblockpos).blocksMotion()) {
+        while(blockpos$mutableblockpos.getY() > this.level().getMinBuildHeight() && !this.level().getBlockState(blockpos$mutableblockpos).isSolidRender(this.level(), blockpos$mutableblockpos)) {
             blockpos$mutableblockpos.move(Direction.DOWN);
         }
 
         BlockState blockstate = this.level().getBlockState(blockpos$mutableblockpos);
-        boolean flag = blockstate.blocksMotion();
+        boolean flag = blockstate.isSolidRender(this.level(), blockpos$mutableblockpos);
         boolean flag1 = blockstate.getFluidState().is(FluidTags.WATER);
         if (flag && !flag1) {
             net.minecraftforge.event.entity.EntityTeleportEvent.EnderEntity event = net.minecraftforge.event.ForgeEventFactory.onEnderTeleport(this, pX, pY, pZ);
