@@ -175,8 +175,9 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             if (flag2) {
                 this.level().gameEvent(GameEvent.TELEPORT, vec3, GameEvent.Context.of(this));
                 if (!this.isSilent()) {
-                    this.level().playSound(null, this.xo, this.yo, this.zo, SoundEvents.ENDERMAN_TELEPORT, this.getSoundSource(), 1.0F, 1.0F);
-                    this.playSound(SoundEvents.ENDERMAN_TELEPORT, 1.0F, 1.0F);
+                    this.level().playSound(null, this.xo, this.yo, this.zo, SoundEvents.GLASS_STEP, this.getSoundSource(), 1.0F, 1.0F);
+                    //TODO play a random minecraft sound to scare.
+                    this.playSound(SoundEvents.GLASS_STEP, 1.0F, 1.0F);
                 }
             }
 
@@ -210,7 +211,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             audio = RevervoxVoicechatPlugin.getRecordedPlayer(randomUUID).getRandomAudio();
             if (audio == null) return;
         }
-        RevervoxMod.LOGGER.info("Playing kill audio: {}", audio);
+        RevervoxMod.LOGGER.info("Playing audio: {}", audio);
         currentAudioPlayer = new AudioPlayer(audio, api, channel);
         currentAudioPlayer.start();
     }
