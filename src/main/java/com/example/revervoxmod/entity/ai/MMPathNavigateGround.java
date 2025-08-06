@@ -1,6 +1,5 @@
 package com.example.revervoxmod.entity.ai;
 
-import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -19,7 +18,6 @@ import java.util.Objects;
 public class MMPathNavigateGround extends GroundPathNavigation {
     public MMPathNavigateGround(RevervoxGeoEntity entity, Level level) {
         super(entity, level);
-        RevervoxMod.LOGGER.info("Using MMPathNavigateGround!");
     }
 
     @Override

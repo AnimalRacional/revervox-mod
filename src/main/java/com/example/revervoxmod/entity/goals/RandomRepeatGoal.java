@@ -45,8 +45,10 @@ public class RandomRepeatGoal extends Goal {
         if (RevervoxMod.vcApi instanceof VoicechatServerApi api){
 
             List<Player> nearbyPlayers = new ArrayList<>(this.mob.level().
-                    getNearbyPlayers(TargetingConditions.DEFAULT, this.mob, this.mob.getBoundingBox()
+                    getNearbyPlayers(TargetingConditions.forNonCombat(), this.mob, this.mob.getBoundingBox()
                     .inflate(CHANNEL_DISTANCE)));
+
+            // TODO nearbyPlayers fica vazio as vezes em singleplayer
 
             RevervoxMod.LOGGER.info("Nearby Players: " + Arrays.toString(nearbyPlayers.toArray()));
 
