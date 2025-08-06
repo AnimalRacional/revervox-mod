@@ -216,6 +216,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel){
         // TODO tanto aqui como no RandomRepeatGoal, é possível o áudio aleatório ser null mesmo quando há audios pois só verificamos o player do evento e um outro player aleatório, que podem ambos ter 0 audios mesmo outros players tendo audios
         RecordedPlayer record = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
+        if (record == null) return;
         Path audio = record.getRandomAudio();
         if(audio == null){
             RevervoxMod.LOGGER.error("No audio found for {}, choosing random player", player.getName());

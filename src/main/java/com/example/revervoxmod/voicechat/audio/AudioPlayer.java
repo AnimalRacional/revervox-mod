@@ -39,7 +39,7 @@ public class AudioPlayer extends Thread{
             if (mode == Mode.DEFAULT) {
                 recording = new AudioReader(path).read().get();
             } else if (mode == Mode.PITCHED) {
-                recording = AudioManipulator.shiftPitch(new AudioReader(path).read().get(), 0.5f);
+                recording = AudioManipulator.changePitch(new AudioReader(path).read().get(), 0.8f);
             } else if (mode == Mode.REVERBED) {
                 recording = AudioManipulator.addReverb(new AudioReader(path).read().get(), 0.5f, 160, 3);
             }

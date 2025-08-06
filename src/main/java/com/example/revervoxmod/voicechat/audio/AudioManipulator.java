@@ -1,16 +1,31 @@
 package com.example.revervoxmod.voicechat.audio;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 import java.util.Arrays;
 
 public class AudioManipulator {
     private static final int SAMPLE_RATE = 48000;
 
-    public static short[] shiftPitch(short[] inputPcm, float pitchFactor) {
-        throw new NotImplementedException("Pitch shifter not implemented");
-    }
+    public static short[] changePitch(short[] pcm, float pitchFactor) {
+        if (pitchFactor <= 0) throw new IllegalArgumentException("Pitch factor must be > 0");
 
+        int newLength = (int)(pcm.length / pitchFactor);
+        short[] result = new short[newLength];
+
+        for (int i = 0; i < newLength; i++) {
+            float srcIndex = i * pitchFactor;
+            int index = (int) srcIndex;
+            float frac = srcIndex - index;
+
+            if (index + 1 < pcm.length) {
+                // Linear interpolation
+                result[i] = (short)((1 - frac) * pcm[index] + frac * pcm[index + 1]);
+            } else {
+                result[i] = pcm[index];
+            }
+        }
+
+        return result;
+    }
 
     /**
      * Adds a simple reverb using delayed echo taps.
