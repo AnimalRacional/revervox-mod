@@ -1,6 +1,8 @@
 package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
+import com.example.revervoxmod.entity.ai.MMPathNavigateGround;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
 import com.example.revervoxmod.registries.ParticleRegistry;
@@ -26,6 +28,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
@@ -34,6 +37,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -57,6 +61,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     public RevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        moveControl = new MMEntityMoveHelper(this, 90);
     }
 
     @Override
@@ -104,7 +109,13 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
                 .add(Attributes.FOLLOW_RANGE, 24.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 7D);
+                .add(Attributes.ATTACK_DAMAGE, 7D)
+                .add(Attributes.ATTACK_SPEED, 0.3D);
+    }
+
+    @Override
+    protected @NotNull PathNavigation createNavigation(Level pLevel) {
+        return new MMPathNavigateGround(this, pLevel);
     }
 
     @Override
@@ -168,11 +179,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         BlockState blockstate = this.level().getBlockState(blockpos$mutableblockpos);
         boolean flag = blockstate.isSolidRender(this.level(), blockpos$mutableblockpos);
         boolean flag1 = blockstate.getFluidState().is(FluidTags.WATER);
+        RevervoxMod.LOGGER.info("flag: " + flag + " flag1: " + flag1);
         if (flag && !flag1) {
+            RevervoxMod.LOGGER.info("Entered main if statement");
             net.minecraftforge.event.entity.EntityTeleportEvent.EnderEntity event = net.minecraftforge.event.ForgeEventFactory.onEnderTeleport(this, pX, pY, pZ);
             if (event.isCanceled()) return false;
             Vec3 vec3 = this.position();
             boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true);
+            RevervoxMod.LOGGER.info("flag2: " + flag2); //TODO ESTA FLAG FICA QUASE SEMPRE FALSE
             if (flag2) {
                 this.level().gameEvent(GameEvent.TELEPORT, vec3, GameEvent.Context.of(this));
                 if (!this.isSilent()) {
