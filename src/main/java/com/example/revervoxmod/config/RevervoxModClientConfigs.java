@@ -2,7 +2,7 @@ package com.example.revervoxmod.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public class RevervoxModServerConfigs {
+public class RevervoxModClientConfigs {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.ConfigValue<Boolean> PRIVACY_MODE;

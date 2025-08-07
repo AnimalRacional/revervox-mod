@@ -7,6 +7,7 @@ import de.maxhenkel.voicechat.api.events.*;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
@@ -16,6 +17,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static String REVERVOX_CATEGORY = "revervox";
     private static HashMap<UUID, RecordedPlayer> recordedPlayers;
     private static ConcurrentHashMap<Path, Future<short[]>> audioCache;
+    private static ConcurrentHashMap<UUID, List<short[]>> recordedAudios;
 
     /**
      * @return the unique ID for this voice chat plugin
@@ -108,6 +110,10 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
 
     public static void removeFromCache(Path path){
         audioCache.remove(path);
+    }
+
+    public static void addAudioToMem(UUID uuid, short[] audio){
+        recordedAudios.get(uuid).add(audio);
     }
 
 }

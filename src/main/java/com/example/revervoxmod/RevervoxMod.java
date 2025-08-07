@@ -1,7 +1,7 @@
 package com.example.revervoxmod;
 
 import com.example.revervoxmod.commands.*;
-import com.example.revervoxmod.config.RevervoxModServerConfigs;
+import com.example.revervoxmod.config.RevervoxModClientConfigs;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.events.ForgeEventBus;
 import com.example.revervoxmod.registries.*;
@@ -47,7 +47,7 @@ public class RevervoxMod {
         CreativeTabRegistry.register(context.getModEventBus());
         ParticleRegistry.register(context.getModEventBus());
 
-        context.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC, "revervox_mod_server.toml");
+        context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox_mod_client.toml");
     }
 
     private void setup(FMLCommonSetupEvent event) {

@@ -1,6 +1,7 @@
 package com.example.revervoxmod.voicechat;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.config.RevervoxModClientConfigs;
 import com.example.revervoxmod.voicechat.audio.AudioSaver;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 
@@ -86,7 +87,12 @@ public class RecordedPlayer {
 
             Path audioPath = userPath.resolve(getUuid().toString() + "-" + recordsCount + ".pcm");
 
-            new AudioSaver(audioPath, currentRecordingIndex, recording).start();
+            if (RevervoxModClientConfigs.PRIVACY_MODE.get()){
+                RevervoxVoicechatPlugin.addAudioToMem(uuid, recording);
+                RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
+            } else {
+                new AudioSaver(audioPath, currentRecordingIndex, recording).start();
+            }
 
             RevervoxVoicechatPlugin.removeFromCache(audioPath);
             updateRecordingCount();
