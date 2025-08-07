@@ -1,6 +1,7 @@
 package com.example.revervoxmod;
 
 import com.example.revervoxmod.commands.*;
+import com.example.revervoxmod.config.RevervoxModServerConfigs;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.events.ForgeEventBus;
 import com.example.revervoxmod.registries.*;
@@ -18,6 +19,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
@@ -44,6 +46,8 @@ public class RevervoxMod {
         ItemRegistry.register(context.getModEventBus());
         CreativeTabRegistry.register(context.getModEventBus());
         ParticleRegistry.register(context.getModEventBus());
+
+        context.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC, "revervox_mod_server.toml");
     }
 
     private void setup(FMLCommonSetupEvent event) {
@@ -71,6 +75,7 @@ public class RevervoxMod {
         StopRecordingCommand.register(event.getDispatcher());
         isRecordingCommand.register(event.getDispatcher());
         ScheduleLogCommand.register(event.getDispatcher());
+
     }
 
 
