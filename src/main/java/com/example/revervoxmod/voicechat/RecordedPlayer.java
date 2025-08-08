@@ -87,12 +87,17 @@ public class RecordedPlayer {
 
             Path audioPath = userPath.resolve(getUuid().toString() + "-" + recordsCount + ".pcm");
 
-            if (RevervoxModClientConfigs.PRIVACY_MODE.get()){
-                RevervoxVoicechatPlugin.addAudioToMem(uuid, recording);
-                RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
+            if (filterAudio(recording)){
+                if (RevervoxModClientConfigs.PRIVACY_MODE.get()){
+                    RevervoxVoicechatPlugin.addAudioToMem(uuid, recording);
+                    RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
+                } else {
+                    new AudioSaver(audioPath, currentRecordingIndex, recording).start();
+                }
             } else {
-                new AudioSaver(audioPath, currentRecordingIndex, recording).start();
+                RevervoxMod.LOGGER.info("Audio is smaller than 0.9 seconds, not saving.");
             }
+
 
             RevervoxVoicechatPlugin.removeFromCache(audioPath);
             updateRecordingCount();
@@ -161,4 +166,13 @@ public class RecordedPlayer {
     public void setLastSpoke(Date lastSpoke) {
         this.lastSpoke = lastSpoke;
     }
+
+    public static boolean filterAudio(short[] pcm) {
+        final int SAMPLE_RATE = 48000; // Hz
+        final int CHANNELS = 1;        // mono
+
+        double durationSeconds = (double) pcm.length / (SAMPLE_RATE * CHANNELS);
+        return durationSeconds > 0.9;
+    }
+
 }

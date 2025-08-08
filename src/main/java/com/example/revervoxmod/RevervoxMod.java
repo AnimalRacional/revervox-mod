@@ -47,7 +47,7 @@ public class RevervoxMod {
         CreativeTabRegistry.register(context.getModEventBus());
         ParticleRegistry.register(context.getModEventBus());
 
-        context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox_mod_client.toml");
+        context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox-client.toml");
     }
 
     private void setup(FMLCommonSetupEvent event) {

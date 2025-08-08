@@ -57,7 +57,6 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
             recordedPlayer.recordPacket(e.getPacket().getOpusEncodedData());
 
             recordedPlayer.setLastSpoke(new Date(System.currentTimeMillis()));
-
         }
     }
 
@@ -84,6 +83,9 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
         api.registerVolumeCategory(revervoxCategory);
         recordedPlayers = new HashMap<>();
         audioCache = new ConcurrentHashMap<>();
+        recordedAudios = new ConcurrentHashMap<>();
+
+        RevervoxMod.TASKS.schedule(checkForSilence(), 20);
     }
 
     public static void stopRecording(UUID uuid) {
@@ -115,5 +117,24 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static void addAudioToMem(UUID uuid, short[] audio){
         recordedAudios.get(uuid).add(audio);
     }
+
+    private Runnable checkForSilence() {
+        return () -> {
+            long silenceThresholdMs = 1500;
+            long now = System.currentTimeMillis();
+
+            for (RecordedPlayer player : RevervoxVoicechatPlugin.getRecordedPlayers().values()) {
+                if (player.isRecording() &&
+                        (now - player.getLastSpoke().getTime()) > silenceThresholdMs) {
+                    RevervoxMod.LOGGER.info("Stopped Speaking!");
+                    RevervoxVoicechatPlugin.stopRecording(player.getUuid());
+                }
+            }
+
+            // Re-schedule this same task to repeat
+            RevervoxMod.TASKS.schedule(checkForSilence(), 20); // runs again in 20 ticks
+        };
+    }
+
 
 }
