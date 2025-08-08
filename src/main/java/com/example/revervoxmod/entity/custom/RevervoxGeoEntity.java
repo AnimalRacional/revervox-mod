@@ -20,6 +20,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.NeutralMob;
@@ -150,7 +151,11 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundRegistry.THINGY_HURT.get();
+        return SoundRegistry.REVERVOX_DEATH.get();
+    }
+    @Override
+    protected SoundEvent getHurtSound(@NotNull DamageSource dmgSrc) {
+        return SoundRegistry.REVERVOX_HURT.get();
     }
 
     public boolean isSpeakingAtMe(Player player) {
@@ -227,7 +232,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             audio = RevervoxVoicechatPlugin.getRecordedPlayer(randomUUID).getRandomAudio();
             if (audio == null) return;
         }
-        RevervoxMod.LOGGER.info("Playing audio: {}", audio);
+        RevervoxMod.LOGGER.info("Playing audio from player: " + player.getName());
         currentAudioPlayer = new AudioPlayer(audio, api, channel);
         currentAudioPlayer.start();
     }
@@ -277,4 +282,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     public void setCanBeAngry(boolean canBeAngry) {
         this.canBeAngry = canBeAngry;
     }
+
+
 }

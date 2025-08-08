@@ -1,11 +1,21 @@
 {
-  "jumpscare": {
-    "subtitle": "revervox_mod.subtitle.sound.thingy_death",
+  "revervox_death": {
+    "subtitle": "sounds.revervox_mod.revervox.death",
     "category": "hostile",
-    "sounds": [ "revervox_mod:jumpscare" ]
+    "sounds": [ "revervox_mod:revervox_death" ]
+  },
+  "revervox_hurt": {
+    "subtitle": "sounds.revervox_mod.revervox.hurt",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:revervox_hurt" ]
+  },
+  "revervox_alert": {
+    "subtitle": "sounds.revervox_mod.revervox.alert",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:revervox_alert" ]
   },
   "thingy_hurt": {
-    "subtitle": "revervox_mod.subtitle.sound.thingy_hurt",
+    "subtitle": "sounds.revervox_mod.thingy.hurt",
     "category": "hostile",
     "sounds": [ "revervox_mod:thingy_hurt" ]
   }

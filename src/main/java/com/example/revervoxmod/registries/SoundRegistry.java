@@ -10,8 +10,10 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class SoundRegistry {
     private static final DeferredRegister<SoundEvent> REGISTRY = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, RevervoxMod.MOD_ID);
-    public static final RegistryObject<SoundEvent> JUMPSCARE = registerSound("jumpscare");
+    public static final RegistryObject<SoundEvent> REVERVOX_DEATH = registerSound("revervox_death");
     public static final RegistryObject<SoundEvent> THINGY_HURT = registerSound("thingy_hurt");
+    public static final RegistryObject<SoundEvent> REVERVOX_HURT = registerSound("revervox_hurt");
+    public static final RegistryObject<SoundEvent> REVERVOX_ALERT = registerSound("revervox_alert");
 
     private static RegistryObject<SoundEvent> registerSound(String name){
         return REGISTRY.register(name, () -> { return SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, name)); });

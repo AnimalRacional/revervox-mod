@@ -82,7 +82,7 @@ public class ThingyEntity extends Monster {
 
     @Override
     protected SoundEvent getDeathSound() {
-        return SoundRegistry.JUMPSCARE.get();
+        return SoundRegistry.REVERVOX_DEATH.get();
     }
 
     @Override

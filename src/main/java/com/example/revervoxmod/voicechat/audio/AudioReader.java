@@ -36,7 +36,6 @@ public class AudioReader {
 
             int numberOfShorts = (int) (file.length() / 2); // each short = 2 bytes
             short[] audio = new short[numberOfShorts];
-            RevervoxMod.LOGGER.info("Short Array Size: " + audio.length);
 
             DataInputStream dis = new DataInputStream(new FileInputStream(file));
             for (int i = 0; i < numberOfShorts; i++) {

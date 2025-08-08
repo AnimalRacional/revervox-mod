@@ -25,7 +25,7 @@ public class RecordedPlayer {
     private Date lastSpoke;
     public static Path audiosPath;
     private boolean isSilent = false;
-    public static final int RECORDING_LIMIT = 50;
+    public static final int RECORDING_LIMIT = 200;
 
     public RecordedPlayer(UUID uuid) {
         this.uuid = uuid;
@@ -150,16 +150,12 @@ public class RecordedPlayer {
     }
 
     public Path getAudioPath(int index){
-        Path audioPath = RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + index + ".pcm");
-        RevervoxMod.LOGGER.info("Audio Path: " + audioPath);
-        return audioPath;
+        return RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + index + ".pcm");
     }
 
     public Path getRandomAudio(){
         if (recordsCount <= 1) return null;
-        Path audioPath = RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + (new Random().nextInt(1, recordsCount)) + ".pcm");
-        RevervoxMod.LOGGER.info("Audio Path: " + audioPath);
-        return audioPath;
+        return RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + (new Random().nextInt(1, recordsCount)) + ".pcm");
     }
 
     public Date getLastSpoke() {
@@ -171,8 +167,8 @@ public class RecordedPlayer {
     }
 
     private boolean filterAudio() {
-        final int SAMPLE_RATE = 48000;    // Hz
-        final double MIN_DURATION = 0.9;  // seconds
+        final int SAMPLE_RATE = 48000;
+        final double MIN_DURATION = 0.9;
         final int SILENCE_THRESHOLD = 500; // amplitude to detect speech start/end
 
         double durationSeconds = (double) currentRecordingIndex / SAMPLE_RATE;

@@ -5,5 +5,8 @@
   "itemGroup.revervoxMod": "Revervox",
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "entity.revervox_mod.revervox_geo": "Revervox",
-  "item.revervox_mod.revervox_spawn_egg": "Revervox Spawn Egg"
+  "item.revervox_mod.revervox_spawn_egg": "Revervox Spawn Egg",
+  "sounds.revervox_mod.revervox.death": "Revervox dies",
+  "sounds.revervox_mod.revervox.hurt": "Revervox hurt",
+  "sounds.revervox_mod.revervox.alert": "Revervox alerted"
 }
