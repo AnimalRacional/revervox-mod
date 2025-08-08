@@ -57,6 +57,8 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
             recordedPlayer.recordPacket(e.getPacket().getOpusEncodedData());
 
             recordedPlayer.setLastSpoke(new Date(System.currentTimeMillis()));
+            recordedPlayer.setSilent(false);
+
         }
     }
 
@@ -124,10 +126,14 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
             long now = System.currentTimeMillis();
 
             for (RecordedPlayer player : RevervoxVoicechatPlugin.getRecordedPlayers().values()) {
+                Date lastSpoke = player.getLastSpoke();
+                if (lastSpoke == null) continue;
+                if (player.isSilent()) continue;
                 if (player.isRecording() &&
-                        (now - player.getLastSpoke().getTime()) > silenceThresholdMs) {
+                        (now - lastSpoke.getTime()) > silenceThresholdMs) {
                     RevervoxMod.LOGGER.info("Stopped Speaking!");
                     RevervoxVoicechatPlugin.stopRecording(player.getUuid());
+                    player.setSilent(true);
                 }
             }
 

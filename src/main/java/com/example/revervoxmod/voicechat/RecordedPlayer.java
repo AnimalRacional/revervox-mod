@@ -24,6 +24,7 @@ public class RecordedPlayer {
     private final Path userPath;
     private Date lastSpoke;
     public static Path audiosPath;
+    private boolean isSilent = false;
     public static final int RECORDING_LIMIT = 50;
 
     public RecordedPlayer(UUID uuid) {
@@ -79,21 +80,25 @@ public class RecordedPlayer {
 
     public void stopRecording() {
         if (isRecording){
+            /*
             isRecording = false;
 
             if (this.decoder != null) {
                 this.decoder.close();
             }
 
+             */
+
             Path audioPath = userPath.resolve(getUuid().toString() + "-" + recordsCount + ".pcm");
 
-            if (filterAudio(recording)){
+            if (filterAudio()){
                 if (RevervoxModClientConfigs.PRIVACY_MODE.get()){
                     RevervoxVoicechatPlugin.addAudioToMem(uuid, recording);
                     RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
                 } else {
                     new AudioSaver(audioPath, currentRecordingIndex, recording).start();
                 }
+                currentRecordingIndex = 0;
             } else {
                 RevervoxMod.LOGGER.info("Audio is smaller than 0.9 seconds, not saving.");
             }
@@ -128,7 +133,6 @@ public class RecordedPlayer {
     public void startRecording() { // WARNING: Poderá ser melhor reniciar a gravação em vez de continuar caso este método seja chamado múltiplas vezes
         if (!isRecording) {
             decoder = RevervoxMod.vcApi.createDecoder();
-            currentRecordingIndex = 0;
             isRecording = true;
         }
     }
@@ -167,12 +171,20 @@ public class RecordedPlayer {
         this.lastSpoke = lastSpoke;
     }
 
-    public static boolean filterAudio(short[] pcm) {
-        final int SAMPLE_RATE = 48000; // Hz
-        final int CHANNELS = 1;        // mono
+    public boolean filterAudio() {
+        final int SAMPLE_RATE = 48000; // Hz, mono
 
-        double durationSeconds = (double) pcm.length / (SAMPLE_RATE * CHANNELS);
+        double durationSeconds = (double) currentRecordingIndex / SAMPLE_RATE;
+        RevervoxMod.LOGGER.info("Audio duration: " + durationSeconds);
         return durationSeconds > 0.9;
     }
 
+
+    public boolean isSilent() {
+        return isSilent;
+    }
+
+    public void setSilent(boolean silent) {
+        isSilent = silent;
+    }
 }
