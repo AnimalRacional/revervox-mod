@@ -3,7 +3,7 @@ package com.example.revervoxmod;
 import com.example.revervoxmod.commands.*;
 import com.example.revervoxmod.config.RevervoxModClientConfigs;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
-import com.example.revervoxmod.events.ForgeEventBus;
+import com.example.revervoxmod.events.ClientForgeEventBus;
 import com.example.revervoxmod.networking.RevervoxPacketHandler;
 import com.example.revervoxmod.registries.*;
 import com.example.revervoxmod.taskscheduler.TaskScheduler;
@@ -14,11 +14,13 @@ import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -40,7 +42,9 @@ public class RevervoxMod {
     public RevervoxMod(FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new ForgeEventBus());
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+            MinecraftForge.EVENT_BUS.register(new ClientForgeEventBus());
+        });
 
         EntityRegistry.register(context.getModEventBus());
         SoundRegistry.register(context.getModEventBus());
