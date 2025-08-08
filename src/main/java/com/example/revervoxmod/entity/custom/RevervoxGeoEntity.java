@@ -4,6 +4,7 @@ import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
 import com.example.revervoxmod.entity.ai.MMPathNavigateGround;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
+import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
 import com.example.revervoxmod.registries.ParticleRegistry;
 import com.example.revervoxmod.registries.SoundRegistry;
@@ -27,7 +28,6 @@ import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
@@ -100,7 +100,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal(this, this::isAngryAt));
-        this.targetSelector.addGoal(2, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 

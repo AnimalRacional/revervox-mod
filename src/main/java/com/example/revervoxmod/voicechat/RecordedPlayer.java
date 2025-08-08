@@ -186,8 +186,6 @@ public class RecordedPlayer {
         }
         double noiseRMS = Math.sqrt(noiseSumSquares / (double) noiseSampleCount);
 
-        double MIN_RMS = noiseRMS * 2.0;
-
         int start = 0;
         while (start < currentRecordingIndex &&
                 Math.abs(recording[start]) < SILENCE_THRESHOLD) {
@@ -214,15 +212,14 @@ public class RecordedPlayer {
         double rms = Math.sqrt(sumSquares / (double) activeSamples);
 
         RevervoxMod.LOGGER.info(String.format(
-                "Audio duration: %.3fs, Active region: %.3fs, Noise RMS: %.1f, Threshold: %.1f, RMS: %.1f",
+                "Audio duration: %.3fs, Active region: %.3fs, Noise RMS: %.1f, RMS: %.1f",
                 durationSeconds,
                 (double) activeSamples / SAMPLE_RATE,
                 noiseRMS,
-                MIN_RMS,
                 rms
         ));
 
-        return rms >= MIN_RMS;
+        return rms >= noiseRMS;
     }
 
 

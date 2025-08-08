@@ -1,6 +1,7 @@
 package com.example.revervoxmod.networking;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.networking.packets.AddSoundInstancePacket;
 import com.example.revervoxmod.networking.packets.PrivacyModePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkRegistry;
@@ -23,6 +24,13 @@ public class RevervoxPacketHandler {
                 PrivacyModePacket::encode,
                 PrivacyModePacket::decode,
                 PrivacyModePacket::handle
+        );
+        INSTANCE.registerMessage(
+                id++,
+                AddSoundInstancePacket.class,
+                AddSoundInstancePacket::encode,
+                AddSoundInstancePacket::decode,
+                AddSoundInstancePacket::handle
         );
     }
 }

@@ -2,11 +2,15 @@ package com.example.revervoxmod.entity.goals;
 
 import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
+import com.example.revervoxmod.networking.RevervoxPacketHandler;
+import com.example.revervoxmod.networking.packets.AddSoundInstancePacket;
 import com.example.revervoxmod.registries.SoundRegistry;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.function.Predicate;
 
@@ -40,7 +44,8 @@ public class TargetSpokeGoal extends NearestAttackableTargetGoal<Player> {
 
     public void start() {
         this.aggroTime = this.adjustedTickDelay(5);
-        this.mob.playSound(SoundRegistry.REVERVOX_ALERT.get());
+        RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this.mob),
+                new AddSoundInstancePacket(this.mob.getId(), SoundRegistry.REVERVOX_ALERT.get(), SoundSource.HOSTILE));
         super.start();
     }
 

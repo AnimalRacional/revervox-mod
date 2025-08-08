@@ -144,8 +144,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
                 }
             }
 
-            // Re-schedule this same task to repeat
-            RevervoxMod.TASKS.schedule(checkForSilence(), 20); // runs again in 20 ticks
+            RevervoxMod.TASKS.schedule(checkForSilence(), 20);
         };
     }
 

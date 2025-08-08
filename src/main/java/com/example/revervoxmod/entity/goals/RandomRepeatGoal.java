@@ -20,12 +20,14 @@ public class RandomRepeatGoal extends Goal {
     private static final int CHANNEL_DISTANCE = 50;
     private EntityAudioChannel channel;
     private int audiosPlayed = 0;
+    private boolean canSpeak = true;
     public RandomRepeatGoal(RevervoxGeoEntity revervoxGeoEntity) {
         this.mob = revervoxGeoEntity;
+        RevervoxMod.TASKS.schedule(setCanSpeak(), 0);
     }
     @Override
     public boolean canUse() {
-        return new Random().nextInt(166) == 1 && mob.getTarget() == null;
+        return canSpeak && mob.getTarget() == null;
     }
 
     public boolean canContinueToUse() {
@@ -40,6 +42,7 @@ public class RandomRepeatGoal extends Goal {
     }
 
     public void tick() {
+        canSpeak = false;
         if (audiosPlayed >= 5) this.mob.remove(Entity.RemovalReason.DISCARDED);
         RevervoxMod.LOGGER.info("Less than 5 audios!");
         if (this.mob.getCurrentAudioPlayer() != null && this.mob.getCurrentAudioPlayer().isPlaying()) return;
@@ -48,8 +51,6 @@ public class RandomRepeatGoal extends Goal {
             List<Player> nearbyPlayers = new ArrayList<>(this.mob.level().
                     getNearbyPlayers(TargetingConditions.forNonCombat(), this.mob, this.mob.getBoundingBox()
                     .inflate(CHANNEL_DISTANCE)));
-
-            // TODO nearbyPlayers fica vazio as vezes em singleplayer
 
             RevervoxMod.LOGGER.info("Nearby Players: " + Arrays.toString(nearbyPlayers.toArray()));
 
@@ -127,6 +128,17 @@ public class RandomRepeatGoal extends Goal {
         channel.setCategory(category);
         channel.setDistance(RandomRepeatGoal.CHANNEL_DISTANCE);
         return channel;
+    }
+
+    private Runnable setCanSpeak() {
+        return () -> {
+            if (this.mob.isAlive()){
+                canSpeak = true;
+                int ticksToSpeak = new Random().nextInt(5*20,10*20);
+
+                RevervoxMod.TASKS.schedule(setCanSpeak(), ticksToSpeak);
+            }
+        };
     }
 
 
