@@ -207,7 +207,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         }
     }
 
-    public void playAudio(Player player, VoicechatServerApi api){
+    public void playAudioPitched(Player player, VoicechatServerApi api){
         Vec3 loc = this.getEyePosition();
         AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
         if(channel == null){
@@ -215,10 +215,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             return;
         }
         channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
-        playAudio(player, api, channel);
+        playAudio(player, api, channel, AudioPlayer.Mode.PITCHED);
     }
 
-    public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel){
+    public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioPlayer.Mode mode){
         // TODO tanto aqui como no RandomRepeatGoal, é possível o áudio aleatório ser null mesmo quando há audios pois só verificamos o player do evento e um outro player aleatório, que podem ambos ter 0 audios mesmo outros players tendo audios
         RecordedPlayer record = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
         if (record == null) return;
@@ -233,12 +233,12 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             if (audio == null) return;
         }
         RevervoxMod.LOGGER.info("Playing audio from player: " + player.getName());
-        currentAudioPlayer = new AudioPlayer(audio, api, channel);
+        currentAudioPlayer = new AudioPlayer(audio, api, channel, mode);
         currentAudioPlayer.start();
     }
 
     public void disappear(Player player, VoicechatServerApi api){
-        playAudio(player, api);
+        playAudioPitched(player, api);
         this.remove(RemovalReason.DISCARDED);
     }
 

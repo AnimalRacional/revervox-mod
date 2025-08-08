@@ -40,7 +40,7 @@ public class TargetSpokeGoal extends NearestAttackableTargetGoal<Player> {
 
     public void start() {
         this.aggroTime = this.adjustedTickDelay(5);
-        this.mob.playSound(SoundRegistry.REVERVOX_ALERT.get(), 1.0F, 1.0F);
+        this.mob.playSound(SoundRegistry.REVERVOX_ALERT.get());
         super.start();
     }
 
