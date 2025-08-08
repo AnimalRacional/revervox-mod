@@ -57,11 +57,4 @@ public class ClientForgeEventBus {
         }
     }
     /// ^^^
-
-    @SubscribeEvent
-    public void tickEvent(TickEvent.ServerTickEvent event){
-        if(event.phase == TickEvent.Phase.START){
-            RevervoxMod.TASKS.tick();
-        }
-    }
 }

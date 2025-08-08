@@ -4,6 +4,7 @@ import com.example.revervoxmod.commands.*;
 import com.example.revervoxmod.config.RevervoxModClientConfigs;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.events.ClientForgeEventBus;
+import com.example.revervoxmod.events.CommonForgeEventBus;
 import com.example.revervoxmod.networking.RevervoxPacketHandler;
 import com.example.revervoxmod.registries.*;
 import com.example.revervoxmod.taskscheduler.TaskScheduler;
@@ -45,6 +46,7 @@ public class RevervoxMod {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             MinecraftForge.EVENT_BUS.register(new ClientForgeEventBus());
         });
+        MinecraftForge.EVENT_BUS.register(new CommonForgeEventBus());
 
         EntityRegistry.register(context.getModEventBus());
         SoundRegistry.register(context.getModEventBus());
