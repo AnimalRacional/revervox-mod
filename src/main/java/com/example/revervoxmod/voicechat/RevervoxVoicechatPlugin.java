@@ -122,7 +122,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
 
     private Runnable checkForSilence() {
         return () -> {
-            long silenceThresholdMs = 1500;
+            long silenceThresholdMs = 1100;
             long now = System.currentTimeMillis();
 
             for (RecordedPlayer player : RevervoxVoicechatPlugin.getRecordedPlayers().values()) {

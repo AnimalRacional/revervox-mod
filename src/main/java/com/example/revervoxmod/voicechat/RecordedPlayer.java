@@ -98,12 +98,11 @@ public class RecordedPlayer {
                 } else {
                     new AudioSaver(audioPath, currentRecordingIndex, recording).start();
                 }
-                currentRecordingIndex = 0;
             } else {
                 RevervoxMod.LOGGER.info("Audio is smaller than 0.9 seconds, not saving.");
             }
 
-
+            currentRecordingIndex = 0;
             RevervoxVoicechatPlugin.removeFromCache(audioPath);
             updateRecordingCount();
         }
@@ -171,12 +170,64 @@ public class RecordedPlayer {
         this.lastSpoke = lastSpoke;
     }
 
-    public boolean filterAudio() {
-        final int SAMPLE_RATE = 48000; // Hz, mono
+    private boolean filterAudio() {
+        final int SAMPLE_RATE = 48000;    // Hz
+        final double MIN_DURATION = 0.9;  // seconds
+        final int SILENCE_THRESHOLD = 500; // amplitude to detect speech start/end
 
         double durationSeconds = (double) currentRecordingIndex / SAMPLE_RATE;
-        RevervoxMod.LOGGER.info("Audio duration: " + durationSeconds);
-        return durationSeconds > 0.9;
+        if (durationSeconds <= MIN_DURATION) {
+            RevervoxMod.LOGGER.info("Audio too short: " + durationSeconds + "s");
+            return false;
+        }
+
+        int noiseSampleCount = (int) (SAMPLE_RATE * 0.5);
+        noiseSampleCount = Math.min(noiseSampleCount, currentRecordingIndex);
+
+        long noiseSumSquares = 0;
+        for (int i = 0; i < noiseSampleCount; i++) {
+            int sample = recording[i];
+            noiseSumSquares += sample * sample;
+        }
+        double noiseRMS = Math.sqrt(noiseSumSquares / (double) noiseSampleCount);
+
+        double MIN_RMS = noiseRMS * 2.0;
+
+        int start = 0;
+        while (start < currentRecordingIndex &&
+                Math.abs(recording[start]) < SILENCE_THRESHOLD) {
+            start++;
+        }
+
+        int end = currentRecordingIndex - 1;
+        while (end > start &&
+                Math.abs(recording[end]) < SILENCE_THRESHOLD) {
+            end--;
+        }
+
+        int activeSamples = end - start + 1;
+        if (activeSamples <= 0) {
+            RevervoxMod.LOGGER.info("No active audio found above silence threshold");
+            return false;
+        }
+
+        long sumSquares = 0;
+        for (int i = start; i <= end; i++) {
+            int sample = recording[i];
+            sumSquares += sample * sample;
+        }
+        double rms = Math.sqrt(sumSquares / (double) activeSamples);
+
+        RevervoxMod.LOGGER.info(String.format(
+                "Audio duration: %.3fs, Active region: %.3fs, Noise RMS: %.1f, Threshold: %.1f, RMS: %.1f",
+                durationSeconds,
+                (double) activeSamples / SAMPLE_RATE,
+                noiseRMS,
+                MIN_RMS,
+                rms
+        ));
+
+        return rms >= MIN_RMS;
     }
 
 
