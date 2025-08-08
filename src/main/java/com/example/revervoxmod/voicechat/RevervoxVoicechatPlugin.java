@@ -16,6 +16,7 @@ import java.util.concurrent.Future;
 public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static String REVERVOX_CATEGORY = "revervox";
     private static HashMap<UUID, RecordedPlayer> recordedPlayers;
+    private static HashMap<UUID, Boolean> privacyMode;
     private static ConcurrentHashMap<Path, Future<short[]>> audioCache;
     private static ConcurrentHashMap<UUID, List<short[]>> recordedAudios;
 
@@ -88,6 +89,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
         recordedAudios = new ConcurrentHashMap<>();
 
         RevervoxMod.TASKS.schedule(checkForSilence(), 20);
+        privacyMode = new HashMap<>();
     }
 
     public static void stopRecording(UUID uuid) {
@@ -116,6 +118,13 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
         audioCache.remove(path);
     }
 
+    public static void setPrivacy(UUID uuid, boolean state){
+        privacyMode.put(uuid, state);
+    }
+
+    public static boolean getPrivacy(UUID uuid){
+        return privacyMode.getOrDefault(uuid, true);
+    }
     public static void addAudioToMem(UUID uuid, short[] audio){
         recordedAudios.get(uuid).add(audio);
     }

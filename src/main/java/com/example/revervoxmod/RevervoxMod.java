@@ -4,6 +4,7 @@ import com.example.revervoxmod.commands.*;
 import com.example.revervoxmod.config.RevervoxModClientConfigs;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.events.ForgeEventBus;
+import com.example.revervoxmod.networking.RevervoxPacketHandler;
 import com.example.revervoxmod.registries.*;
 import com.example.revervoxmod.taskscheduler.TaskScheduler;
 import com.example.revervoxmod.voicechat.RecordedPlayer;
@@ -46,6 +47,8 @@ public class RevervoxMod {
         ItemRegistry.register(context.getModEventBus());
         CreativeTabRegistry.register(context.getModEventBus());
         ParticleRegistry.register(context.getModEventBus());
+
+        RevervoxPacketHandler.registerPackets();
 
         context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox-client.toml");
     }
