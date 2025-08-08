@@ -10,7 +10,7 @@ public class RevervoxModClientConfigs {
     static {
         BUILDER.push("Configs for Revervox Mod");
 
-        PRIVACY_MODE = BUILDER.comment("If your audios get saved on your computer or not").define("Privacy Mode", false);
+        PRIVACY_MODE = BUILDER.comment("If your audios get saved to disk on the servers you play on").define("Privacy Mode", false);
 
         BUILDER.pop();
         SPEC = BUILDER.build();

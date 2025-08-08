@@ -34,6 +34,7 @@ public class PrivacyModePacket {
             RevervoxMod.LOGGER.info("PACKET RECEIVED!!!!");
             if(ctx.get().getSender() != null){
                 RevervoxVoicechatPlugin.setPrivacy(ctx.get().getSender().getUUID(), state);
+                RevervoxMod.LOGGER.info("Set privacy mode for {} to {}", ctx.get().getSender().getName(), state);
             } else {
                 RevervoxMod.LOGGER.warn("Received PrivacyModePacket without sender?");
             }

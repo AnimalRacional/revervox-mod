@@ -5,10 +5,7 @@ import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
 
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
@@ -66,6 +63,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     private void onPlayerConnected(PlayerConnectedEvent e){
         UUID playerUuid = e.getConnection().getPlayer().getUuid();
         recordedPlayers.put(playerUuid, new RecordedPlayer(playerUuid));
+        recordedAudios.put(playerUuid, new LinkedList<>());
     }
 
     private void onPlayerDisconnected(PlayerDisconnectedEvent e){

@@ -1,6 +1,7 @@
 package com.example.revervoxmod.events;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.config.RevervoxModClientConfigs;
 import com.example.revervoxmod.networking.RevervoxPacketHandler;
 import com.example.revervoxmod.networking.packets.PrivacyModePacket;
 import net.minecraft.client.Minecraft;
@@ -16,7 +17,7 @@ public class ForgeEventBus {
                     event.getEntity() instanceof LocalPlayer){
                 Minecraft.getInstance().submit(() -> {
                     RevervoxMod.LOGGER.info("CLIENT SENDING ENTITY JOIN PACKET!");
-                    RevervoxPacketHandler.INSTANCE.sendToServer(new PrivacyModePacket(true));
+                    RevervoxPacketHandler.INSTANCE.sendToServer(new PrivacyModePacket(RevervoxModClientConfigs.PRIVACY_MODE.get()));
                 });
             }
     }
