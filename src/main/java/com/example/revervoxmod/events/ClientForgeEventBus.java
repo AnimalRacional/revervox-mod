@@ -6,10 +6,13 @@ import com.example.revervoxmod.networking.RevervoxPacketHandler;
 import com.example.revervoxmod.networking.packets.PrivacyModePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 
+@OnlyIn(Dist.CLIENT)
 public class ClientForgeEventBus {
     @SubscribeEvent
     public void clientJoinEvent(EntityJoinLevelEvent event){

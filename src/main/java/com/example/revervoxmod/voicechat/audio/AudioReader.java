@@ -1,33 +1,33 @@
 package com.example.revervoxmod.voicechat.audio;
 
 import com.example.revervoxmod.RevervoxMod;
-import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class AudioReader {
     private final Path path;
-    private static ConcurrentHashMap<Path, Future<short[]>> audioCache;
+    boolean destroy;
 
     public AudioReader(Path path){
         this.path = path;
-        audioCache = RevervoxVoicechatPlugin.getAudioCache();
+        this.destroy = false;
+    }
+
+    public AudioReader(Path path, boolean deleteAfter) {
+        this.path = path;
+        this.destroy = deleteAfter;
     }
 
     public Future<short[]> read() {
-        if (!audioCache.containsKey(path)) {
-            audioCache.put(path, Executors.newSingleThreadExecutor().submit(() -> {
-                return getFile(path);
-            }));
-        }
-        return audioCache.get(path);
+        RevervoxMod.LOGGER.debug("AUDIOREADER STARTING {}", path);
+        return Executors.newSingleThreadExecutor().submit(() -> getFile(path));
     }
 
     private short[] getFile(Path path){
@@ -43,12 +43,12 @@ public class AudioReader {
             }
             dis.close();
             RevervoxMod.LOGGER.debug("Read from the file!");
-
+            Files.delete(path);
             return audio;
         } catch (FileNotFoundException e){
-            RevervoxMod.LOGGER.error("File not found: " + path);
+            RevervoxMod.LOGGER.error("AUDIOREADER File not found: {}", path);
         } catch (Exception e) {
-            RevervoxMod.LOGGER.error(e.getMessage());
+            RevervoxMod.LOGGER.error("ERROR ON AUDIOREADER: {}", e.getMessage());
             throw new RuntimeException(e);
         }
         return null;

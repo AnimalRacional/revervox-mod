@@ -1,20 +1,19 @@
 package com.example.revervoxmod.commands;
 
+import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import com.example.revervoxmod.voicechat.audio.AudioPlayer;
-import com.example.revervoxmod.RevervoxMod;
-import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.GameProfileArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -22,7 +21,6 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -47,27 +45,37 @@ public class NearestEntityPlayVoiceCommand {
         );
     }
 
-    public static int runCommandEntity(CommandContext<CommandSourceStack> cmdSrc) throws CommandSyntaxException {
-        if (RevervoxMod.vcApi instanceof VoicechatServerApi api){
+    public static int runCommandEntity(CommandContext<CommandSourceStack> cmdSrc) {
+        try{
+            if (RevervoxMod.vcApi instanceof VoicechatServerApi api){
 
-            Collection<? extends Entity> entities = EntityArgument.getEntities(cmdSrc, "entity");
+                Collection<? extends Entity> entities = EntityArgument.getEntities(cmdSrc, "entity");
 
-            for(Entity nearestEntity : entities){
-                RevervoxMod.LOGGER.debug("Entity: " + nearestEntity.getName());
-                String category = RevervoxVoicechatPlugin.REVERVOX_CATEGORY;
-                Collection<GameProfile> targets = GameProfileArgument.getGameProfiles(cmdSrc, "player");
-                int idx = IntegerArgumentType.getInteger(cmdSrc, "index");
-                for (GameProfile target : targets) {
-                    UUID channelID = UUID.randomUUID();
-                    EntityAudioChannel channel = createChannel(api, channelID, category, nearestEntity);
-                    RevervoxMod.LOGGER.debug("Created new channel: " + channel);
-                    new AudioPlayer(getAudioPath(target.getId(), idx), api, channel).start();
-                    RevervoxMod.LOGGER.debug("silent: " + nearestEntity.isSilent());
+                for(Entity nearestEntity : entities){
+                    RevervoxMod.LOGGER.info("Entity: " + nearestEntity.getName());
+                    String category = RevervoxVoicechatPlugin.REVERVOX_CATEGORY;
+                    Collection<GameProfile> targets = GameProfileArgument.getGameProfiles(cmdSrc, "player");
+                    int idx = IntegerArgumentType.getInteger(cmdSrc, "index");
+                    for (GameProfile target : targets) {
+                        UUID channelID = UUID.randomUUID();
+                        EntityAudioChannel channel = createChannel(api, channelID, category, nearestEntity);
+                        RevervoxMod.LOGGER.info("Created new channel: " + channel);
+                        short[] audio = RevervoxVoicechatPlugin.getAudio(target.getId(), idx);
+                        if(audio != null){
+                            new AudioPlayer(audio, api, channel).start();
+                        } else {
+                            cmdSrc.getSource().sendFailure(Component.literal("Invalid index!"));
+                        }
+                        RevervoxMod.LOGGER.info("silent: " + nearestEntity.isSilent());
+                    }
                 }
+                return 1;
             }
-            return 1;
+            return 0;
+        } catch(Exception e){
+            RevervoxMod.LOGGER.error("ERROR! {}", e.getMessage());
+            throw new RuntimeException(e);
         }
-        return 0;
     }
 
     public static int runCommand(CommandContext<CommandSourceStack> cmdSrc) {
@@ -88,8 +96,12 @@ public class NearestEntityPlayVoiceCommand {
                         UUID channelID = UUID.randomUUID();
                         EntityAudioChannel channel = createChannel(api, channelID, category, nearestEntity);
                         RevervoxMod.LOGGER.debug("Created new channel: " + channel);
-                        new AudioPlayer(getAudioPath(target.getId(), idx), api, channel).start();
-                        RevervoxMod.LOGGER.debug("silent: " + nearestEntity.isSilent());
+                        short[] audio = RevervoxVoicechatPlugin.getAudio(target.getId(), idx);
+                        if(audio != null){
+                            new AudioPlayer(audio, api, channel).start();
+                        } else {
+                            cmdSrc.getSource().sendFailure(Component.literal("Invalid index!"));
+                        }
                     }
 
                 } else {
@@ -102,12 +114,6 @@ public class NearestEntityPlayVoiceCommand {
             RevervoxMod.LOGGER.error("Error on playvoice: {}", e.getMessage());
         }
         return 0;
-    }
-
-    private static Path getAudioPath(UUID uuid, int index){
-        Path audioPath = RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + index + ".pcm");
-        RevervoxMod.LOGGER.debug("Audio Path: " + audioPath);
-        return audioPath;
     }
 
 

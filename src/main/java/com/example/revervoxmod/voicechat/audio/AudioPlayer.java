@@ -4,28 +4,26 @@ import com.example.revervoxmod.RevervoxMod;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 
-import java.nio.file.Path;
-
 public class AudioPlayer extends Thread{
-    private final Path path;
     private final VoicechatServerApi api;
     private final AudioChannel channel;
     private Mode mode = Mode.DEFAULT;
+    private final short[] audio;
     private de.maxhenkel.voicechat.api.audiochannel.AudioPlayer playerAudioPlayer;
     public enum Mode{
         DEFAULT,
         PITCHED,
         REVERBED
     }
-    public AudioPlayer(Path path, VoicechatServerApi api, AudioChannel channel) {
-        this.path = path;
+    public AudioPlayer(short[] audio, VoicechatServerApi api, AudioChannel channel) {
+        this.audio = audio;
         this.api = api;
         this.channel = channel;
     }
 
-    public AudioPlayer(Path path, VoicechatServerApi api, AudioChannel channel, Mode mode) {
+    public AudioPlayer(short[] audio, VoicechatServerApi api, AudioChannel channel, Mode mode) {
         this.mode = mode;
-        this.path = path;
+        this.audio = audio;
         this.api = api;
         this.channel = channel;
     }
@@ -37,16 +35,22 @@ public class AudioPlayer extends Thread{
             recording = null;
 
             if (mode == Mode.DEFAULT) {
-                recording = new AudioReader(path).read().get();
+                recording = audio;
             } else if (mode == Mode.PITCHED) {
-                recording = AudioManipulator.changePitch(new AudioReader(path).read().get(), 0.8f);
+                recording = AudioManipulator.changePitch(audio, 0.8f);
             } else if (mode == Mode.REVERBED) {
-                recording = AudioManipulator.addReverb(new AudioReader(path).read().get(), 0.5f, 160, 3);
+                recording = AudioManipulator.addReverb(audio, 0.5f, 160, 3);
             }
             if (recording != null) {
-                playerAudioPlayer = api.createAudioPlayer(channel, api.createEncoder(), recording);
-                playerAudioPlayer.startPlaying();
-                RevervoxMod.LOGGER.debug("Playing Audio...");
+                try{
+                    playerAudioPlayer = api.createAudioPlayer(channel, api.createEncoder(), recording);
+                    playerAudioPlayer.startPlaying();
+                    RevervoxMod.LOGGER.debug("Playing Audio...");
+                } catch(Exception e){
+                    RevervoxMod.LOGGER.error("ERROR {}", e.getMessage());
+                    throw new RuntimeException(e);
+                }
+
             }
         } catch (Exception e) {
             RevervoxMod.LOGGER.error(e.getMessage());

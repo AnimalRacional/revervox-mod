@@ -1,80 +1,84 @@
 package com.example.revervoxmod.voicechat;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.voicechat.audio.AudioReader;
 import com.example.revervoxmod.voicechat.audio.AudioSaver;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class RecordedPlayer {
+    public static Path audiosPath;
+    private final Random rnd;
     public static final int RECORDING_SIZE = 1024*1024;
     private OpusDecoder decoder = null;
     private final short[] recording;
     private int currentRecordingIndex;
-    private int recordsCount;
     private boolean isRecording = false;
     private final UUID uuid;
-    private final Path userPath;
     private Date lastSpoke;
-    public static Path audiosPath;
     private boolean isSilent = false;
-    public static final int RECORDING_LIMIT = 200;
-
+    public static final int RECORDING_LIMIT = 20; // recording limit per user, so total amount of audios should be (limit * players online)
+    public boolean privacy;
+    private final List<short[]> recordedAudios;
     public RecordedPlayer(UUID uuid) {
+        rnd = new Random();
+        this.privacy = false;
         this.uuid = uuid;
         this.recording = new short[RECORDING_SIZE];
-        userPath = audiosPath.resolve(uuid.toString());
-        recordsCount = 0;
-        if(!Files.exists(userPath)){
-            try {
-                Files.createDirectory(userPath);
-            } catch (IOException e) {
-                RevervoxMod.LOGGER.error("Error creating directory " + userPath);
-                return;
-            }
-        }
-        try{
-            // TODO isto le muitos ficheiros duma vez, talvez usar DirectoryStream
-            File[] files = userPath.toFile().listFiles();
-            if(files == null){
-                RevervoxMod.LOGGER.error("User path {} not found!", userPath);
-                throw new RuntimeException(String.format("User path %s not found!", userPath));
-            }
-            for(File f : files){
-                String name = f.getName();
-                if(name.startsWith(uuid.toString())){
-                    String ending = name.substring(name.lastIndexOf('-')+1, name.lastIndexOf('.'));
-                    try {
-                        int num = Integer.parseInt(ending);
-                        if(num > recordsCount){
-                            recordsCount = num;
-                        }
-                    } catch(NumberFormatException e){
-                        RevervoxMod.LOGGER.warn("Invalid audio found in folder {}", uuid);
+        this.recordedAudios = new LinkedList<>();
+        Path userPath = audiosPath.resolve(this.uuid.toString());
+        if(Files.exists(userPath)){
+            try(DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)){
+                List<Future<short[]>> audios = new ArrayList<>();
+                for (Path cur : stream) {
+                    String filename = cur.getFileName().toString();
+                    RevervoxMod.LOGGER.debug("Reading {} {}/{} ({})", filename, filename.startsWith("audio-"), filename.endsWith(".pcm"), cur);
+                    if(filename.startsWith("audio-") && filename.endsWith(".pcm")){
+                        RevervoxMod.LOGGER.debug("Starting AudioReader for {}", cur);
+                        AudioReader reader = new AudioReader(cur, true);
+                        audios.add(reader.read());
                     }
-                } else {
-                    RevervoxMod.LOGGER.warn("Unknown audio found in folder {}", uuid);
                 }
+                for(Future<short[]> cur : audios){
+                    try{
+                        recordedAudios.add(cur.get());
+                    } catch(InterruptedException e){
+                        RevervoxMod.LOGGER.error("File reading interrupted");
+                    } catch(ExecutionException e){
+                        RevervoxMod.LOGGER.error("Execution Exception during file reading");
+                    }
+                }
+                Files.delete(userPath);
+            } catch(IOException e){
+                RevervoxMod.LOGGER.error("Error reading audios for {}:\r\n{}\r\n{}", uuid, e.getMessage(), e.getStackTrace());
             }
-        } catch(Exception e){
-            RevervoxMod.LOGGER.error("error on recordedplayer: {}", e.getMessage());
         }
-        updateRecordingCount();
     }
 
-    private void updateRecordingCount(){
-        recordsCount++;
-        recordsCount %= RECORDING_LIMIT;
-    }
-
-    public Path getAudio(int index){
-        return userPath.resolve(uuid.toString() + "-" + index + ".pcm");
+    private boolean savingaudios = false;
+    public void saveAudios(){
+        if(!privacy && !savingaudios){ // This method should only ever happen once per RecordedPlayer, no more no less
+            savingaudios = true;
+            Path userPath = audiosPath.resolve(this.uuid.toString());
+            try{
+                if(!Files.exists(userPath)){
+                    Files.createDirectory(userPath);
+                }
+                for(int i = 0; i < recordedAudios.size(); i++){
+                    short[] cur = recordedAudios.get(i);
+                    new AudioSaver(userPath.resolve("audio-" + i + ".pcm"), cur.length, cur).start();
+                }
+            } catch(IOException e){
+                RevervoxMod.LOGGER.error("Error saving audios for {}:\r\n{}\r\n{}", uuid, e.getMessage(), e.getStackTrace());
+            }
+        }
     }
 
     public void stopRecording() {
@@ -87,23 +91,19 @@ public class RecordedPlayer {
             }
 
              */
-
-            Path audioPath = userPath.resolve(getUuid().toString() + "-" + recordsCount + ".pcm");
-
+            if(recordedAudios.size() >= RECORDING_LIMIT){
+                // TODO em vez disto implementar um array circular
+                return;
+            }
             if (filterAudio()){
-                RevervoxMod.LOGGER.info("{} privacy: {}", uuid, RevervoxVoicechatPlugin.getPrivacy(uuid));
-                if (RevervoxVoicechatPlugin.getPrivacy(uuid)){
-                    RevervoxVoicechatPlugin.addAudioToMem(uuid, recording);
-                    RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
-                } else {
-                    new AudioSaver(audioPath, currentRecordingIndex, recording).start();
-                }
+                short[] savedRecording = new short[currentRecordingIndex];
+                System.arraycopy(recording, 0, savedRecording, 0, currentRecordingIndex);
+                recordedAudios.add(savedRecording);
+                RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
             } else {
-                RevervoxMod.LOGGER.info("Audio is smaller than 0.9 seconds, not saving.");
+                RevervoxMod.LOGGER.info("Audio filtered, not storing");
             }
             currentRecordingIndex = 0;
-            RevervoxVoicechatPlugin.removeFromCache(audioPath);
-            updateRecordingCount();
         }
     }
 
@@ -128,7 +128,20 @@ public class RecordedPlayer {
         }
     }
 
-    public void startRecording() { // WARNING: Poderá ser melhor reniciar a gravação em vez de continuar caso este método seja chamado múltiplas vezes
+    public short[] getAudio(int idx){
+        RevervoxMod.LOGGER.debug("getting audio {}: {}", idx, recordedAudios.get(idx).length);
+        return recordedAudios.get(idx);
+    }
+    public short[] getRandomAudio(){
+        if(recordedAudios.isEmpty()){ return null; }
+        return recordedAudios.get(rnd.nextInt(recordedAudios.size()));
+    }
+
+    public int getAudioCount(){
+        return recordedAudios.size();
+    }
+
+    public void startRecording() {
         if (!isRecording) {
             decoder = RevervoxMod.vcApi.createDecoder();
             isRecording = true;
@@ -146,15 +159,6 @@ public class RecordedPlayer {
     public boolean isSpeaking() {
         if (this.getLastSpoke() == null) return false;
         return System.currentTimeMillis() - this.getLastSpoke().getTime() < 5000;
-    }
-
-    public Path getAudioPath(int index){
-        return RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + index + ".pcm");
-    }
-
-    public Path getRandomAudio(){
-        if (recordsCount <= 1) return null;
-        return RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + (new Random().nextInt(1, recordsCount)) + ".pcm");
     }
 
     public Date getLastSpoke() {

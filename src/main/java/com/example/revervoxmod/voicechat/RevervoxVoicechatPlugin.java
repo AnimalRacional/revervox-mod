@@ -4,18 +4,12 @@ import com.example.revervoxmod.RevervoxMod;
 import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
 
-import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 
 @ForgeVoicechatPlugin
 public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static String REVERVOX_CATEGORY = "revervox";
     private static HashMap<UUID, RecordedPlayer> recordedPlayers;
-    private static HashMap<UUID, Boolean> privacyMode;
-    private static ConcurrentHashMap<Path, Future<short[]>> audioCache;
-    private static ConcurrentHashMap<UUID, List<short[]>> recordedAudios;
 
     /**
      * @return the unique ID for this voice chat plugin
@@ -63,11 +57,11 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     private void onPlayerConnected(PlayerConnectedEvent e){
         UUID playerUuid = e.getConnection().getPlayer().getUuid();
         recordedPlayers.put(playerUuid, new RecordedPlayer(playerUuid));
-        recordedAudios.put(playerUuid, new LinkedList<>());
     }
 
     private void onPlayerDisconnected(PlayerDisconnectedEvent e){
         stopRecording(e.getPlayerUuid());
+        recordedPlayers.get(e.getPlayerUuid()).saveAudios();
         recordedPlayers.remove(e.getPlayerUuid());
     }
 
@@ -83,11 +77,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
 
         api.registerVolumeCategory(revervoxCategory);
         recordedPlayers = new HashMap<>();
-        audioCache = new ConcurrentHashMap<>();
-        recordedAudios = new ConcurrentHashMap<>();
-
         RevervoxMod.TASKS.schedule(checkForSilence(), 20);
-        privacyMode = new HashMap<>();
     }
 
     public static void stopRecording(UUID uuid) {
@@ -108,23 +98,26 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
         return recordedPlayers;
     }
 
-    public static ConcurrentHashMap<Path, Future<short[]>> getAudioCache() {
-        return audioCache;
-    }
-
-    public static void removeFromCache(Path path){
-        audioCache.remove(path);
-    }
 
     public static void setPrivacy(UUID uuid, boolean state){
-        privacyMode.put(uuid, state);
+        recordedPlayers.get(uuid).privacy = state;
     }
-
-    public static boolean getPrivacy(UUID uuid){
-        return privacyMode.getOrDefault(uuid, true);
+    public static short[] getAudio(UUID uuid, int idx){
+        if(recordedPlayers.get(uuid).getAudioCount() > idx){
+            return recordedPlayers.get(uuid).getAudio(idx);
+        }
+        return null;
     }
-    public static void addAudioToMem(UUID uuid, short[] audio){
-        recordedAudios.get(uuid).add(audio);
+    public static short[] getRandomAudio(UUID uuid){
+        return recordedPlayers.get(uuid).getRandomAudio();
+    }
+    public static short[] getRandomAudio(){
+        Random rnd = new Random();
+        List<RecordedPlayer> players = recordedPlayers.values()
+                .stream().filter((r) -> r.getAudioCount() > 0)
+                .toList();
+        if(players.isEmpty()){ return null; }
+        return players.get(rnd.nextInt(players.size())).getRandomAudio();
     }
 
     private Runnable checkForSilence() {
@@ -144,7 +137,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
                 }
             }
 
-            RevervoxMod.TASKS.schedule(checkForSilence(), 20);
+            RevervoxMod.TASKS.schedule(checkForSilence(), silenceThresholdMs * 23);
         };
     }
 

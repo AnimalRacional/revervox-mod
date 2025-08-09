@@ -46,9 +46,6 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
-import java.nio.file.Path;
-import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
@@ -115,7 +112,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     }
 
     @Override
-    protected @NotNull PathNavigation createNavigation(Level pLevel) {
+    protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
         return new MMPathNavigateGround(this, pLevel);
     }
 
@@ -219,17 +216,12 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     }
 
     public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioPlayer.Mode mode){
-        // TODO tanto aqui como no RandomRepeatGoal, é possível o áudio aleatório ser null mesmo quando há audios pois só verificamos o player do evento e um outro player aleatório, que podem ambos ter 0 audios mesmo outros players tendo audios
         RecordedPlayer record = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
         if (record == null) return;
-        Path audio = record.getRandomAudio();
+        short[] audio = record.getRandomAudio();
         if(audio == null){
             RevervoxMod.LOGGER.error("No audio found for {}, choosing random player", player.getName());
-            Set<UUID> keyset = RevervoxVoicechatPlugin.getRecordedPlayers().keySet();
-            if (keyset.isEmpty()) return;
-            UUID randomUUID = keyset.stream().skip(new Random().nextInt(keyset.size())).findFirst().orElse(null);
-
-            audio = RevervoxVoicechatPlugin.getRecordedPlayer(randomUUID).getRandomAudio();
+            audio = RevervoxVoicechatPlugin.getRandomAudio();
             if (audio == null) return;
         }
         RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());
