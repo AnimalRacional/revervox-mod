@@ -19,7 +19,7 @@ public class ScheduleLogCommand {
                                         .executes((src) -> {
                                             String text = StringArgumentType.getString(src, "text");
                                             RevervoxMod.TASKS.schedule(() -> {
-                                                RevervoxMod.LOGGER.info(text);
+                                                RevervoxMod.LOGGER.debug(text);
                                             }, IntegerArgumentType.getInteger(src, "ticks"));
                                             return 1;
                                 })))

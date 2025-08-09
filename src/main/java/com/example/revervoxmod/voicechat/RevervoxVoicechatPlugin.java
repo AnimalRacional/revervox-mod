@@ -32,7 +32,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
      */
     @Override
     public void initialize(VoicechatApi api) {
-        RevervoxMod.LOGGER.info("Revervox voice chat plugin initialized!");
+        RevervoxMod.LOGGER.debug("Revervox voice chat plugin initialized!");
         RevervoxMod.vcApi = api;
     }
 
@@ -92,12 +92,12 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
 
     public static void stopRecording(UUID uuid) {
         recordedPlayers.get(uuid).stopRecording();
-        RevervoxMod.LOGGER.info("Stopped recording for player: " + uuid.toString());
+        RevervoxMod.LOGGER.debug("Stopped recording for player: " + uuid.toString());
     }
 
     public static void startRecording(UUID uuid) {
         recordedPlayers.get(uuid).startRecording();
-        RevervoxMod.LOGGER.info("Recording started for player: " + uuid.toString());
+        RevervoxMod.LOGGER.debug("Recording started for player: " + uuid.toString());
     }
 
     public static RecordedPlayer getRecordedPlayer(UUID uuid) {
@@ -138,7 +138,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
                 if (player.isSilent()) continue;
                 if (player.isRecording() &&
                         (now - lastSpoke.getTime()) > silenceThresholdMs) {
-                    RevervoxMod.LOGGER.info("Stopped Speaking!");
+                    RevervoxMod.LOGGER.debug("Stopped Speaking!");
                     RevervoxVoicechatPlugin.stopRecording(player.getUuid());
                     player.setSilent(true);
                 }

@@ -38,7 +38,7 @@ public class isRecordingCommand {
                 if (targets.size() != 1) sb.append("\n");
             }
 
-            RevervoxMod.LOGGER.info(sb.toString());
+            RevervoxMod.LOGGER.debug(sb.toString());
 
             cmdSrc.getSource().sendSuccess(() -> {
                 return Component.literal(sb.toString());

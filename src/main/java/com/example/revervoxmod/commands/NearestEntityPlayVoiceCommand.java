@@ -53,16 +53,16 @@ public class NearestEntityPlayVoiceCommand {
             Collection<? extends Entity> entities = EntityArgument.getEntities(cmdSrc, "entity");
 
             for(Entity nearestEntity : entities){
-                RevervoxMod.LOGGER.info("Entity: " + nearestEntity.getName());
+                RevervoxMod.LOGGER.debug("Entity: " + nearestEntity.getName());
                 String category = RevervoxVoicechatPlugin.REVERVOX_CATEGORY;
                 Collection<GameProfile> targets = GameProfileArgument.getGameProfiles(cmdSrc, "player");
                 int idx = IntegerArgumentType.getInteger(cmdSrc, "index");
                 for (GameProfile target : targets) {
                     UUID channelID = UUID.randomUUID();
                     EntityAudioChannel channel = createChannel(api, channelID, category, nearestEntity);
-                    RevervoxMod.LOGGER.info("Created new channel: " + channel);
+                    RevervoxMod.LOGGER.debug("Created new channel: " + channel);
                     new AudioPlayer(getAudioPath(target.getId(), idx), api, channel).start();
-                    RevervoxMod.LOGGER.info("silent: " + nearestEntity.isSilent());
+                    RevervoxMod.LOGGER.debug("silent: " + nearestEntity.isSilent());
                 }
             }
             return 1;
@@ -80,16 +80,16 @@ public class NearestEntityPlayVoiceCommand {
                 Entity nearestEntity = level.getNearestEntity(LivingEntity.class, TargetingConditions.DEFAULT,
                         null, srcPos.x, srcPos.y, srcPos.z, aabb);
                 if (nearestEntity != null) {
-                    RevervoxMod.LOGGER.info("Entity: " + nearestEntity.getName());
+                    RevervoxMod.LOGGER.debug("Entity: " + nearestEntity.getName());
                     String category = RevervoxVoicechatPlugin.REVERVOX_CATEGORY;
                     Collection<GameProfile> targets = GameProfileArgument.getGameProfiles(cmdSrc, "player");
                     int idx = IntegerArgumentType.getInteger(cmdSrc, "index");
                     for (GameProfile target : targets) {
                         UUID channelID = UUID.randomUUID();
                         EntityAudioChannel channel = createChannel(api, channelID, category, nearestEntity);
-                        RevervoxMod.LOGGER.info("Created new channel: " + channel);
+                        RevervoxMod.LOGGER.debug("Created new channel: " + channel);
                         new AudioPlayer(getAudioPath(target.getId(), idx), api, channel).start();
-                        RevervoxMod.LOGGER.info("silent: " + nearestEntity.isSilent());
+                        RevervoxMod.LOGGER.debug("silent: " + nearestEntity.isSilent());
                     }
 
                 } else {
@@ -106,7 +106,7 @@ public class NearestEntityPlayVoiceCommand {
 
     private static Path getAudioPath(UUID uuid, int index){
         Path audioPath = RecordedPlayer.audiosPath.resolve(uuid.toString()).resolve(uuid + "-" + index + ".pcm");
-        RevervoxMod.LOGGER.info("Audio Path: " + audioPath);
+        RevervoxMod.LOGGER.debug("Audio Path: " + audioPath);
         return audioPath;
     }
 

@@ -145,7 +145,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     public void startPersistentAngerTimer() {
-        RevervoxMod.LOGGER.info("Starting persistent anger timer!");
+        RevervoxMod.LOGGER.debug("Starting persistent anger timer!");
         this.setRemainingPersistentAngerTime(PERSISTENT_ANGER_TIME.sample(this.random));
     }
 
@@ -184,14 +184,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         BlockState blockstate = this.level().getBlockState(blockpos$mutableblockpos);
         boolean flag = blockstate.isSolidRender(this.level(), blockpos$mutableblockpos);
         boolean flag1 = blockstate.getFluidState().is(FluidTags.WATER);
-        RevervoxMod.LOGGER.info("flag: " + flag + " flag1: " + flag1);
+        RevervoxMod.LOGGER.debug("flag: " + flag + " flag1: " + flag1);
         if (flag && !flag1) {
-            RevervoxMod.LOGGER.info("Entered main if statement");
+            RevervoxMod.LOGGER.debug("Entered main if statement");
             net.minecraftforge.event.entity.EntityTeleportEvent.EnderEntity event = net.minecraftforge.event.ForgeEventFactory.onEnderTeleport(this, pX, pY, pZ);
             if (event.isCanceled()) return false;
             Vec3 vec3 = this.position();
             boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true);
-            RevervoxMod.LOGGER.info("flag2: " + flag2); //TODO ESTA FLAG FICA QUASE SEMPRE FALSE
+            RevervoxMod.LOGGER.debug("flag2: " + flag2); //TODO ESTA FLAG FICA QUASE SEMPRE FALSE
             if (flag2) {
                 this.level().gameEvent(GameEvent.TELEPORT, vec3, GameEvent.Context.of(this));
                 if (!this.isSilent()) {
@@ -232,7 +232,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             audio = RevervoxVoicechatPlugin.getRecordedPlayer(randomUUID).getRandomAudio();
             if (audio == null) return;
         }
-        RevervoxMod.LOGGER.info("Playing audio from player: " + player.getName());
+        RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());
         currentAudioPlayer = new AudioPlayer(audio, api, channel, mode);
         currentAudioPlayer.start();
     }

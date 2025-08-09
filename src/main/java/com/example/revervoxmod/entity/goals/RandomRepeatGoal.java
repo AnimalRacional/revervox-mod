@@ -44,7 +44,7 @@ public class RandomRepeatGoal extends Goal {
     public void tick() {
         canSpeak = false;
         if (audiosPlayed >= 5) this.mob.remove(Entity.RemovalReason.DISCARDED);
-        RevervoxMod.LOGGER.info("Less than 5 audios!");
+        RevervoxMod.LOGGER.debug("Less than 5 audios!");
         if (this.mob.getCurrentAudioPlayer() != null && this.mob.getCurrentAudioPlayer().isPlaying()) return;
         if (RevervoxMod.vcApi instanceof VoicechatServerApi api){
 
@@ -52,10 +52,10 @@ public class RandomRepeatGoal extends Goal {
                     getNearbyPlayers(TargetingConditions.forNonCombat(), this.mob, this.mob.getBoundingBox()
                     .inflate(CHANNEL_DISTANCE)));
 
-            RevervoxMod.LOGGER.info("Nearby Players: " + Arrays.toString(nearbyPlayers.toArray()));
+            RevervoxMod.LOGGER.debug("Nearby Players: " + Arrays.toString(nearbyPlayers.toArray()));
 
             if (nearbyPlayers.isEmpty()) {
-                RevervoxMod.LOGGER.info("No players nearby");
+                RevervoxMod.LOGGER.debug("No players nearby");
 
                 Level level = this.mob.level();
                 Player nearestPlayer = null;
@@ -69,20 +69,20 @@ public class RandomRepeatGoal extends Goal {
                 }
 
                 if (nearestPlayer != null) {
-                    RevervoxMod.LOGGER.info("Teleporting towards nearest player: " + nearestPlayer.getName());
-                    RevervoxMod.LOGGER.info("TeleportTowards: " + this.mob.teleportTowards(nearestPlayer));
+                    RevervoxMod.LOGGER.debug("Teleporting towards nearest player: " + nearestPlayer.getName());
+                    RevervoxMod.LOGGER.debug("TeleportTowards: " + this.mob.teleportTowards(nearestPlayer));
                     audiosPlayed = 0;
                 }
             } else {
                 if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {
-                    RevervoxMod.LOGGER.info("Atleast 2 players nearby");
+                    RevervoxMod.LOGGER.debug("Atleast 2 players nearby");
 
                     for (int i = 0; i < nearbyPlayers.size(); i++) {
                         for (int k = i + 1; k < nearbyPlayers.size(); k++) {
                             Player player1 = nearbyPlayers.get(i);
                             Player player2 = nearbyPlayers.get(k);
                             if (player1.distanceToSqr(player2) > (double) CHANNEL_DISTANCE /2) {
-                                RevervoxMod.LOGGER.info("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE/2);
+                                RevervoxMod.LOGGER.debug("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE/2);
                                 Player furthestPlayer = player1.distanceToSqr(this.mob) > player2.distanceToSqr(this.mob) ? player1 : player2;
                                 this.mob.playAudio(furthestPlayer, api, channel, AudioPlayer.Mode.DEFAULT);
                                 audiosPlayed++;
@@ -94,7 +94,7 @@ public class RandomRepeatGoal extends Goal {
                         }
                     }
                 }
-                RevervoxMod.LOGGER.info("Playing audio from random player that is not near...");
+                RevervoxMod.LOGGER.debug("Playing audio from random player that is not near...");
                 Set<UUID> recordedPlayers = RevervoxVoicechatPlugin.getRecordedPlayers().keySet();
                 Set<UUID> nearbyPlayerUUIDs = nearbyPlayers.stream().map(Player::getUUID).collect(Collectors.toSet());
                 Set<UUID> otherPlayers = new HashSet<>(recordedPlayers);
@@ -103,7 +103,7 @@ public class RandomRepeatGoal extends Goal {
                 if (!otherPlayers.isEmpty()) {
                     playRandomAudioFromSet(api, otherPlayers);
                 } else {
-                    RevervoxMod.LOGGER.info("No other players to play sounds from");
+                    RevervoxMod.LOGGER.debug("No other players to play sounds from");
                     playRandomAudioFromSet(api, nearbyPlayerUUIDs);
                 }
             }

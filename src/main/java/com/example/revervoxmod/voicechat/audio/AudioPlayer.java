@@ -46,7 +46,7 @@ public class AudioPlayer extends Thread{
             if (recording != null) {
                 playerAudioPlayer = api.createAudioPlayer(channel, api.createEncoder(), recording);
                 playerAudioPlayer.startPlaying();
-                RevervoxMod.LOGGER.info("Playing Audio...");
+                RevervoxMod.LOGGER.debug("Playing Audio...");
             }
         } catch (Exception e) {
             RevervoxMod.LOGGER.error(e.getMessage());

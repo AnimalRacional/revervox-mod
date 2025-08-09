@@ -30,7 +30,7 @@ public class TargetSpokeGoal extends NearestAttackableTargetGoal<Player> {
             boolean isSpeakingAtMe = revervox.isSpeakingAtMe((Player)player);
             boolean isAngryAt = revervox.isAngryAt(player);
             boolean hasIndirectPassenger = revervox.hasIndirectPassenger(player);
-            //ExampleMod.LOGGER.info("isSpeakingAtMe: " + isSpeakingAtMe + ", isAngryAt: " + isAngryAt + ", hasIndirectPassenger: " + hasIndirectPassenger);
+            //ExampleMod.LOGGER.debug("isSpeakingAtMe: " + isSpeakingAtMe + ", isAngryAt: " + isAngryAt + ", hasIndirectPassenger: " + hasIndirectPassenger);
             return (isSpeakingAtMe || isAngryAt) && !hasIndirectPassenger;
         };
         this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(this.isAngerInducing);
@@ -86,7 +86,7 @@ public class TargetSpokeGoal extends NearestAttackableTargetGoal<Player> {
             if (--this.aggroTime <= 0) {
                 this.target = this.pendingTarget;
                 super.setTarget(this.target);
-                RevervoxMod.LOGGER.info("Target: " + this.target.getName());
+                RevervoxMod.LOGGER.debug("Target: " + this.target.getName());
                 this.pendingTarget = null;
                 super.start();
             }

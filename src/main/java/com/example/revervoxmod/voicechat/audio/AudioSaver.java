@@ -30,7 +30,7 @@ public class AudioSaver extends Thread{
             }
             dos.close();
 
-            RevervoxMod.LOGGER.info("Wrote recording to file {}", path);
+            RevervoxMod.LOGGER.debug("Wrote recording to file {}", path);
         } catch (IOException e){
             RevervoxMod.LOGGER.error(e.getMessage());
         }

@@ -19,6 +19,7 @@ public class AddSoundInstancePacket {
     private SoundEvent sound;
     private SoundSource soundSource;
     public AddSoundInstancePacket(int entityID, SoundEvent sound, SoundSource soundSource) {
+        RevervoxMod.LOGGER.debug("Created AddSoundInstancePacket");
         this.entityID = entityID;
         this.sound = sound;
         this.soundSource = soundSource;
@@ -26,6 +27,7 @@ public class AddSoundInstancePacket {
 
     public void encode(FriendlyByteBuf buffer){
         // Fill the buffer with packet
+        RevervoxMod.LOGGER.debug("Encoded AddSoundInstancePacket");
         buffer.writeInt(entityID);
         buffer.writeResourceLocation(sound.getLocation());
         buffer.writeInt(soundSource.ordinal());
@@ -33,19 +35,21 @@ public class AddSoundInstancePacket {
 
     public static AddSoundInstancePacket decode(FriendlyByteBuf buffer){
         // Create the packet from the buffer
+        RevervoxMod.LOGGER.debug("Decoded AddSoundInstancePacket");
         return new AddSoundInstancePacket(buffer.readInt(), SoundEvent.createVariableRangeEvent(buffer.readResourceLocation()) , SoundSource.values()[buffer.readInt()]);
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         // Handle the packet
+        RevervoxMod.LOGGER.debug("Handling AddSoundInstancePacket");
         ctx.get().enqueueWork(() -> {
-            RevervoxMod.LOGGER.info("Sound instance packet received!");
+            RevervoxMod.LOGGER.debug("Sound instance packet received!");
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->{
                 Level level = Minecraft.getInstance().level;
                 if (level != null && level.getEntity(entityID) instanceof LivingEntity entity){
                     Minecraft.getInstance().getSoundManager().play(new EntityFollowingSoundInstance(entity, sound, soundSource));
                 } else {
-                    RevervoxMod.LOGGER.info("Could not find entity with id {}", entityID);
+                    RevervoxMod.LOGGER.error("Could not find entity with id {}", entityID);
                 }
 
             });

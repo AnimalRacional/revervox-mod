@@ -42,7 +42,7 @@ public class AudioReader {
                 audio[i] = dis.readShort();
             }
             dis.close();
-            RevervoxMod.LOGGER.info("Read from the file!");
+            RevervoxMod.LOGGER.debug("Read from the file!");
 
             return audio;
         } catch (FileNotFoundException e){

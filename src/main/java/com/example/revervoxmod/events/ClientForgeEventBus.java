@@ -6,7 +6,6 @@ import com.example.revervoxmod.networking.RevervoxPacketHandler;
 import com.example.revervoxmod.networking.packets.PrivacyModePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
@@ -17,7 +16,7 @@ public class ClientForgeEventBus {
             if(event.getLevel().isClientSide() &&
                     event.getEntity() instanceof LocalPlayer){
                 Minecraft.getInstance().submit(() -> {
-                    RevervoxMod.LOGGER.info("CLIENT SENDING ENTITY JOIN PACKET!");
+                    RevervoxMod.LOGGER.debug("Client Sending EntityJoinLevelEvent Packet!");
                     RevervoxPacketHandler.INSTANCE.sendToServer(new PrivacyModePacket(RevervoxModClientConfigs.PRIVACY_MODE.get()));
                 });
             }
@@ -26,10 +25,10 @@ public class ClientForgeEventBus {
     // \/\/\/ TODO descobrir porque nenhum destes eventos é chamado... talvez sejam para a server-side config?
     @SubscribeEvent
     public void clientConfigChangedEvent(ModConfigEvent.Loading event){
-        RevervoxMod.LOGGER.info("CONFIG CHANGED! load");
+        RevervoxMod.LOGGER.debug("Client Config Changed! Load");
         if(event.getConfig().getModId().equals(RevervoxMod.MOD_ID)){
             Minecraft.getInstance().submit(() -> {
-                RevervoxMod.LOGGER.info("CLIENT SENDING CONFIG CHANGED PACKET!");
+                RevervoxMod.LOGGER.debug("Client Sending Config Changed Packet!");
                 RevervoxPacketHandler.INSTANCE.sendToServer(new PrivacyModePacket(RevervoxModClientConfigs.PRIVACY_MODE.get()));
             });
         }
@@ -37,10 +36,10 @@ public class ClientForgeEventBus {
 
     @SubscribeEvent
     public void clientConfigChangedEvent(ModConfigEvent.Unloading event){
-        RevervoxMod.LOGGER.info("CONFIG CHANGED! unload");
+        RevervoxMod.LOGGER.debug("Client Config Changed! Unload");
         if(event.getConfig().getModId().equals(RevervoxMod.MOD_ID)){
             Minecraft.getInstance().submit(() -> {
-                RevervoxMod.LOGGER.info("CLIENT SENDING CONFIG CHANGED PACKET!");
+                RevervoxMod.LOGGER.debug("Client Sending Config Changed Packet!");
                 RevervoxPacketHandler.INSTANCE.sendToServer(new PrivacyModePacket(RevervoxModClientConfigs.PRIVACY_MODE.get()));
             });
         }
@@ -48,10 +47,10 @@ public class ClientForgeEventBus {
 
     @SubscribeEvent
     public void clientConfigChangedEvent(ModConfigEvent.Reloading event){
-        RevervoxMod.LOGGER.info("CONFIG CHANGED! reload");
+        RevervoxMod.LOGGER.debug("Client Config Changed! Reload");
         if(event.getConfig().getModId().equals(RevervoxMod.MOD_ID)){
             Minecraft.getInstance().submit(() -> {
-                RevervoxMod.LOGGER.info("CLIENT SENDING CONFIG CHANGED PACKET!");
+                RevervoxMod.LOGGER.debug("Client Sending Config Changed Packet!");
                 RevervoxPacketHandler.INSTANCE.sendToServer(new PrivacyModePacket(RevervoxModClientConfigs.PRIVACY_MODE.get()));
             });
         }

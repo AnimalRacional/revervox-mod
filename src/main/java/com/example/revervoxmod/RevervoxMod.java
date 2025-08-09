@@ -60,12 +60,12 @@ public class RevervoxMod {
     }
 
     private void setup(FMLCommonSetupEvent event) {
-        LOGGER.info("Setting up Revervox Mod");
+        LOGGER.debug("Setting up Revervox Mod");
     }
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        LOGGER.info("Server starting");
+        LOGGER.debug("Server starting");
         RecordedPlayer.audiosPath = event.getServer().getWorldPath(AUDIOS);
         if(!Files.exists(RecordedPlayer.audiosPath)){
             try {
