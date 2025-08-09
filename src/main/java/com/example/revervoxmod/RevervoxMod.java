@@ -20,7 +20,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -39,7 +38,6 @@ public class RevervoxMod {
     public static final LevelResource AUDIOS = new LevelResource("player_audios");
     public static VoicechatApi vcApi = null;
     public static TaskScheduler TASKS = new TaskScheduler();
-
 
     public RevervoxMod(FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.addListener(this::setup);
@@ -77,10 +75,21 @@ public class RevervoxMod {
         }
     }
 
+    //TODO salvar audios quando server crasha, rn o onPlayerDisconnected é chamado mas n vai a tempo de salvar os audios
+    /*
     @SubscribeEvent
     public void onServerCrash(ServerStoppedEvent event) {
-        RevervoxMod.LOGGER.info("MIAUUUUUUUUUUUUUUUU");
+            RevervoxMod.LOGGER.debug("Saving audios from player");
+            if (RevervoxVoicechatPlugin.ran) {
+                RevervoxMod.LOGGER.debug("ran is true");
+                return;
+            }
+            for (UUID uuid : RevervoxVoicechatPlugin.getRecordedPlayers().keySet()){
+                RevervoxVoicechatPlugin.getRecordedPlayer(uuid).saveAudios();
+            }
     }
+
+     */
 
 
     @SubscribeEvent

@@ -2,7 +2,7 @@ package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
-import com.example.revervoxmod.entity.ai.MMPathNavigateGround;
+import com.example.revervoxmod.entity.ai.MMWallClimberNavigation;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
@@ -16,6 +16,9 @@ import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
@@ -50,6 +53,7 @@ import java.util.UUID;
 
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+    private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BYTE);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
@@ -60,6 +64,11 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     public RevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         moveControl = new MMEntityMoveHelper(this, 90);
+    }
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DATA_FLAGS_ID, (byte)0);
     }
 
     @Override
@@ -113,7 +122,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
-        return new MMPathNavigateGround(this, pLevel);
+        return new MMWallClimberNavigation(this, pLevel);
     }
 
     @Override
@@ -213,6 +222,31 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         }
         channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
         playAudio(player, api, channel, AudioPlayer.Mode.PITCHED);
+    }
+
+    public void tick() {
+        super.tick();
+        if (!this.level().isClientSide) {
+            this.setClimbing(this.horizontalCollision);
+        }
+
+    }
+    @Override
+    public boolean onClimbable() {
+        return this.isClimbing();
+    }
+    public boolean isClimbing() {
+        return (this.entityData.get(DATA_FLAGS_ID) & 1) != 0;
+    }
+    public void setClimbing(boolean pClimbing) {
+        byte b0 = this.entityData.get(DATA_FLAGS_ID);
+        if (pClimbing) {
+            b0 = (byte)(b0 | 1);
+        } else {
+            b0 = (byte)(b0 & -2);
+        }
+
+        this.entityData.set(DATA_FLAGS_ID, b0);
     }
 
     public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioPlayer.Mode mode){
