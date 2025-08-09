@@ -33,8 +33,8 @@ public class PrivacyModePacket {
         ctx.get().enqueueWork(() -> {
             RevervoxMod.LOGGER.debug("PrivacyModePacket received!");
             if(ctx.get().getSender() != null){
+                RevervoxMod.LOGGER.debug("Setting privacy mode for {} to {}", ctx.get().getSender().getName(), state);
                 RevervoxVoicechatPlugin.setPrivacy(ctx.get().getSender().getUUID(), state);
-                RevervoxMod.LOGGER.debug("Set privacy mode for {} to {}", ctx.get().getSender().getName(), state);
             } else {
                 RevervoxMod.LOGGER.warn("Received PrivacyModePacket without sender?");
             }

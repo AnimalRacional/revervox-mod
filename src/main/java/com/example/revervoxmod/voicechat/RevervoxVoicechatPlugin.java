@@ -5,12 +5,13 @@ import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @ForgeVoicechatPlugin
 public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static String REVERVOX_CATEGORY = "revervox";
-    private static HashMap<UUID, RecordedPlayer> recordedPlayers;
-
+    private static Map<UUID, RecordedPlayer> recordedPlayers;
+    private static Map<UUID, Boolean> privacyMode;
     /**
      * @return the unique ID for this voice chat plugin
      */
@@ -63,6 +64,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
         stopRecording(e.getPlayerUuid());
         recordedPlayers.get(e.getPlayerUuid()).saveAudios();
         recordedPlayers.remove(e.getPlayerUuid());
+        privacyMode.remove(e.getPlayerUuid());
     }
 
     private void onServerStarted(VoicechatServerStartedEvent event) {
@@ -76,7 +78,8 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
                 .build();
 
         api.registerVolumeCategory(revervoxCategory);
-        recordedPlayers = new HashMap<>();
+        recordedPlayers = new ConcurrentHashMap<>();
+        privacyMode = new ConcurrentHashMap<>();
         RevervoxMod.TASKS.schedule(checkForSilence(), 20);
     }
 
@@ -94,13 +97,16 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
         return recordedPlayers.get(uuid);
     }
 
-    public static HashMap<UUID, RecordedPlayer> getRecordedPlayers() {
+    public static Map<UUID, RecordedPlayer> getRecordedPlayers() {
         return recordedPlayers;
     }
 
 
+    public static boolean getPrivacy(UUID uuid){
+        return privacyMode.getOrDefault(uuid, false);
+    }
     public static void setPrivacy(UUID uuid, boolean state){
-        recordedPlayers.get(uuid).privacy = state;
+        privacyMode.put(uuid, state);
     }
     public static short[] getAudio(UUID uuid, int idx, boolean remove){
         if(recordedPlayers.get(uuid).getAudioCount() > idx){

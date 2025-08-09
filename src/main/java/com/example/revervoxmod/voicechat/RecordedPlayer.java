@@ -25,11 +25,9 @@ public class RecordedPlayer {
     private Date lastSpoke;
     private boolean isSilent = false;
     public static final int RECORDING_LIMIT = 20; // recording limit per user, so total amount of audios should be (limit * players online)
-    public boolean privacy;
     private final List<short[]> recordedAudios;
     public RecordedPlayer(UUID uuid) {
         rnd = new Random();
-        this.privacy = false;
         this.uuid = uuid;
         this.recording = new short[RECORDING_SIZE];
         this.recordedAudios = new ArrayList<>();
@@ -64,7 +62,7 @@ public class RecordedPlayer {
 
     private boolean savingaudios = false;
     public void saveAudios(){
-        if(!privacy && !savingaudios){ // This method should only ever happen once per RecordedPlayer, no more no less
+        if(!RevervoxVoicechatPlugin.getPrivacy(uuid) && !savingaudios){ // This method should only ever happen once per RecordedPlayer, no more no less
             savingaudios = true;
             Path userPath = audiosPath.resolve(this.uuid.toString());
             try{
