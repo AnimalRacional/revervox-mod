@@ -4,6 +4,8 @@ import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.networking.packets.AddSoundInstancePacket;
 import com.example.revervoxmod.networking.packets.PrivacyModePacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -30,7 +32,7 @@ public class RevervoxPacketHandler {
                 AddSoundInstancePacket.class,
                 AddSoundInstancePacket::encode,
                 AddSoundInstancePacket::decode,
-                AddSoundInstancePacket::handle
+                DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> AddSoundInstancePacket::handle)
         );
     }
 }
