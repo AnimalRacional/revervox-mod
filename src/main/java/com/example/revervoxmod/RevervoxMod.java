@@ -20,6 +20,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -74,6 +75,11 @@ public class RevervoxMod {
                 LOGGER.error("Error creating audios directory: " + e.getMessage());
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onServerCrash(ServerStoppedEvent event) {
+        RevervoxMod.LOGGER.info("MIAUUUUUUUUUUUUUUUU");
     }
 
 

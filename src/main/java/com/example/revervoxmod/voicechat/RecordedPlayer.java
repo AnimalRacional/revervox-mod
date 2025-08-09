@@ -192,22 +192,13 @@ public class RecordedPlayer {
         final int SAMPLE_RATE = 48000;
         final double MIN_DURATION = 0.9;
         final int SILENCE_THRESHOLD = 500; // amplitude to detect speech start/end
+        final double MIN_RMS = 500;      // loudness threshold
 
         double durationSeconds = (double) currentRecordingIndex / SAMPLE_RATE;
         if (durationSeconds <= MIN_DURATION) {
             RevervoxMod.LOGGER.info("Audio too short: " + durationSeconds + "s");
             return false;
         }
-
-        int noiseSampleCount = (int) (SAMPLE_RATE * 0.5);
-        noiseSampleCount = Math.min(noiseSampleCount, currentRecordingIndex);
-
-        long noiseSumSquares = 0;
-        for (int i = 0; i < noiseSampleCount; i++) {
-            int sample = recording[i];
-            noiseSumSquares += sample * sample;
-        }
-        double noiseRMS = Math.sqrt(noiseSumSquares / (double) noiseSampleCount);
 
         int start = 0;
         while (start < currentRecordingIndex &&
@@ -227,6 +218,7 @@ public class RecordedPlayer {
             return false;
         }
 
+        // RMS on trimmed region
         long sumSquares = 0;
         for (int i = start; i <= end; i++) {
             int sample = recording[i];
@@ -235,14 +227,13 @@ public class RecordedPlayer {
         double rms = Math.sqrt(sumSquares / (double) activeSamples);
 
         RevervoxMod.LOGGER.info(String.format(
-                "Audio duration: %.3fs, Active region: %.3fs, Noise RMS: %.1f, RMS: %.1f",
+                "Audio duration: %.3fs, Active region: %.3fs, RMS: %.1f",
                 durationSeconds,
                 (double) activeSamples / SAMPLE_RATE,
-                noiseRMS,
                 rms
         ));
 
-        return rms >= noiseRMS;
+        return rms >= MIN_RMS;
     }
 
 
