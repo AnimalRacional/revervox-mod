@@ -218,10 +218,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioPlayer.Mode mode){
         RecordedPlayer record = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
         if (record == null) return;
-        short[] audio = record.getRandomAudio();
+        short[] audio = record.getRandomAudio(true);
         if(audio == null){
             RevervoxMod.LOGGER.error("No audio found for {}, choosing random player", player.getName());
-            audio = RevervoxVoicechatPlugin.getRandomAudio();
+            audio = RevervoxVoicechatPlugin.getRandomAudio(true);
             if (audio == null) return;
         }
         RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());

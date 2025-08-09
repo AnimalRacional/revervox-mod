@@ -102,22 +102,22 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static void setPrivacy(UUID uuid, boolean state){
         recordedPlayers.get(uuid).privacy = state;
     }
-    public static short[] getAudio(UUID uuid, int idx){
+    public static short[] getAudio(UUID uuid, int idx, boolean remove){
         if(recordedPlayers.get(uuid).getAudioCount() > idx){
-            return recordedPlayers.get(uuid).getAudio(idx);
+            return recordedPlayers.get(uuid).getAudio(idx, remove);
         }
         return null;
     }
-    public static short[] getRandomAudio(UUID uuid){
-        return recordedPlayers.get(uuid).getRandomAudio();
+    public static short[] getRandomAudio(UUID uuid, boolean remove){
+        return recordedPlayers.get(uuid).getRandomAudio(remove);
     }
-    public static short[] getRandomAudio(){
+    public static short[] getRandomAudio(boolean remove){
         Random rnd = new Random();
         List<RecordedPlayer> players = recordedPlayers.values()
                 .stream().filter((r) -> r.getAudioCount() > 0)
                 .toList();
         if(players.isEmpty()){ return null; }
-        return players.get(rnd.nextInt(players.size())).getRandomAudio();
+        return players.get(rnd.nextInt(players.size())).getRandomAudio(remove);
     }
 
     private Runnable checkForSilence() {
@@ -137,7 +137,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
                 }
             }
 
-            RevervoxMod.TASKS.schedule(checkForSilence(), silenceThresholdMs * 23);
+            RevervoxMod.TASKS.schedule(checkForSilence(), silenceThresholdMs / 50);
         };
     }
 

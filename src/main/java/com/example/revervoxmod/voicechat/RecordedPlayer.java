@@ -32,7 +32,7 @@ public class RecordedPlayer {
         this.privacy = false;
         this.uuid = uuid;
         this.recording = new short[RECORDING_SIZE];
-        this.recordedAudios = new LinkedList<>();
+        this.recordedAudios = new ArrayList<>();
         Path userPath = audiosPath.resolve(this.uuid.toString());
         if(Files.exists(userPath)){
             try(DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)){
@@ -48,7 +48,7 @@ public class RecordedPlayer {
                 }
                 for(Future<short[]> cur : audios){
                     try{
-                        recordedAudios.add(cur.get());
+                        addAudio(cur.get());
                     } catch(InterruptedException e){
                         RevervoxMod.LOGGER.error("File reading interrupted");
                     } catch(ExecutionException e){
@@ -81,6 +81,14 @@ public class RecordedPlayer {
         }
     }
 
+    public void addAudio(short[] audio){
+        if(recordedAudios.size() >= RECORDING_LIMIT){
+            recordedAudios.set(rnd.nextInt(recordedAudios.size()), audio);
+        } else {
+            recordedAudios.add(audio);
+        }
+    }
+
     public void stopRecording() {
         if (isRecording){
             /*
@@ -91,14 +99,10 @@ public class RecordedPlayer {
             }
 
              */
-            if(recordedAudios.size() >= RECORDING_LIMIT){
-                // TODO em vez disto implementar um array circular
-                return;
-            }
             if (filterAudio()){
                 short[] savedRecording = new short[currentRecordingIndex];
                 System.arraycopy(recording, 0, savedRecording, 0, currentRecordingIndex);
-                recordedAudios.add(savedRecording);
+                addAudio(savedRecording);
                 RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
             } else {
                 RevervoxMod.LOGGER.info("Audio filtered, not storing");
@@ -128,13 +132,28 @@ public class RecordedPlayer {
         }
     }
 
-    public short[] getAudio(int idx){
+    public short[] removeAudio(int idx){
+        short[] audio = recordedAudios.get(idx);
+        recordedAudios.set(idx, recordedAudios.get(recordedAudios.size()-1));
+        recordedAudios.remove(recordedAudios.size()-1);
+        return audio;
+    }
+
+    public short[] getAudio(int idx, boolean remove){
         RevervoxMod.LOGGER.debug("getting audio {}: {}", idx, recordedAudios.get(idx).length);
+        if(idx < 0 || idx >= recordedAudios.size()){
+            return null;
+        }
+        if(remove){
+            RevervoxMod.LOGGER.debug("removing audio {}", idx);
+            return removeAudio(idx);
+        }
         return recordedAudios.get(idx);
     }
-    public short[] getRandomAudio(){
+    public short[] getRandomAudio(boolean remove){
         if(recordedAudios.isEmpty()){ return null; }
-        return recordedAudios.get(rnd.nextInt(recordedAudios.size()));
+        int i = rnd.nextInt(recordedAudios.size());
+        return getAudio(i, remove);
     }
 
     public int getAudioCount(){
