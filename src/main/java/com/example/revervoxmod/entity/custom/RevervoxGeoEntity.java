@@ -2,7 +2,7 @@ package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
-import com.example.revervoxmod.entity.ai.MMWallClimberNavigation;
+import com.example.revervoxmod.entity.ai.MMClimbSqueezeNavigation;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
@@ -26,10 +26,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.NeutralMob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -44,6 +41,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +61,8 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
     private boolean canBeAngry = false;
+    private MMClimbSqueezeNavigation.PassageType passageType = MMClimbSqueezeNavigation.PassageType.NONE;
+
     @Nullable
     private UUID persistentAngerTarget;
 
@@ -127,7 +127,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
-        return new MMWallClimberNavigation(this, pLevel);
+        return new MMClimbSqueezeNavigation(this, pLevel);
     }
 
     @Override
@@ -169,6 +169,31 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         return SoundRegistry.REVERVOX_HURT.get();
     }
 
+    public void setPassageType(MMClimbSqueezeNavigation.PassageType type) {
+        if (this.passageType != type) {
+            RevervoxMod.LOGGER.debug("Passage type changed from {} to {}", this.passageType, type);
+            this.passageType = type;
+            this.refreshDimensions();
+        }
+    }
+
+    public MMClimbSqueezeNavigation.PassageType getPassageType() {
+        return passageType;
+    }
+
+    @Override
+    public @NotNull EntityDimensions getDimensions(@NotNull Pose pPose) {
+        switch (passageType) {
+            case ONE_BY_TWO:
+                return EntityDimensions.scalable(0.6F, 1.5F); // fit 1×2
+            case ONE_BY_ONE:
+                return EntityDimensions.scalable(0.6F, 1.0F); // fit 1×1
+            default:
+                return super.getDimensions(pPose);
+        }
+    }
+
+
     public boolean isSpeakingAtMe(Player player) {
         if (RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
             return RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
@@ -195,14 +220,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         BlockState blockstate = this.level().getBlockState(blockpos$mutableblockpos);
         boolean flag = blockstate.isSolidRender(this.level(), blockpos$mutableblockpos);
         boolean flag1 = blockstate.getFluidState().is(FluidTags.WATER);
-        RevervoxMod.LOGGER.debug("flag: " + flag + " flag1: " + flag1);
+        //RevervoxMod.LOGGER.debug("flag: " + flag + " flag1: " + flag1);
         if (flag && !flag1) {
-            RevervoxMod.LOGGER.debug("Entered main if statement");
+            //RevervoxMod.LOGGER.debug("Entered main if statement");
             net.minecraftforge.event.entity.EntityTeleportEvent.EnderEntity event = net.minecraftforge.event.ForgeEventFactory.onEnderTeleport(this, pX, pY, pZ);
             if (event.isCanceled()) return false;
             Vec3 vec3 = this.position();
             boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true);
-            RevervoxMod.LOGGER.debug("flag2: " + flag2); //TODO ESTA FLAG FICA QUASE SEMPRE FALSE
+            //RevervoxMod.LOGGER.debug("flag2: " + flag2);
             if (flag2) {
                 this.level().gameEvent(GameEvent.TELEPORT, vec3, GameEvent.Context.of(this));
                 if (!this.isSilent()) {
@@ -305,6 +330,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         if (pPos.getY() >= pLevel.getSeaLevel()) {
             return false;
         } else {
+            // Check if there are other Revervox around
             if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
                     TargetingConditions.DEFAULT,
                     null,
@@ -315,15 +341,47 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
                 return false;
             }
 
+            // Priority to spawn on alone player
+            Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
+            if (player != null){
+                RevervoxMod.LOGGER.debug("Nearby Player Found");
+                if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100)).isEmpty()){
+                    RevervoxMod.LOGGER.debug("Spawning Revervox on alone player: " + player.getName());
 
-            int i = pLevel.getMaxLocalRawBrightness(pPos);
-            int j = 4;
-            if (pRandom.nextBoolean()) {
-                return false;
+                    // Shift pPos to a nearby valid location
+                    BlockPos validPos = findNearbyValidSpawnPos(pLevel, pRevervox, pSpawnType, pPos, pRandom, 50);
+                    if (validPos != null) {
+                        return checkMobSpawnRules(pRevervox, pLevel, pSpawnType, validPos, pRandom);
+                    }
+
+                }
+            } else {
+                int i = pLevel.getMaxLocalRawBrightness(pPos);
+                int j = 4;
+                if (pRandom.nextBoolean()) {
+                    return false;
+                }
+                return i > pRandom.nextInt(j) ? false : checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
             }
 
-            return i > pRandom.nextInt(j) ? false : checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
         }
+        return false;
+    }
+
+    private static BlockPos findNearbyValidSpawnPos(LevelAccessor level, EntityType<RevervoxGeoEntity> type, MobSpawnType spawnType, BlockPos center, RandomSource random, int radius) {
+        for (int attempts = 0; attempts < 20; attempts++) {
+            int dx = random.nextInt(radius * 2 + 1) - radius;
+            int dz = random.nextInt(radius * 2 + 1) - radius;
+            BlockPos testPos = center.offset(dx, 0, dz);
+
+            // Find the topmost solid block
+            testPos = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, testPos);
+
+            if (checkMobSpawnRules(type, level, spawnType, testPos, random)) {
+                return testPos;
+            }
+        }
+        return null;
     }
 
 
