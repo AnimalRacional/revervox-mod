@@ -63,7 +63,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
     private boolean canBeAngry = false;
-    private MMClimbSqueezeNavigation.PassageType passageType = MMClimbSqueezeNavigation.PassageType.NONE;
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
     // TODO tornar numa config
