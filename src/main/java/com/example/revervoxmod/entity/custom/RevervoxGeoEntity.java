@@ -127,7 +127,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
                 .add(Attributes.FOLLOW_RANGE, 24.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 7D)
+                .add(Attributes.ATTACK_DAMAGE, 14D)
                 .add(Attributes.ATTACK_SPEED, 0.3D);
     }
 
