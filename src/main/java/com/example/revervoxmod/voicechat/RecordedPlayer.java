@@ -42,6 +42,9 @@ public class RecordedPlayer {
                         RevervoxMod.LOGGER.debug("Starting AudioReader for {}", cur);
                         AudioReader reader = new AudioReader(cur, true);
                         audios.add(reader.read());
+                    } else {
+                        RevervoxMod.LOGGER.warn("Unkown file {} in audio folder for {}, deleting", cur, uuid);
+                        Files.delete(cur);
                     }
                 }
                 for(Future<short[]> cur : audios){
