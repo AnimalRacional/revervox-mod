@@ -39,12 +39,6 @@ public class MMClimbSqueezeNavigation extends MMPathNavigateGround {
         }
     }
 
-    public enum PassageType {
-        NONE,
-        ONE_BY_TWO,
-        ONE_BY_ONE
-    }
-
     @Override
     public void tick() {
 
