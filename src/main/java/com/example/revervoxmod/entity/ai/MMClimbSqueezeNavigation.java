@@ -2,6 +2,8 @@ package com.example.revervoxmod.entity.ai;
 
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
@@ -45,20 +47,31 @@ public class MMClimbSqueezeNavigation extends MMPathNavigateGround {
 
     @Override
     public void tick() {
-        BlockPos checkPos = null;
 
-        if (this.path != null && !this.path.isDone()) {
-            checkPos = this.path.getNextNodePos();
-        } else if (this.pathToPosition != null) {
-            checkPos = this.pathToPosition;
-        }
+        if (level instanceof ServerLevel) {
+            boolean isAboveSolid = level.getBlockState(this.revervox.blockPosition().above()).isSolid();
+            boolean isTwoAboveSolid = level.getBlockState(this.revervox.blockPosition().above(2)).isSolid();
+            boolean isThreeAboveSolid = level.getBlockState(this.revervox.blockPosition().above(3)).isSolid();
 
-        if (checkPos != null) {
-            PassageType type = getPassageType(checkPos);
-            revervox.setPassageType(type);
-        } else {
-            revervox.setPassageType(PassageType.NONE);
+            Vec3i offset = this.revervox.getDirection().getNormal();
+            boolean isFacingSolid = level.getBlockState(this.revervox.blockPosition().relative(this.revervox.getDirection())).isSolid();
+
+            if (isFacingSolid) {
+                offset = offset.offset(0, 1, 0);
+            }
+
+            boolean isOffsetFacingSolid = level.getBlockState(this.revervox.blockPosition().offset(offset)).isSolid();
+            boolean isOffsetFacingAboveSolid = level.getBlockState(this.revervox.blockPosition().offset(offset).above()).isSolid();
+            boolean isOffsetFacingTwoAboveSolid = level.getBlockState(this.revervox.blockPosition().offset(offset).above(2)).isSolid();
+
+            boolean shouldCrouch = isTwoAboveSolid || (!isOffsetFacingSolid && !isOffsetFacingAboveSolid && (isOffsetFacingTwoAboveSolid || isFacingSolid && isThreeAboveSolid)) ;
+
+            boolean shouldCrawl = isAboveSolid || !isOffsetFacingSolid && isOffsetFacingAboveSolid || isFacingSolid && isTwoAboveSolid;
+
+            this.revervox.getEntityData().set(RevervoxGeoEntity.CROUCHING_ACCESSOR, shouldCrouch);
+            this.revervox.setCrawling(shouldCrawl);
         }
+        this.revervox.refreshDimensions();
 
         if (!this.isDone()) {
             super.tick();
@@ -81,21 +94,9 @@ public class MMClimbSqueezeNavigation extends MMPathNavigateGround {
                 }
             }
         }
+
     }
 
-    private PassageType getPassageType(BlockPos pos) {
-        boolean emptyHere = level.isEmptyBlock(pos);
-        boolean emptyAbove = level.isEmptyBlock(pos.above());
-        boolean emptyTwoAbove = level.isEmptyBlock(pos.above(2));
-
-        if (emptyHere && emptyAbove && !emptyTwoAbove) {
-            return PassageType.ONE_BY_TWO;
-        }
-        if (emptyHere && !emptyAbove) {
-            return PassageType.ONE_BY_ONE;
-        }
-        return PassageType.NONE;
-    }
 
 
 }

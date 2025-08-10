@@ -56,7 +56,9 @@ import java.util.UUID;
 
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-    private static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BYTE);
+    public static final EntityDataAccessor<Boolean> CROUCHING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> CRAWLING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
@@ -79,7 +81,9 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(DATA_FLAGS_ID, (byte)0);
+        entityData.define(CLIMBING_ACCESSOR, false);
+        entityData.define(CROUCHING_ACCESSOR, false);
+        entityData.define(CRAWLING_ACCESSOR, false);
     }
 
     @Override
@@ -175,25 +179,28 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         return SoundRegistry.REVERVOX_HURT.get();
     }
 
-    public void setPassageType(MMClimbSqueezeNavigation.PassageType type) {
-        if (this.passageType != type) {
-            RevervoxMod.LOGGER.debug("Passage type changed from {} to {}", this.passageType, type);
-            this.passageType = type;
-            this.refreshDimensions();
+    public void setCrawling(boolean shouldCrawl) {
+        if (shouldCrawl) {
+            getEntityData().set(CROUCHING_ACCESSOR, false);
         }
+
+        getEntityData().set(CRAWLING_ACCESSOR, shouldCrawl);
+        refreshDimensions();
     }
 
-    public MMClimbSqueezeNavigation.PassageType getPassageType() {
-        return passageType;
+    public boolean isCrawling() {
+        return entityData.get(CRAWLING_ACCESSOR);
     }
 
     @Override
-    public @NotNull EntityDimensions getDimensions(@NotNull Pose pPose) {
-        return switch (passageType) {
-            case ONE_BY_TWO -> EntityDimensions.scalable(0.6F, 1.5F); // fit 1×2
-            case ONE_BY_ONE -> EntityDimensions.scalable(0.6F, 1.0F); // fit 1×1
-            default -> super.getDimensions(pPose);
-        };
+    public @NotNull EntityDimensions getDimensions(@NotNull final Pose pose) {
+        if (entityData.get(CRAWLING_ACCESSOR)) {
+            return new EntityDimensions(0.5F, 0.5F, true);
+        } else if (entityData.get(CROUCHING_ACCESSOR)) {
+            return new EntityDimensions(0.5F, 1.7F, true);
+        }
+
+        return super.getDimensions(pose);
     }
 
     public boolean hasSpoken(){
@@ -286,17 +293,13 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         return this.isClimbing();
     }
     public boolean isClimbing() {
-        return (this.entityData.get(DATA_FLAGS_ID) & 1) != 0;
+        if (getTarget() != null) {
+            return !isCrawling() && !isCrouching() && entityData.get(CLIMBING_ACCESSOR);
+        }
+        return false;
     }
     public void setClimbing(boolean pClimbing) {
-        byte b0 = this.entityData.get(DATA_FLAGS_ID);
-        if (pClimbing) {
-            b0 = (byte)(b0 | 1);
-        } else {
-            b0 = (byte)(b0 & -2);
-        }
-
-        this.entityData.set(DATA_FLAGS_ID, b0);
+        this.entityData.set(CLIMBING_ACCESSOR, pClimbing);
     }
 
     public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioPlayer.Mode mode){
