@@ -131,7 +131,6 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
         return () -> {
             for (RecordedPlayer player : RevervoxVoicechatPlugin.getRecordedPlayers().values()) {
                 if(player.isSpeaking()) continue;
-                RevervoxMod.LOGGER.debug("is not speaking!");
                 if (player.isSilent()) continue;
                 RevervoxMod.LOGGER.debug("Stopped Speaking!");
                 RevervoxVoicechatPlugin.stopRecording(player.getUuid());
