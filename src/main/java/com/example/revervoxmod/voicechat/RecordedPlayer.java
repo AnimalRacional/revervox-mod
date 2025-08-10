@@ -25,7 +25,6 @@ public class RecordedPlayer {
     private long lastSpoke;
     private static final long NOT_SPOKEN_YET = -1;
     private boolean isSilent = false;
-    public static final int RECORDING_LIMIT = 20; // recording limit per user, so total amount of audios should be (limit * players online)
     private final List<short[]> recordedAudios;
     public RecordedPlayer(UUID uuid) {
         rnd = new Random();
@@ -51,7 +50,7 @@ public class RecordedPlayer {
                 }
                 for(Future<short[]> cur : audios){
                     try{
-                        addAudio(cur.get());
+                        RevervoxVoicechatPlugin.addAudio(uuid, cur.get());
                     } catch(InterruptedException e){
                         RevervoxMod.LOGGER.error("File reading interrupted");
                     } catch(ExecutionException e){
@@ -84,12 +83,12 @@ public class RecordedPlayer {
         }
     }
 
-    public void addAudio(short[] audio){
-        if(recordedAudios.size() >= RECORDING_LIMIT){
-            recordedAudios.set(rnd.nextInt(recordedAudios.size()), audio);
-        } else {
-            recordedAudios.add(audio);
-        }
+    public void replaceRandomAudio(short[] audio){
+        recordedAudios.set(rnd.nextInt(recordedAudios.size()), audio);
+    }
+    // This method should rarely be used, use RevervoxVoiceChatPlugin.addAudio(UUID, short[]) instead
+    public void addAudioDirect(short[] audio){
+        this.recordedAudios.add(audio);
     }
 
     public void stopRecording() {
@@ -105,7 +104,7 @@ public class RecordedPlayer {
             if (filterAudio()){
                 short[] savedRecording = new short[currentRecordingIndex];
                 System.arraycopy(recording, 0, savedRecording, 0, currentRecordingIndex);
-                addAudio(savedRecording);
+                RevervoxVoicechatPlugin.addAudio(uuid, savedRecording);
                 RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
             } else {
                 RevervoxMod.LOGGER.info("Audio filtered, not storing");

@@ -4,10 +4,7 @@ import com.example.revervoxmod.RevervoxMod;
 import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ForgeVoicechatPlugin
@@ -16,6 +13,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     private static Map<UUID, RecordedPlayer> recordedPlayers;
     private static Map<UUID, Boolean> privacyMode;
     // TODO turn into config
+    public static final int RECORDING_LIMIT = 200;
     public static final int SILENCE_THRESHOLD = 700; // amplitude to detect speech start/end
     /**
      * @return the unique ID for this voice chat plugin
@@ -125,6 +123,31 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
                 .toList();
         if(players.isEmpty()){ return null; }
         return players.get(rnd.nextInt(players.size())).getRandomAudio(remove);
+    }
+
+    public static int getAudioCount(){
+        return recordedPlayers.values().stream().map(RecordedPlayer::getAudioCount).reduce(0, Integer::sum);
+    }
+    // TODO atualmente todos os players têm a mesma chance de calhar para ser replaced, e não importa a quantidade de áudios que cada player tem
+    // um player com 199 audios e outro com 1 vão ter a mesma chance de ser escolhidos para dar replace a um dos seus áudios
+    public static void replaceRandomAudio(short[] audio){
+        List<RecordedPlayer> hasAudio = recordedPlayers.values().stream().filter((r) -> r.getAudioCount() > 0).toList();
+        RevervoxMod.LOGGER.debug("hasAudio: {}", hasAudio.size());
+        if(hasAudio.isEmpty()){
+            RevervoxMod.LOGGER.error("replaceRandomAudio called when no one has audios");
+            return;
+        }
+        hasAudio.get((new Random()).nextInt(hasAudio.size())).replaceRandomAudio(audio);
+    }
+
+    public static void addAudio(UUID uuid, short[] audio){
+        RecordedPlayer player = recordedPlayers.get(uuid);
+        if(player == null){ return; }
+        if(getAudioCount() >= RECORDING_LIMIT){
+            replaceRandomAudio(audio);
+        } else {
+            player.addAudioDirect(audio);
+        }
     }
 
     private Runnable checkForSilence() {
