@@ -57,6 +57,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     private void onPlayerConnected(PlayerConnectedEvent e){
         UUID playerUuid = e.getConnection().getPlayer().getUuid();
         recordedPlayers.put(playerUuid, new RecordedPlayer(playerUuid));
+        startRecording(playerUuid);
     }
 
     private void onPlayerDisconnected(PlayerDisconnectedEvent e){

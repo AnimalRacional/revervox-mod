@@ -100,11 +100,11 @@ public class NearestEntityPlayVoiceCommand {
     private static void playAudio(CommandContext<CommandSourceStack> ctx,
                                   Entity entity, Collection<GameProfile> players, int index, boolean remove,
                                   VoicechatServerApi api){
-        RevervoxMod.LOGGER.info("Entity: " + entity.getName());
+        RevervoxMod.LOGGER.debug("Entity: " + entity.getName());
         for (GameProfile player : players) {
             UUID channelID = UUID.randomUUID();
             EntityAudioChannel channel = createChannel(api, channelID, RevervoxVoicechatPlugin.REVERVOX_CATEGORY, entity);
-            RevervoxMod.LOGGER.info("Created new channel: " + channel);
+            RevervoxMod.LOGGER.debug("Created new channel: " + channel);
             short[] audio = RevervoxVoicechatPlugin.getAudio(player.getId(), index, remove);
             if(audio != null){
                 ctx.getSource().sendSuccess(() ->

@@ -1,6 +1,7 @@
 package com.example.revervoxmod.entity.goals;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.config.RevervoxModServerConfigs;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import com.example.revervoxmod.voicechat.audio.AudioPlayer;
@@ -21,6 +22,7 @@ public class RandomRepeatGoal extends Goal {
     private EntityAudioChannel channel;
     private int audiosPlayed = 0;
     private boolean canSpeak = true;
+    private final int MAX_AUDIOS_TO_PLAY = RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS_TO_PLAY.get();
     public RandomRepeatGoal(RevervoxGeoEntity revervoxGeoEntity) {
         this.mob = revervoxGeoEntity;
         RevervoxMod.TASKS.schedule(setCanSpeak(), 0);
@@ -43,8 +45,8 @@ public class RandomRepeatGoal extends Goal {
 
     public void tick() {
         canSpeak = false;
-        if (audiosPlayed >= 5) this.mob.remove(Entity.RemovalReason.DISCARDED);
-        RevervoxMod.LOGGER.debug("Less than 5 audios!");
+        if (audiosPlayed >= MAX_AUDIOS_TO_PLAY) this.mob.remove(Entity.RemovalReason.DISCARDED);
+        RevervoxMod.LOGGER.debug("Less than 20 audios!");
         if (this.mob.getCurrentAudioPlayer() != null && this.mob.getCurrentAudioPlayer().isPlaying()) return;
         if (RevervoxMod.vcApi instanceof VoicechatServerApi api){
 

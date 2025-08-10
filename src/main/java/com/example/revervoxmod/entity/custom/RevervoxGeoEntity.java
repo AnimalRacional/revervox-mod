@@ -1,8 +1,9 @@
 package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
-import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
+import com.example.revervoxmod.config.RevervoxModServerConfigs;
 import com.example.revervoxmod.entity.ai.MMClimbSqueezeNavigation;
+import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
@@ -41,7 +42,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -65,8 +65,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     private boolean canBeAngry = false;
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
-    // TODO tornar numa config
-    private static final int AFTER_SPEAK_GRACE_PERIOD = 1000;
+    private static final int AFTER_SPEAK_GRACE_PERIOD = RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000;
 
     @Nullable
     private UUID persistentAngerTarget;
@@ -106,8 +105,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     protected void registerGoals() {
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
-
-        //TODO resolver counter a construir 3 blocos
         this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
         this.goalSelector.addGoal(4, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5D));
@@ -141,7 +138,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     public int getCurrentSwingDuration() {
-        return 5 + 5 + 1;
+        int ANIMATION_TICKS = 5;
+        int TRANSITION_TICKS = 5;
+        int IDK_TICKS = 1;
+        return ANIMATION_TICKS + TRANSITION_TICKS + IDK_TICKS;
     }
 
     @Override
@@ -321,7 +321,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         this.remove(RemovalReason.DISCARDED);
     }
 
-
     public void addParticlesAroundSelf(ParticleOptions pParticleOption) {
         addParticlesAroundSelf(pParticleOption, 1.0);
     }
@@ -350,6 +349,16 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     }
 
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
+        // Priority to spawn on alone player
+        Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
+        if (player != null){
+            RevervoxMod.LOGGER.debug("Nearby Player Found");
+            if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100)).isEmpty()){
+                RevervoxMod.LOGGER.info("Spawning Revervox on alone player: " + player.getName() + " at " + pPos);
+                return checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
+
+            }
+        }
         if (pPos.getY() >= pLevel.getSeaLevel()) {
             return false;
         } else {
@@ -362,49 +371,20 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
                     new AABB(pPos).inflate(100)) != null) {
 
                 return false;
-            }
-
-            // Priority to spawn on alone player
-            Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
-            if (player != null){
-                RevervoxMod.LOGGER.debug("Nearby Player Found");
-                if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100)).isEmpty()){
-                    RevervoxMod.LOGGER.debug("Spawning Revervox on alone player: " + player.getName());
-
-                    // Shift pPos to a nearby valid location
-                    BlockPos validPos = findNearbyValidSpawnPos(pLevel, pRevervox, pSpawnType, pPos, pRandom, 50);
-                    if (validPos != null) {
-                        return checkMobSpawnRules(pRevervox, pLevel, pSpawnType, validPos, pRandom);
-                    }
-
-                }
             } else {
                 int i = pLevel.getMaxLocalRawBrightness(pPos);
                 int j = 4;
                 if (pRandom.nextBoolean()) {
                     return false;
                 }
-                return i > pRandom.nextInt(j) ? false : checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
+                boolean flag1 = i <= pRandom.nextInt(j) && checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
+                if (flag1) {
+                    RevervoxMod.LOGGER.info("Spawning Revervox at " + pPos);
+                }
+                return flag1;
             }
 
         }
-        return false;
-    }
-
-    private static BlockPos findNearbyValidSpawnPos(LevelAccessor level, EntityType<RevervoxGeoEntity> type, MobSpawnType spawnType, BlockPos center, RandomSource random, int radius) {
-        for (int attempts = 0; attempts < 20; attempts++) {
-            int dx = random.nextInt(radius * 2 + 1) - radius;
-            int dz = random.nextInt(radius * 2 + 1) - radius;
-            BlockPos testPos = center.offset(dx, 0, dz);
-
-            // Find the topmost solid block
-            testPos = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, testPos);
-
-            if (checkMobSpawnRules(type, level, spawnType, testPos, random)) {
-                return testPos;
-            }
-        }
-        return null;
     }
 
 

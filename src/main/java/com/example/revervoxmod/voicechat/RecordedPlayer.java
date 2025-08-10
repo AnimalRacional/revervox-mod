@@ -105,9 +105,9 @@ public class RecordedPlayer {
                 short[] savedRecording = new short[currentRecordingIndex];
                 System.arraycopy(recording, 0, savedRecording, 0, currentRecordingIndex);
                 RevervoxVoicechatPlugin.addAudio(uuid, savedRecording);
-                RevervoxMod.LOGGER.info("Added audio to MEMORY for player: " + uuid.toString());
+                RevervoxMod.LOGGER.debug("Added audio to MEMORY for player: " + uuid.toString());
             } else {
-                RevervoxMod.LOGGER.info("Audio filtered, not storing");
+                RevervoxMod.LOGGER.debug("Audio filtered, not storing");
             }
             currentRecordingIndex = 0;
         }
@@ -209,11 +209,11 @@ public class RecordedPlayer {
 
         double durationSeconds = (double) currentRecordingIndex / SAMPLE_RATE;
         if (durationSeconds <= MIN_DURATION) {
-            RevervoxMod.LOGGER.info("Audio too short: " + durationSeconds + "s");
+            RevervoxMod.LOGGER.debug("Audio too short: " + durationSeconds + "s");
             return false;
         }
         if (durationSeconds > MAX_DURATION) {
-            RevervoxMod.LOGGER.info("Audio too long: " + durationSeconds + "s");
+            RevervoxMod.LOGGER.debug("Audio too long: " + durationSeconds + "s");
             return false;
         }
 
@@ -231,7 +231,7 @@ public class RecordedPlayer {
 
         int activeSamples = end - start + 1;
         if (activeSamples <= 0) {
-            RevervoxMod.LOGGER.info("No active audio found above silence threshold");
+            RevervoxMod.LOGGER.debug("No active audio found above silence threshold");
             return false;
         }
 
@@ -243,7 +243,7 @@ public class RecordedPlayer {
         }
         double rms = Math.sqrt(sumSquares / (double) activeSamples);
 
-        RevervoxMod.LOGGER.info(String.format(
+        RevervoxMod.LOGGER.debug(String.format(
                 "Audio duration: %.3fs, Active region: %.3fs, RMS: %.1f",
                 durationSeconds,
                 (double) activeSamples / SAMPLE_RATE,
