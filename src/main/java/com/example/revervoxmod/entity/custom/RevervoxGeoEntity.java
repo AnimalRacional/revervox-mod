@@ -66,7 +66,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
     // TODO tornar numa config
-    private static final int AFTER_SPEAK_GRACE_PERIOD = 20;
+    private static final int AFTER_SPEAK_GRACE_PERIOD = 1000;
 
     @Nullable
     private UUID persistentAngerTarget;
