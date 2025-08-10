@@ -189,12 +189,17 @@ public class RecordedPlayer {
     private boolean filterAudio() {
         final int SAMPLE_RATE = 48000;
         final double MIN_DURATION = 0.9;
+        final double MAX_DURATION = 10;
         final int SILENCE_THRESHOLD = 500; // amplitude to detect speech start/end
         final double MIN_RMS = 500;      // loudness threshold
 
         double durationSeconds = (double) currentRecordingIndex / SAMPLE_RATE;
         if (durationSeconds <= MIN_DURATION) {
             RevervoxMod.LOGGER.info("Audio too short: " + durationSeconds + "s");
+            return false;
+        }
+        if (durationSeconds > MAX_DURATION) {
+            RevervoxMod.LOGGER.info("Audio too long: " + durationSeconds + "s");
             return false;
         }
 

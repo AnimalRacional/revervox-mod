@@ -22,24 +22,29 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -293,6 +298,31 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             double velZ = (this.random.nextDouble() - 0.5) * velocityScale;
 
             this.level().addParticle(pParticleOption, particleX, particleY, particleZ, velX, velY, velZ);
+        }
+    }
+
+    public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
+        if (pPos.getY() >= pLevel.getSeaLevel()) {
+            return false;
+        } else {
+            if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
+                    TargetingConditions.DEFAULT,
+                    null,
+                    pPos.getX(),
+                    pPos.getY(), pPos.getZ(),
+                    new AABB(pPos).inflate(100)) != null) {
+
+                return false;
+            }
+
+
+            int i = pLevel.getMaxLocalRawBrightness(pPos);
+            int j = 4;
+            if (pRandom.nextBoolean()) {
+                return false;
+            }
+
+            return i > pRandom.nextInt(j) ? false : checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
         }
     }
 
