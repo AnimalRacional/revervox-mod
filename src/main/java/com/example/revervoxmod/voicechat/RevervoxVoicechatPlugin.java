@@ -4,7 +4,10 @@ import com.example.revervoxmod.RevervoxMod;
 import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @ForgeVoicechatPlugin
@@ -12,6 +15,8 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static String REVERVOX_CATEGORY = "revervox";
     private static Map<UUID, RecordedPlayer> recordedPlayers;
     private static Map<UUID, Boolean> privacyMode;
+    // TODO turn into config
+    public static final int SILENCE_THRESHOLD = 700; // amplitude to detect speech start/end
     /**
      * @return the unique ID for this voice chat plugin
      */
@@ -48,10 +53,6 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
         if (e.getSenderConnection() != null){ // If it's a player and not an entity
             RecordedPlayer recordedPlayer = recordedPlayers.get(e.getSenderConnection().getPlayer().getUuid());
             recordedPlayer.recordPacket(e.getPacket().getOpusEncodedData());
-
-            recordedPlayer.setLastSpoke(new Date(System.currentTimeMillis()));
-            recordedPlayer.setSilent(false);
-
         }
     }
 
@@ -128,22 +129,15 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
 
     private Runnable checkForSilence() {
         return () -> {
-            long silenceThresholdMs = 500;
-            long now = System.currentTimeMillis();
-
             for (RecordedPlayer player : RevervoxVoicechatPlugin.getRecordedPlayers().values()) {
-                Date lastSpoke = player.getLastSpoke();
-                if (lastSpoke == null) continue;
+                if(player.isSpeaking()) continue;
+                RevervoxMod.LOGGER.debug("is not speaking!");
                 if (player.isSilent()) continue;
-                if (player.isRecording() &&
-                        (now - lastSpoke.getTime()) > silenceThresholdMs) {
-                    RevervoxMod.LOGGER.debug("Stopped Speaking!");
-                    RevervoxVoicechatPlugin.stopRecording(player.getUuid());
-                    player.setSilent(true);
-                }
+                RevervoxMod.LOGGER.debug("Stopped Speaking!");
+                RevervoxVoicechatPlugin.stopRecording(player.getUuid());
+                player.setSilent(true);
             }
-
-            RevervoxMod.TASKS.schedule(checkForSilence(), silenceThresholdMs / 50);
+            RevervoxMod.TASKS.schedule(checkForSilence(), 25);
         };
     }
 

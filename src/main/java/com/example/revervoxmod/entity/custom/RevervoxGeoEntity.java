@@ -62,6 +62,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     private AudioPlayer currentAudioPlayer;
     private boolean canBeAngry = false;
     private MMClimbSqueezeNavigation.PassageType passageType = MMClimbSqueezeNavigation.PassageType.NONE;
+    private long firstSpeak;
+    private static final long NOT_SPOKEN_YET = -1;
+    // TODO tornar numa config
+    private static final int AFTER_SPEAK_GRACE_PERIOD = 20;
 
     @Nullable
     private UUID persistentAngerTarget;
@@ -69,7 +73,9 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     public RevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         moveControl = new MMEntityMoveHelper(this, 90);
+        firstSpeak = NOT_SPOKEN_YET;
     }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
@@ -183,21 +189,35 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     public @NotNull EntityDimensions getDimensions(@NotNull Pose pPose) {
-        switch (passageType) {
-            case ONE_BY_TWO:
-                return EntityDimensions.scalable(0.6F, 1.5F); // fit 1×2
-            case ONE_BY_ONE:
-                return EntityDimensions.scalable(0.6F, 1.0F); // fit 1×1
-            default:
-                return super.getDimensions(pPose);
+        return switch (passageType) {
+            case ONE_BY_TWO -> EntityDimensions.scalable(0.6F, 1.5F); // fit 1×2
+            case ONE_BY_ONE -> EntityDimensions.scalable(0.6F, 1.0F); // fit 1×1
+            default -> super.getDimensions(pPose);
+        };
+    }
+
+    public boolean hasSpoken(){
+        return firstSpeak != NOT_SPOKEN_YET;
+    }
+
+    public long getFirstSpoken(){
+        return firstSpeak;
+    }
+
+    public void onSpeak(){
+        if(!hasSpoken() && !level().isClientSide()){
+            firstSpeak = System.currentTimeMillis();
         }
     }
 
-
     public boolean isSpeakingAtMe(Player player) {
-        if (RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
-            return RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
-        } else return false;
+        long time = System.currentTimeMillis();
+        if(hasSpoken() && time - getFirstSpoken() >= AFTER_SPEAK_GRACE_PERIOD){
+            if (RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
+                return RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
+            } else return false;
+        }
+        return false;
     }
 
     public boolean teleportTowards(Entity pTarget) {
@@ -291,6 +311,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());
         currentAudioPlayer = new AudioPlayer(audio, api, channel, mode);
         currentAudioPlayer.start();
+        onSpeak();
     }
 
     public void disappear(Player player, VoicechatServerApi api){

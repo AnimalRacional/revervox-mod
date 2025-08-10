@@ -22,7 +22,8 @@ public class RecordedPlayer {
     private int currentRecordingIndex;
     private boolean isRecording = false;
     private final UUID uuid;
-    private Date lastSpoke;
+    private long lastSpoke;
+    private static final long NOT_SPOKEN_YET = -1;
     private boolean isSilent = false;
     public static final int RECORDING_LIMIT = 20; // recording limit per user, so total amount of audios should be (limit * players online)
     private final List<short[]> recordedAudios;
@@ -31,6 +32,7 @@ public class RecordedPlayer {
         this.uuid = uuid;
         this.recording = new short[RECORDING_SIZE];
         this.recordedAudios = new ArrayList<>();
+        this.lastSpoke = NOT_SPOKEN_YET;
         Path userPath = audiosPath.resolve(this.uuid.toString());
         if(Files.exists(userPath)){
             try(DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)){
@@ -121,6 +123,18 @@ public class RecordedPlayer {
             try {
                 short[] decodedPacket = decoder.decode(packet);
                 if (decodedPacket.length + currentRecordingIndex < RECORDING_SIZE){
+                    boolean active = false;
+                    for (short value : decodedPacket) {
+                        if (Math.abs(value) >= RevervoxVoicechatPlugin.SILENCE_THRESHOLD) {
+                            setLastSpoke(System.currentTimeMillis());
+                            setSilent(false);
+                            active = true;
+                            break;
+                        }
+                    }
+                    if(!active && currentRecordingIndex < 5){
+                        return;
+                    }
                     System.arraycopy(decodedPacket, 0, recording, currentRecordingIndex, decodedPacket.length);
                     currentRecordingIndex += decodedPacket.length;
                 } else {
@@ -177,15 +191,14 @@ public class RecordedPlayer {
     }
 
     public boolean isSpeaking() {
-        if (this.getLastSpoke() == null) return false;
-        return System.currentTimeMillis() - this.getLastSpoke().getTime() < 5000;
+        return getLastSpoke() != NOT_SPOKEN_YET && System.currentTimeMillis() - getLastSpoke() < 2000;
     }
 
-    public Date getLastSpoke() {
+    public long getLastSpoke() {
         return lastSpoke;
     }
 
-    public void setLastSpoke(Date lastSpoke) {
+    public void setLastSpoke(long lastSpoke) {
         this.lastSpoke = lastSpoke;
     }
 
@@ -193,7 +206,6 @@ public class RecordedPlayer {
         final int SAMPLE_RATE = 48000;
         final double MIN_DURATION = 0.9;
         final double MAX_DURATION = 10;
-        final int SILENCE_THRESHOLD = 500; // amplitude to detect speech start/end
         final double MIN_RMS = 500;      // loudness threshold
 
         double durationSeconds = (double) currentRecordingIndex / SAMPLE_RATE;
@@ -208,13 +220,13 @@ public class RecordedPlayer {
 
         int start = 0;
         while (start < currentRecordingIndex &&
-                Math.abs(recording[start]) < SILENCE_THRESHOLD) {
+                Math.abs(recording[start]) < RevervoxVoicechatPlugin.SILENCE_THRESHOLD) {
             start++;
         }
 
         int end = currentRecordingIndex - 1;
         while (end > start &&
-                Math.abs(recording[end]) < SILENCE_THRESHOLD) {
+                Math.abs(recording[end]) < RevervoxVoicechatPlugin.SILENCE_THRESHOLD) {
             end--;
         }
 
