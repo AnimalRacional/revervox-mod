@@ -2,8 +2,8 @@ package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.config.RevervoxModServerConfigs;
-import com.example.revervoxmod.entity.ai.RVClimbNavigation;
 import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
+import com.example.revervoxmod.entity.ai.RVClimbNavigation;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
@@ -20,9 +20,12 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -57,8 +60,7 @@ import java.util.UUID;
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
-
-    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
+    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
     private boolean canBeAngry = false;
@@ -85,7 +87,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         controllers.add(DefaultAnimations.genericWalkIdleController(this).transitionLength(5),
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5));
     }
-
 
     @Override
     public void onRemovedFromWorld() {
@@ -261,7 +262,68 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         if (!this.level().isClientSide) {
             this.setClimbing(this.horizontalCollision);
         }
+    }
 
+    @Override
+    public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
+        if (!this.level().isClientSide){
+            if (pTarget == null) {
+                this.disappear((Player) this.getTarget(), (VoicechatServerApi) RevervoxMod.vcApi);
+            }
+        }
+        super.setTarget(pTarget);
+    }
+    @Override
+    public void updatePersistentAnger(ServerLevel pServerLevel, boolean pUpdateAnger) {
+        if (this.getTarget() == null || !this.hasLineOfSight(this.getTarget())) {
+            NeutralMob.super.updatePersistentAnger(pServerLevel, pUpdateAnger);
+        }
+    }
+
+    @Override
+    protected void customServerAiStep() {
+        if (this.getTarget() != null && !this.hasLineOfSight(this.getTarget())) {
+            double playerDirectionOffset = (this.getTarget().getY() - this.getY());
+            double offset = Double.compare(playerDirectionOffset, 0.0D);
+            offset = offset < 0.0D ? -1.0D : offset == 0 ? 0.0D : 1.0D;
+            boolean inWall = this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0));
+        }
+
+        super.customServerAiStep();
+    }
+
+    private boolean checkWalls(AABB pArea) {
+        int i = Mth.floor(pArea.minX);
+        int j = Mth.floor(pArea.minY);
+        int k = Mth.floor(pArea.minZ);
+        int l = Mth.floor(pArea.maxX);
+        int i1 = Mth.floor(pArea.maxY);
+        int j1 = Mth.floor(pArea.maxZ);
+        boolean flag = false;
+        boolean flag1 = false;
+
+        for(int k1 = i; k1 <= l; ++k1) {
+            for(int l1 = j; l1 <= i1; ++l1) {
+                for(int i2 = k; i2 <= j1; ++i2) {
+                    BlockPos blockpos = new BlockPos(k1, l1, i2);
+                    BlockState blockstate = this.level().getBlockState(blockpos);
+                    if (!blockstate.isAir() && !blockstate.is(BlockTags.DRAGON_TRANSPARENT)) {
+                        if (net.minecraftforge.common.ForgeHooks.canEntityDestroy(this.level(), blockpos, this)) {
+                            flag1 = this.level().destroyBlock(blockpos, true) || flag1;
+                        } else {
+                            flag = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (flag1) {
+            BlockPos blockpos1 = new BlockPos(i + this.random.nextInt(l - i + 1), j + this.random.nextInt(i1 - j + 1), k + this.random.nextInt(j1 - k + 1));
+            this.level().levelEvent(2008, blockpos1, 0);
+        }
+
+        return flag;
     }
     @Override
     public boolean onClimbable() {
@@ -348,12 +410,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
             if (player != null){
                 RevervoxMod.LOGGER.debug("Nearby Player Found");
-                if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100)).isEmpty()){
-                    boolean flag = checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
-                    if (flag) {
-                        RevervoxMod.LOGGER.info("Trying to Spawn Revervox on alone player: " + player.getName() + " at " + pPos);
+                if (player.position().y <= pLevel.getSeaLevel()){
+                    if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100, 50, 100)).isEmpty()){
+                        boolean flag = checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
+                        if (flag) {
+                            RevervoxMod.LOGGER.info("Trying to Spawn Revervox on alone player: " + player.getName() + " at " + pPos);
+                        }
+                        return flag;
                     }
-                    return flag;
                 }
             }
         }

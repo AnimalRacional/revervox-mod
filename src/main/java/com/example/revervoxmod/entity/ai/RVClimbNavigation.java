@@ -42,7 +42,7 @@ public class RVClimbNavigation extends MMPathNavigateGround {
         if (!this.isDone()) {
             super.tick();
         } else {
-            if (revervox.isAngry()) {
+            if (revervox.getTarget() != null) {
                 if (this.pathToPosition != null) {
                     if (!this.pathToPosition.closerToCenterThan(this.mob.position(),
                             Math.max(this.mob.getBbWidth(), 1.0D)) &&
