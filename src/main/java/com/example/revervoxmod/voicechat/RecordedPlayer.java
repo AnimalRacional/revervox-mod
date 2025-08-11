@@ -1,7 +1,6 @@
 package com.example.revervoxmod.voicechat;
 
 import com.example.revervoxmod.RevervoxMod;
-import com.example.revervoxmod.config.RevervoxModServerConfigs;
 import com.example.revervoxmod.voicechat.audio.AudioReader;
 import com.example.revervoxmod.voicechat.audio.AudioSaver;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
@@ -125,7 +124,7 @@ public class RecordedPlayer {
                 if (decodedPacket.length + currentRecordingIndex < RECORDING_SIZE){
                     boolean active = false;
                     for (short value : decodedPacket) {
-                        if (Math.abs(value) >= RevervoxModServerConfigs.SILENCE_THRESHOLD.get()) {
+                        if (Math.abs(value) >= RevervoxVoicechatPlugin.SILENCE_THRESHOLD) {
                             setLastSpoke(System.currentTimeMillis());
                             setSilent(false);
                             active = true;
@@ -220,13 +219,13 @@ public class RecordedPlayer {
 
         int start = 0;
         while (start < currentRecordingIndex &&
-                Math.abs(recording[start]) < RevervoxModServerConfigs.SILENCE_THRESHOLD.get()) {
+                Math.abs(recording[start]) < RevervoxVoicechatPlugin.SILENCE_THRESHOLD) {
             start++;
         }
 
         int end = currentRecordingIndex - 1;
         while (end > start &&
-                Math.abs(recording[end]) < RevervoxModServerConfigs.SILENCE_THRESHOLD.get()) {
+                Math.abs(recording[end]) < RevervoxVoicechatPlugin.SILENCE_THRESHOLD) {
             end--;
         }
 
