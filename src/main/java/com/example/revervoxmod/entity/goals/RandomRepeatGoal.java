@@ -46,7 +46,7 @@ public class RandomRepeatGoal extends Goal {
     public void tick() {
         canSpeak = false;
         if (audiosPlayed >= MAX_AUDIOS_TO_PLAY) this.mob.remove(Entity.RemovalReason.DISCARDED);
-        RevervoxMod.LOGGER.debug("Less than 20 audios!");
+        RevervoxMod.LOGGER.debug("Less than " + MAX_AUDIOS_TO_PLAY + " audios!");
         if (this.mob.getCurrentAudioPlayer() != null && this.mob.getCurrentAudioPlayer().isPlaying()) return;
         if (RevervoxMod.vcApi instanceof VoicechatServerApi api){
 

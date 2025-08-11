@@ -2,7 +2,7 @@ package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.config.RevervoxModServerConfigs;
-import com.example.revervoxmod.entity.ai.MMClimbSqueezeNavigation;
+import com.example.revervoxmod.entity.ai.RVClimbSqueezeNavigation;
 import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
@@ -65,7 +65,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     private boolean canBeAngry = false;
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
-    private static final int AFTER_SPEAK_GRACE_PERIOD = RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000;
+    private static final int AFTER_SPEAK_GRACE_PERIOD = (int) (RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000);
 
     @Nullable
     private UUID persistentAngerTarget;
@@ -105,10 +105,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     protected void registerGoals() {
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(4, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
+        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.5D));
+        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
 
@@ -133,7 +133,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
-        return new MMClimbSqueezeNavigation(this, pLevel);
+        return new RVClimbSqueezeNavigation(this, pLevel);
     }
 
     @Override

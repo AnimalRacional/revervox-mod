@@ -10,11 +10,11 @@ import net.minecraft.world.level.pathfinder.Path;
 
 import javax.annotation.Nullable;
 
-public class MMClimbSqueezeNavigation extends MMPathNavigateGround {
+public class RVClimbSqueezeNavigation extends MMPathNavigateGround {
     @Nullable
     private BlockPos pathToPosition;
     private final RevervoxGeoEntity revervox;
-    public MMClimbSqueezeNavigation(RevervoxGeoEntity entity, Level level) {
+    public RVClimbSqueezeNavigation(RevervoxGeoEntity entity, Level level) {
         super(entity, level);
         this.revervox = entity;
     }

@@ -1,6 +1,7 @@
 package com.example.revervoxmod.voicechat;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.config.RevervoxModServerConfigs;
 import de.maxhenkel.voicechat.api.*;
 import de.maxhenkel.voicechat.api.events.*;
 
@@ -12,9 +13,8 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static String REVERVOX_CATEGORY = "revervox";
     private static Map<UUID, RecordedPlayer> recordedPlayers;
     private static Map<UUID, Boolean> privacyMode;
-    // TODO turn into config
-    public static final int RECORDING_LIMIT = 200;
-    public static final int SILENCE_THRESHOLD = 700; // amplitude to detect speech start/end
+    public static final int RECORDING_LIMIT = RevervoxModServerConfigs.RECORDING_LIMIT.get();
+    public static final int SILENCE_THRESHOLD = RevervoxModServerConfigs.SILENCE_THRESHOLD.get();
     /**
      * @return the unique ID for this voice chat plugin
      */
