@@ -185,15 +185,16 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         return firstSpeak;
     }
 
-    public void onSpeak(){
+    public void onSpeak(long audioDuration){
         if(!hasSpoken() && !level().isClientSide()){
-            firstSpeak = System.currentTimeMillis();
+            firstSpeak = System.currentTimeMillis() + audioDuration;
         }
     }
 
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
-        if(hasSpoken() && time - getFirstSpoken() >= (int) (RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000)){
+        long diff = time - getFirstSpoken();
+        if(hasSpoken() && diff >= getGracePeriod()){
             if (RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
                 return RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
             } else return false;
@@ -276,6 +277,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         this.entityData.set(CLIMBING_ACCESSOR, pClimbing);
     }
 
+
+
+    public static int getGracePeriod(){
+        return (int) (RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000);
+    }
+
+
+
     public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioPlayer.Mode mode){
         RecordedPlayer record = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
         if (record == null) return;
@@ -288,7 +297,8 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());
         currentAudioPlayer = new AudioPlayer(audio, api, channel, mode);
         currentAudioPlayer.start();
-        onSpeak();
+        final int SAMPLE_RATE = 48000;
+        onSpeak((audio.length / SAMPLE_RATE) * 1000);
     }
 
     public void disappear(Player player, VoicechatServerApi api){
