@@ -2,8 +2,42 @@ package com.example.revervoxmod.voicechat.audio;
 
 import java.util.Arrays;
 
-public class AudioManipulator {
+public class AudioEffect {
+    private float pitchFactor;
+    private float reverbDecay;
+    private int reverbDelayMs;
+    private int reverbRepeats;
+    private boolean pitchEnabled, reverbEnabled;
     private static final int SAMPLE_RATE = 48000;
+
+    public AudioEffect(){
+        this.pitchFactor = 1;
+        this.reverbDecay = 0;
+        this.reverbDelayMs = 0;
+        this.reverbRepeats = 0;
+        this.pitchEnabled = false;
+        this.reverbEnabled = false;
+    }
+
+    public AudioEffect setPitchEnabled(float pitchFactor) {
+        this.pitchFactor = pitchFactor;
+        this.pitchEnabled = true;
+        return this;
+    }
+
+    public AudioEffect setReverbEnabled(float decay, int delayMs, int repeats) {
+        this.reverbDecay = decay;
+        this.reverbDelayMs = delayMs;
+        this.reverbRepeats = repeats;
+        this.reverbEnabled = true;
+        return this;
+    }
+
+    public short[] applyEffects(short[] pcm) {
+        if (pitchEnabled) pcm = changePitch(pcm, pitchFactor);
+        if (reverbEnabled) pcm = addReverb(pcm, reverbDecay, reverbDelayMs, reverbRepeats);
+        return pcm;
+    }
 
     public static short[] changePitch(short[] pcm, float pitchFactor) {
         if (pitchFactor <= 0) throw new IllegalArgumentException("Pitch factor must be > 0");

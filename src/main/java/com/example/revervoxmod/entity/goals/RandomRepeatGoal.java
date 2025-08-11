@@ -4,7 +4,7 @@ import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.config.RevervoxModServerConfigs;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
-import com.example.revervoxmod.voicechat.audio.AudioPlayer;
+import com.example.revervoxmod.voicechat.audio.AudioEffect;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import net.minecraft.world.entity.Entity;
@@ -85,11 +85,8 @@ public class RandomRepeatGoal extends Goal {
                             if (player1.distanceToSqr(player2) > (double) CHANNEL_DISTANCE /2) {
                                 RevervoxMod.LOGGER.debug("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE/2);
                                 Player furthestPlayer = player1.distanceToSqr(this.mob) > player2.distanceToSqr(this.mob) ? player1 : player2;
-                                this.mob.playAudio(furthestPlayer, api, channel, AudioPlayer.Mode.DEFAULT);
+                                this.mob.playPlayerAudio(furthestPlayer, api, channel);
                                 audiosPlayed++;
-                                if (!this.mob.isCanBeAngry()){
-                                    RevervoxMod.TASKS.schedule(() -> this.mob.setCanBeAngry(true), 30L);
-                                }
                                 return;
                             }
                         }
@@ -105,7 +102,9 @@ public class RandomRepeatGoal extends Goal {
                     playRandomAudioFromSet(api, otherPlayers);
                 } else {
                     RevervoxMod.LOGGER.debug("No other players to play sounds from");
-                    playRandomAudioFromSet(api, nearbyPlayerUUIDs);
+                    short[] audio = RevervoxVoicechatPlugin.getRandomAudio(true);
+                    if (audio == null) return;
+                    this.mob.playAudio(audio, api, channel, new AudioEffect());
                 }
             }
         }
@@ -113,11 +112,8 @@ public class RandomRepeatGoal extends Goal {
 
     private void playRandomAudioFromSet(VoicechatServerApi api, Set<UUID> nearbyPlayerUUIDs) {
         UUID randomUUID = new ArrayList<>(nearbyPlayerUUIDs).get(new Random().nextInt(nearbyPlayerUUIDs.size()));
-        this.mob.playAudio(Objects.requireNonNull(this.mob.level().getPlayerByUUID(randomUUID)), api, channel, AudioPlayer.Mode.DEFAULT);
+        this.mob.playPlayerAudio(Objects.requireNonNull(this.mob.level().getPlayerByUUID(randomUUID)), api, channel);
         audiosPlayed++;
-        if (!this.mob.isCanBeAngry()){
-            RevervoxMod.TASKS.schedule(() -> this.mob.setCanBeAngry(true), 30L);
-        }
     }
 
     private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, String category, Entity nearestEntity) {

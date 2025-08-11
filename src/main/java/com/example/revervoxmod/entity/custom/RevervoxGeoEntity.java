@@ -9,8 +9,8 @@ import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
 import com.example.revervoxmod.registries.ParticleRegistry;
 import com.example.revervoxmod.registries.SoundRegistry;
-import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
+import com.example.revervoxmod.voicechat.audio.AudioEffect;
 import com.example.revervoxmod.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
@@ -57,15 +57,14 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
+public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);
     private int remainingPersistentAngerTime;
-    private AudioPlayer currentAudioPlayer;
-    private boolean canBeAngry = false;
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
+    private AudioPlayer currentAudioPlayer;
 
     @Nullable
     private UUID persistentAngerTarget;
@@ -114,9 +113,18 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal(this, this::isAngryAt));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get()));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
+    }
+
+    @Override
+    public float getSpeed() {
+        if (this.isSwimming()){
+            return 5.0F;
+        } else{
+            return super.getSpeed();
+        }
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -177,6 +185,18 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     protected SoundEvent getHurtSound(@NotNull DamageSource dmgSrc) {
         return SoundRegistry.REVERVOX_HURT.get();
     }
+    @Override
+    public void onKilledPlayer(Player player, VoicechatServerApi api){
+        Vec3 loc = this.getEyePosition();
+        AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
+        if(channel == null){
+            RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
+            return;
+        }
+        channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+        playPlayerAudio(player, api, channel, new AudioEffect().setPitchEnabled(0.7f));
+        this.remove(Entity.RemovalReason.DISCARDED);
+    }
 
     public boolean hasSpoken(){
         return firstSpeak != NOT_SPOKEN_YET;
@@ -192,6 +212,17 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         }
     }
 
+    @Override
+    public AudioPlayer getCurrentAudioPlayer() {
+        return this.currentAudioPlayer;
+    }
+
+    @Override
+    public void setCurrentAudioPlayer(AudioPlayer player) {
+        this.currentAudioPlayer = player;
+    }
+
+    @Override
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         long diff = time - getFirstSpoken();
@@ -246,17 +277,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         }
     }
 
-    public void playAudioPitched(Player player, VoicechatServerApi api){
-        Vec3 loc = this.getEyePosition();
-        AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
-        if(channel == null){
-            RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
-            return;
-        }
-        channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
-        playAudio(player, api, channel, AudioPlayer.Mode.PITCHED);
-    }
-
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
@@ -267,8 +287,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     @Override
     public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
         if (!this.level().isClientSide){
-            if (pTarget == null) {
-                this.disappear((Player) this.getTarget(), (VoicechatServerApi) RevervoxMod.vcApi);
+            if (pTarget == null && this.getTarget() != null) {
+                if (this.getTarget() instanceof Player player){
+                    this.onKilledPlayer(player, (VoicechatServerApi) RevervoxMod.vcApi);
+                }
             }
         }
         super.setTarget(pTarget);
@@ -340,60 +362,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     }
 
 
-
     public static int getGracePeriod(){
         return (int) (RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000);
     }
 
-
-
-    public void playAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioPlayer.Mode mode){
-        RecordedPlayer record = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
-        if (record == null) return;
-        short[] audio = record.getRandomAudio(true);
-        if(audio == null){
-            RevervoxMod.LOGGER.error("No audio found for {}, choosing random player", player.getName());
-            audio = RevervoxVoicechatPlugin.getRandomAudio(true);
-            if (audio == null) return;
-        }
-        RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());
-        currentAudioPlayer = new AudioPlayer(audio, api, channel, mode);
-        currentAudioPlayer.start();
-        final int SAMPLE_RATE = 48000;
-        onSpeak((audio.length / SAMPLE_RATE) * 1000);
-    }
-
-    public void disappear(Player player, VoicechatServerApi api){
-        playAudioPitched(player, api);
-        this.remove(RemovalReason.DISCARDED);
-    }
-
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption) {
-        addParticlesAroundSelf(pParticleOption, 1.0);
-    }
-
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius) {
-        addParticlesAroundSelf(pParticleOption, radius, 30);
-    }
-
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius, int particleCount) {
-        for(int i = 0; i < particleCount; i++) {
-            double offsetX = (this.random.nextDouble() - 0.5) * 2.0 * radius;
-            double offsetY = (this.random.nextDouble() - 0.5) * 2.0 * radius;
-            double offsetZ = (this.random.nextDouble() - 0.5) * 2.0 * radius;
-
-            double particleX = this.getX() + offsetX;
-            double particleY = this.getY() + 1.0 + offsetY;
-            double particleZ = this.getZ() + offsetZ;
-
-            double velocityScale = radius * 0.1;
-            double velX = (this.random.nextDouble() - 0.5) * velocityScale;
-            double velY = (this.random.nextDouble() - 0.5) * velocityScale;
-            double velZ = (this.random.nextDouble() - 0.5) * velocityScale;
-
-            this.level().addParticle(pParticleOption, particleX, particleY, particleZ, velX, velY, velZ);
-        }
-    }
 
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
         if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
@@ -409,7 +381,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             // Priority to spawn on alone player
             Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
             if (player != null){
-                RevervoxMod.LOGGER.debug("Nearby Player Found");
                 if (player.position().y <= pLevel.getSeaLevel()){
                     if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100, 50, 100)).isEmpty()){
                         boolean flag = checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
@@ -438,19 +409,30 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
         }
     }
-
-
-    public AudioPlayer getCurrentAudioPlayer() {
-        return currentAudioPlayer;
+    public void addParticlesAroundSelf(ParticleOptions pParticleOption) {
+        addParticlesAroundSelf(pParticleOption, 1.0);
     }
 
-    public boolean isCanBeAngry() {
-        return canBeAngry;
+    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius) {
+        addParticlesAroundSelf(pParticleOption, radius, 30);
     }
 
-    public void setCanBeAngry(boolean canBeAngry) {
-        this.canBeAngry = canBeAngry;
+    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius, int particleCount) {
+        for(int i = 0; i < particleCount; i++) {
+            double offsetX = (this.random.nextDouble() - 0.5) * 2.0 * radius;
+            double offsetY = (this.random.nextDouble() - 0.5) * 2.0 * radius;
+            double offsetZ = (this.random.nextDouble() - 0.5) * 2.0 * radius;
+
+            double particleX = this.getX() + offsetX;
+            double particleY = this.getY() + 1.0 + offsetY;
+            double particleZ = this.getZ() + offsetZ;
+
+            double velocityScale = radius * 0.1;
+            double velX = (this.random.nextDouble() - 0.5) * velocityScale;
+            double velY = (this.random.nextDouble() - 0.5) * velocityScale;
+            double velZ = (this.random.nextDouble() - 0.5) * velocityScale;
+
+            this.level().addParticle(pParticleOption, particleX, particleY, particleZ, velX, velY, velZ);
+        }
     }
-
-
 }

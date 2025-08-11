@@ -8,5 +8,6 @@
   "item.revervox_mod.revervox_spawn_egg": "Revervox Spawn Egg",
   "sounds.revervox_mod.revervox.death": "Revervox dies",
   "sounds.revervox_mod.revervox.hurt": "Revervox hurt",
-  "sounds.revervox_mod.revervox.alert": "Revervox alerted"
+  "sounds.revervox_mod.revervox.alert": "Revervox alerted",
+  "entity.revervox_mod.revervox_bat": "Bat Revervox"
 }

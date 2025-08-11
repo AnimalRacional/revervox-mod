@@ -1,6 +1,7 @@
 package com.example.revervoxmod.events;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.entity.custom.ThingyEntity;
 import com.example.revervoxmod.registries.EntityRegistry;
@@ -17,6 +18,7 @@ public class ModEventBusEvents {
     public static void registerAttributes(EntityAttributeCreationEvent event){
         event.put(EntityRegistry.THINGY.get(), ThingyEntity.createAttributes().build());
         event.put(EntityRegistry.REVERVOX_GEO.get(), RevervoxGeoEntity.createAttributes().build());
+        event.put(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoEntity.createAttributes().build());
     }
     @SubscribeEvent
     public static void registerSpawnPlacement(SpawnPlacementRegisterEvent event) {

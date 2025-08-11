@@ -3,7 +3,7 @@ package com.example.revervoxmod;
 import com.example.revervoxmod.commands.*;
 import com.example.revervoxmod.config.RevervoxModClientConfigs;
 import com.example.revervoxmod.config.RevervoxModServerConfigs;
-import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
+import com.example.revervoxmod.entity.custom.SpeakingEntity;
 import com.example.revervoxmod.events.ClientForgeEventBus;
 import com.example.revervoxmod.events.CommonForgeEventBus;
 import com.example.revervoxmod.networking.RevervoxPacketHandler;
@@ -105,23 +105,21 @@ public class RevervoxMod {
 
     }
 
-
     @SubscribeEvent
-    public void onRevervoxDeath(LivingDeathEvent event) {
+    public void onSpeakingEntityDeath(LivingDeathEvent event) {
         Entity entity = event.getEntity();
-        if (entity instanceof RevervoxGeoEntity revervox) {
+        if (entity instanceof SpeakingEntity) {
             event.setCanceled(true); // Prevent default death behavior
-            revervox.remove(Entity.RemovalReason.KILLED); // Dissapear instantly
+            entity.remove(Entity.RemovalReason.KILLED); // Dissapear instantly
         }
     }
 
-
     @SubscribeEvent
-    public void onEntityDeath(LivingDeathEvent e){
+    public void onSpeakingEntityKill(LivingDeathEvent e){
         if(e.getEntity() instanceof Player player){
-            if(e.getSource().getEntity() instanceof RevervoxGeoEntity revervox){
+            if(e.getSource().getEntity() instanceof SpeakingEntity speakingEntity){
                 if(!player.level().isClientSide() && RevervoxMod.vcApi instanceof VoicechatServerApi api){
-                    revervox.disappear(player, api);
+                    speakingEntity.onKilledPlayer(player, api);
                 }
             }
         }

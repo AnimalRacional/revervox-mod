@@ -1,10 +1,7 @@
 package com.example.revervoxmod.events;
 
 import com.example.revervoxmod.RevervoxMod;
-import com.example.revervoxmod.entity.client.ModModelLayers;
-import com.example.revervoxmod.entity.client.RevervoxGeoRenderer;
-import com.example.revervoxmod.entity.client.ThingyModel;
-import com.example.revervoxmod.entity.client.ThingyRenderer;
+import com.example.revervoxmod.entity.client.*;
 import com.example.revervoxmod.particle.custom.RevervoxParticles;
 import com.example.revervoxmod.registries.EntityRegistry;
 import com.example.revervoxmod.registries.ParticleRegistry;
@@ -29,6 +26,7 @@ public class ModEventBusClientEvents {
     public static void onClientSetup(FMLClientSetupEvent event) {
         EntityRenderers.register(EntityRegistry.THINGY.get(), ThingyRenderer::new);
         EntityRenderers.register(EntityRegistry.REVERVOX_GEO.get(), RevervoxGeoRenderer::new);
+        EntityRenderers.register(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoRenderer::new);
     }
 
     @SubscribeEvent

@@ -1,6 +1,7 @@
 package com.example.revervoxmod.registries;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import com.example.revervoxmod.entity.custom.RevervoxGeoEntity;
 import com.example.revervoxmod.entity.custom.ThingyEntity;
 import net.minecraft.world.entity.EntityType;
@@ -23,6 +24,9 @@ public class EntityRegistry {
     public static final RegistryObject<EntityType<RevervoxGeoEntity>> REVERVOX_GEO =
             ENTITY_TYPES.register("revervox_geo", () -> EntityType.Builder.of(RevervoxGeoEntity::new, MobCategory.MONSTER)
                     .sized(REVERVOX_HITBOX_WIDTH, REVERVOX_HITBOX_HEIGHT).build("revervox_geo"));
+    public static final RegistryObject<EntityType<RevervoxBatGeoEntity>> REVERVOX_BAT =
+            ENTITY_TYPES.register("revervox_bat", () -> EntityType.Builder.of(RevervoxBatGeoEntity::new, MobCategory.AMBIENT)
+                    .sized(0.5F, 1).build("revervox_bat"));
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);
     }
