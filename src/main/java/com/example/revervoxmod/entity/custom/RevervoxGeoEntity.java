@@ -2,7 +2,7 @@ package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.config.RevervoxModServerConfigs;
-import com.example.revervoxmod.entity.ai.RVClimbSqueezeNavigation;
+import com.example.revervoxmod.entity.ai.RVClimbNavigation;
 import com.example.revervoxmod.entity.ai.MMEntityMoveHelper;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
@@ -56,10 +56,7 @@ import java.util.UUID;
 
 public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-    public static final EntityDataAccessor<Boolean> CROUCHING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Boolean> CRAWLING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Integer> MODEL_TYPE = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.INT);
 
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
     private int remainingPersistentAngerTime;
@@ -81,20 +78,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     protected void defineSynchedData() {
         super.defineSynchedData();
         entityData.define(CLIMBING_ACCESSOR, false);
-        entityData.define(CROUCHING_ACCESSOR, false);
-        entityData.define(CRAWLING_ACCESSOR, false);
-        entityData.define(MODEL_TYPE, 0);
-    }
-
-    @Override
-    public void onSyncedDataUpdated(EntityDataAccessor<?> pKey) {
-        super.onSyncedDataUpdated(pKey);
-        // Refresh dimensions on client when crawling or crouching state changes
-        if (CRAWLING_ACCESSOR.equals(pKey) || CROUCHING_ACCESSOR.equals(pKey)) {
-            this.refreshDimensions();
-            this.setModelType(CRAWLING_ACCESSOR.equals(pKey) ? 1 : 0);
-            this.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 2);
-        }
     }
 
     @Override
@@ -147,7 +130,9 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
 
     @Override
     protected @NotNull PathNavigation createNavigation(@NotNull Level pLevel) {
-        return new RVClimbSqueezeNavigation(this, pLevel);
+        RVClimbNavigation navigation = new RVClimbNavigation(this, pLevel);
+        navigation.setMaxVisitedNodesMultiplier(4);
+        return navigation;
     }
 
     @Override
@@ -192,33 +177,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         return SoundRegistry.REVERVOX_HURT.get();
     }
 
-    public void setCrawling(boolean shouldCrawl) {
-        getEntityData().set(CRAWLING_ACCESSOR, shouldCrawl);
-    }
-
-    public boolean isCrawling() {
-        return entityData.get(CRAWLING_ACCESSOR);
-    }
-
-    public void setCrouching(boolean shouldCrouch) {
-        getEntityData().set(CROUCHING_ACCESSOR, shouldCrouch);
-    }
-
-    public boolean isCrouching() {
-        return entityData.get(CROUCHING_ACCESSOR);
-    }
-
-    @Override
-    public @NotNull EntityDimensions getDimensions(@NotNull final Pose pose) {
-        if (entityData.get(CRAWLING_ACCESSOR)) {
-            return new EntityDimensions(0.5F, 0.9F, true);
-        } else if (entityData.get(CROUCHING_ACCESSOR)) {
-            return new EntityDimensions(0.5F, 1.7F, true);
-        }
-
-        return super.getDimensions(pose);
-    }
-
     public boolean hasSpoken(){
         return firstSpeak != NOT_SPOKEN_YET;
     }
@@ -233,7 +191,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         }
     }
 
-
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(hasSpoken() && time - getFirstSpoken() >= (int) (RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000)){
@@ -242,14 +199,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
             } else return false;
         }
         return false;
-    }
-
-    public int getModelType() {
-        return this.entityData.get(MODEL_TYPE);
-    }
-
-    public void setModelType(int type) {
-        this.entityData.set(MODEL_TYPE, type);
     }
 
     public boolean teleportTowards(Entity pTarget) {
@@ -319,7 +268,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     }
     public boolean isClimbing() {
         if (getTarget() != null) {
-            return !isCrawling() && !isCrouching() && entityData.get(CLIMBING_ACCESSOR);
+            return entityData.get(CLIMBING_ACCESSOR);
         }
         return false;
     }
