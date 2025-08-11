@@ -227,7 +227,7 @@
 				}
 			}
 		},
-		"attack.swing": {
+		"attack.bite": {
 			"animation_length": 0.6667,
 			"bones": {
 				"revervox": {

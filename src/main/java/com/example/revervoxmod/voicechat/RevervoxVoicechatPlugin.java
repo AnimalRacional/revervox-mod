@@ -13,8 +13,6 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static String REVERVOX_CATEGORY = "revervox";
     private static Map<UUID, RecordedPlayer> recordedPlayers;
     private static Map<UUID, Boolean> privacyMode;
-    public static final int RECORDING_LIMIT = RevervoxModServerConfigs.RECORDING_LIMIT.get();
-    public static final int SILENCE_THRESHOLD = RevervoxModServerConfigs.SILENCE_THRESHOLD.get();
     /**
      * @return the unique ID for this voice chat plugin
      */
@@ -144,7 +142,7 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
     public static void addAudio(UUID uuid, short[] audio){
         RecordedPlayer player = recordedPlayers.get(uuid);
         if(player == null){ return; }
-        if(getAudioCount() >= RECORDING_LIMIT){
+        if(getAudioCount() >= RevervoxModServerConfigs.RECORDING_LIMIT.get()){
             replaceRandomAudio(audio);
         } else {
             player.addAudioDirect(audio);
