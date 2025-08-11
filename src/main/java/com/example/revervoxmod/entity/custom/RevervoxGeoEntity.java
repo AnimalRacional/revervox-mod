@@ -59,13 +59,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     public static final EntityDataAccessor<Boolean> CROUCHING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CRAWLING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Integer> MODEL_TYPE = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.INT);
+
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(7, 12);
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
     private boolean canBeAngry = false;
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
-    private static final int AFTER_SPEAK_GRACE_PERIOD = (int) (RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000);
 
     @Nullable
     private UUID persistentAngerTarget;
@@ -82,6 +83,18 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         entityData.define(CLIMBING_ACCESSOR, false);
         entityData.define(CROUCHING_ACCESSOR, false);
         entityData.define(CRAWLING_ACCESSOR, false);
+        entityData.define(MODEL_TYPE, 0);
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> pKey) {
+        super.onSyncedDataUpdated(pKey);
+        // Refresh dimensions on client when crawling or crouching state changes
+        if (CRAWLING_ACCESSOR.equals(pKey) || CROUCHING_ACCESSOR.equals(pKey)) {
+            this.refreshDimensions();
+            this.setModelType(CRAWLING_ACCESSOR.equals(pKey) ? 1 : 0);
+            this.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 2);
+        }
     }
 
     @Override
@@ -103,6 +116,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     }
     @Override
     protected void registerGoals() {
+        RevervoxMod.LOGGER.info("(!!!) Revervox Spawned");
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
@@ -179,22 +193,25 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     }
 
     public void setCrawling(boolean shouldCrawl) {
-        if (shouldCrawl) {
-            getEntityData().set(CROUCHING_ACCESSOR, false);
-        }
-
         getEntityData().set(CRAWLING_ACCESSOR, shouldCrawl);
-        refreshDimensions();
     }
 
     public boolean isCrawling() {
         return entityData.get(CRAWLING_ACCESSOR);
     }
 
+    public void setCrouching(boolean shouldCrouch) {
+        getEntityData().set(CROUCHING_ACCESSOR, shouldCrouch);
+    }
+
+    public boolean isCrouching() {
+        return entityData.get(CROUCHING_ACCESSOR);
+    }
+
     @Override
     public @NotNull EntityDimensions getDimensions(@NotNull final Pose pose) {
         if (entityData.get(CRAWLING_ACCESSOR)) {
-            return new EntityDimensions(0.5F, 0.5F, true);
+            return new EntityDimensions(0.5F, 0.9F, true);
         } else if (entityData.get(CROUCHING_ACCESSOR)) {
             return new EntityDimensions(0.5F, 1.7F, true);
         }
@@ -216,14 +233,23 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
         }
     }
 
+
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
-        if(hasSpoken() && time - getFirstSpoken() >= AFTER_SPEAK_GRACE_PERIOD){
+        if(hasSpoken() && time - getFirstSpoken() >= (int) (RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000)){
             if (RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
                 return RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
             } else return false;
         }
         return false;
+    }
+
+    public int getModelType() {
+        return this.entityData.get(MODEL_TYPE);
+    }
+
+    public void setModelType(int type) {
+        this.entityData.set(MODEL_TYPE, type);
     }
 
     public boolean teleportTowards(Entity pTarget) {
@@ -349,40 +375,43 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob 
     }
 
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
-        // Priority to spawn on alone player
-        Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
-        if (player != null){
-            RevervoxMod.LOGGER.debug("Nearby Player Found");
-            if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100)).isEmpty()){
-                RevervoxMod.LOGGER.info("Spawning Revervox on alone player: " + player.getName() + " at " + pPos);
-                return checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
+        if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
+                TargetingConditions.DEFAULT,
+                null,
+                pPos.getX(),
+                pPos.getY(), pPos.getZ(),
+                new AABB(pPos).inflate(100)) != null) {
 
+            return false;
+        }
+        if (pLevel.getMaxLocalRawBrightness(pPos) < 4) {
+            // Priority to spawn on alone player
+            Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
+            if (player != null){
+                RevervoxMod.LOGGER.debug("Nearby Player Found");
+                if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100)).isEmpty()){
+                    boolean flag = checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
+                    if (flag) {
+                        RevervoxMod.LOGGER.info("Trying to Spawn Revervox on alone player: " + player.getName() + " at " + pPos);
+                    }
+                    return flag;
+                }
             }
         }
         if (pPos.getY() >= pLevel.getSeaLevel()) {
             return false;
         } else {
             // Check if there are other Revervox around
-            if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
-                    TargetingConditions.DEFAULT,
-                    null,
-                    pPos.getX(),
-                    pPos.getY(), pPos.getZ(),
-                    new AABB(pPos).inflate(100)) != null) {
-
+            int i = pLevel.getMaxLocalRawBrightness(pPos);
+            int j = 4;
+            if (pRandom.nextBoolean()) {
                 return false;
-            } else {
-                int i = pLevel.getMaxLocalRawBrightness(pPos);
-                int j = 4;
-                if (pRandom.nextBoolean()) {
-                    return false;
-                }
-                boolean flag1 = i <= pRandom.nextInt(j) && checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
-                if (flag1) {
-                    RevervoxMod.LOGGER.info("Spawning Revervox at " + pPos);
-                }
-                return flag1;
             }
+            boolean flag1 = i <= pRandom.nextInt(j) && checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
+            if (flag1) {
+                RevervoxMod.LOGGER.info("Trying to Spawn Revervox at " + pPos);
+            }
+            return flag1;
 
         }
     }
