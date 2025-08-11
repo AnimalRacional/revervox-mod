@@ -41,7 +41,6 @@ public class RVClimbSqueezeNavigation extends MMPathNavigateGround {
 
     @Override
     public void tick() {
-
         if (level instanceof ServerLevel) {
             boolean isAboveSolid = level.getBlockState(this.revervox.blockPosition().above()).isSolid();
             boolean isTwoAboveSolid = level.getBlockState(this.revervox.blockPosition().above(2)).isSolid();
@@ -58,14 +57,39 @@ public class RVClimbSqueezeNavigation extends MMPathNavigateGround {
             boolean isOffsetFacingAboveSolid = level.getBlockState(this.revervox.blockPosition().offset(offset).above()).isSolid();
             boolean isOffsetFacingTwoAboveSolid = level.getBlockState(this.revervox.blockPosition().offset(offset).above(2)).isSolid();
 
-            boolean shouldCrouch = isTwoAboveSolid || (!isOffsetFacingSolid && !isOffsetFacingAboveSolid && (isOffsetFacingTwoAboveSolid || isFacingSolid && isThreeAboveSolid)) ;
-
+            boolean shouldCrouch = isTwoAboveSolid || (!isOffsetFacingSolid && !isOffsetFacingAboveSolid && (isOffsetFacingTwoAboveSolid || isFacingSolid && isThreeAboveSolid));
             boolean shouldCrawl = isAboveSolid || !isOffsetFacingSolid && isOffsetFacingAboveSolid || isFacingSolid && isTwoAboveSolid;
 
-            this.revervox.getEntityData().set(RevervoxGeoEntity.CROUCHING_ACCESSOR, shouldCrouch);
-            this.revervox.setCrawling(shouldCrawl);
+            int pose = shouldCrawl ? 1 : shouldCrouch ? 2 : 0;
+
+            switch (pose) {
+                case 1:
+                    if (!revervox.isCrawling()) {
+                        revervox.setCrawling(true);
+                        revervox.setCrouching(false);
+                        revervox.setModelType(1);
+                    }
+                    break;
+                case 2:
+                    if (!revervox.isCrouching()) {
+                        revervox.setCrouching(true);
+                        revervox.setCrawling(false);
+                        revervox.setModelType(1);
+                    }
+                    break;
+                default: // normal
+                    if (revervox.isCrawling() || revervox.isCrouching()) {
+                        revervox.setCrawling(false);
+                        revervox.setCrouching(false);
+                        revervox.setModelType(0);
+                    }
+                    break;
+            }
+
+
+
         }
-        this.revervox.refreshDimensions();
+
 
         if (!this.isDone()) {
             super.tick();
@@ -88,7 +112,6 @@ public class RVClimbSqueezeNavigation extends MMPathNavigateGround {
                 }
             }
         }
-
     }
 
 

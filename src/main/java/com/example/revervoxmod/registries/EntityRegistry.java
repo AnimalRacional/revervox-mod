@@ -13,7 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 public class EntityRegistry {
     public static final float THINGY_HITBOX_SIZE = 0.8F;
     public static final float REVERVOX_HITBOX_WIDTH = 1.3F;
-    public static final float REVERVOX_HITBOX_HEIGHT = 4F;
+    public static final float REVERVOX_HITBOX_HEIGHT = 2.9F;
 
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, RevervoxMod.MOD_ID);
