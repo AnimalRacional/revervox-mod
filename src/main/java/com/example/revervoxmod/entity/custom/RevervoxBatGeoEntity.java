@@ -4,6 +4,7 @@ import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
 import com.example.revervoxmod.particle.ParticleManager;
 import com.example.revervoxmod.registries.ParticleRegistry;
+import com.example.revervoxmod.registries.SoundRegistry;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import com.example.revervoxmod.voicechat.audio.AudioEffect;
 import com.example.revervoxmod.voicechat.audio.AudioPlayer;
@@ -11,9 +12,13 @@ import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -158,7 +163,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         VoicechatServerApi api = (VoicechatServerApi) RevervoxMod.vcApi;
         short[] audio = RevervoxVoicechatPlugin.getRandomAudio(true);
         if (audio != null) {
-            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().setPitchEnabled(1.5f));
+            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().setPitchEnabled(1.5f).setReverbEnabled(0.5f, 160, 3));
         }
         super.remove(pReason);
     }
@@ -177,6 +182,27 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
             }
         }
         return false;
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getHurtSound(DamageSource pDamageSource) {
+        if (pDamageSource.is(DamageTypes.FALL)){
+            return null;
+        }
+        return SoundRegistry.REVERVOX_HURT.get();
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getDeathSound() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public SoundEvent getAmbientSound() {
+        return this.random.nextInt(4) != 0 ? null : SoundEvents.BAT_AMBIENT;
     }
 
     @Override
@@ -357,6 +383,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
                     double attackSpeed = RevervoxBatGeoEntity.this.getAttributeValue(Attributes.ATTACK_SPEED);
                     attackCooldown = (int)(getCurrentSwingDuration() / attackSpeed);
 
+                    //TODO som de ataque
                     if (!RevervoxBatGeoEntity.this.isSilent()) {
                         RevervoxBatGeoEntity.this.level().levelEvent(1039, RevervoxBatGeoEntity.this.blockPosition(), 0);
                     }
