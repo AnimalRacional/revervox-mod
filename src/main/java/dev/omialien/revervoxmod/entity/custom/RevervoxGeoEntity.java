@@ -2,6 +2,8 @@ package dev.omialien.revervoxmod.entity.custom;
 
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
+import de.maxhenkel.voicechat.api.VoicechatServerApi;
+import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
@@ -10,7 +12,6 @@ import dev.omialien.revervoxmod.entity.goals.RandomRepeatGoal;
 import dev.omialien.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
 import dev.omialien.revervoxmod.particle.ParticleManager;
-import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
@@ -53,6 +54,8 @@ import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
+import net.minecraft.core.Vec3i;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
@@ -62,6 +65,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);
+    private final RawAnimation REVERVO_CLIMB = RawAnimation.begin().thenLoop("move.climb");
     private int remainingPersistentAngerTime;
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
@@ -84,8 +88,15 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(DefaultAnimations.genericWalkIdleController(this).transitionLength(5),
-                DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5));
+        controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5),
+                DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
+                new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
+                    if (this.isClimbing()){
+                        RevervoxMod.LOGGER.info("Setting animation to Climb");
+                        return state.setAndContinue(REVERVO_CLIMB);
+                    }
+                    return PlayState.STOP;
+                }));
     }
 
     @Override
@@ -104,7 +115,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 1.2D, Ingredient.of(Items.MUSIC_DISC_13), false));
+        this.goalSelector.addGoal(3, new TemptGoal(this, 0.4D, Ingredient.of(Items.MUSIC_DISC_13), false));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.5D));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
 
@@ -119,15 +130,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 
-    @Override
-    public float getSpeed() {
-        if (this.isSwimming()){
-            return 5.0F;
-        } else{
-            return super.getSpeed();
-        }
-    }
-
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createLivingAttributes()
                 .add(Attributes.MAX_HEALTH, 100.0D)
@@ -135,7 +137,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
                 .add(Attributes.ATTACK_DAMAGE, 14D)
-                .add(Attributes.ATTACK_SPEED, 0.3D);
+                .add(Attributes.ATTACK_SPEED, 0.3D)
+                .add(Attributes.MOVEMENT_SPEED, 0.5D);
     }
 
     @Override
@@ -197,10 +200,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     @Override
-    public void awardKillScore(Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {
-        RevervoxMod.LOGGER.debug("killed entity {}", pEntity.getName());
+    public void awardKillScore(@NotNull Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {
         if(pEntity instanceof Player player && RevervoxMod.vcApi instanceof VoicechatServerApi api){
-            RevervoxMod.LOGGER.debug("was player and server");
             Vec3 loc = this.getEyePosition();
             AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
             if(channel == null){
@@ -294,10 +295,31 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         }
     }
 
+    @Override
+    public float getStepHeight() {
+        return 1;
+    }
+
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
-            this.setClimbing(this.horizontalCollision);
+
+            Vec3i offset = this.getDirection().getNormal();
+            boolean isFacingSolid = !this.level().getBlockState(blockPosition().relative(getDirection())).isAir();
+
+            if (isFacingSolid) {
+                offset = offset.offset(0, 1, 0);
+            }
+
+            boolean isFacingBelowSolid = !this.level().getBlockState(blockPosition().relative(getDirection()).below()).isAir();
+            boolean isOffsetFacingTwoAboveSolid = !this.level().getBlockState(blockPosition().offset(offset).above(2)).isAir();
+
+            if (this.isInFluidType()){
+                this.setDeltaMovement(this.getDeltaMovement().scale(1.0D));
+            }
+
+            this.setClimbing((this.horizontalCollision && this.getTarget() != null) && (isOffsetFacingTwoAboveSolid || !isFacingBelowSolid));
+            this.setSprinting(this.getTarget() != null);
         }
     }
 
@@ -362,10 +384,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         return this.isClimbing();
     }
     public boolean isClimbing() {
-        if (getTarget() != null) {
-            return entityData.get(CLIMBING_ACCESSOR);
-        }
-        return false;
+        return entityData.get(CLIMBING_ACCESSOR);
     }
     public void setClimbing(boolean pClimbing) {
         this.entityData.set(CLIMBING_ACCESSOR, pClimbing);
