@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class RevervoxSword extends SwordItem {
+public class RevervoxSword extends SwordItem implements IRevervoxWeapon {
     private static int getBonusDamage(){
         return RevervoxModServerConfigs.REVERVOX_SWORD_BONUS_DAMAGE.get();
     }
@@ -38,5 +38,6 @@ public class RevervoxSword extends SwordItem {
         }
         return super.hurtEnemy(pStack, pTarget, pAttacker);
     }
+
 
 }
