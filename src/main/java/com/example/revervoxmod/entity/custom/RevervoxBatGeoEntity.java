@@ -26,7 +26,6 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.animal.Cat;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -41,7 +40,6 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.EnumSet;
-import java.util.List;
 import java.util.UUID;
 
 public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
@@ -301,9 +299,6 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
     }
 
     class RVBatSweepAttackGoal extends Goal{
-        private static final int CAT_SEARCH_TICK_DELAY = 20;
-        private boolean isScaredOfCat;
-        private int catSearchTick;
         private int attackCooldown = 0; // in ticks
         public RVBatSweepAttackGoal() {
             this.setFlags(EnumSet.of(Goal.Flag.MOVE));
@@ -337,18 +332,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
                 if (!this.canUse()) {
                     return false;
                 } else {
-                    if (RevervoxBatGeoEntity.this.tickCount > this.catSearchTick) {
-                        this.catSearchTick = RevervoxBatGeoEntity.this.tickCount + 20;
-                        List<Cat> list = RevervoxBatGeoEntity.this.level().getEntitiesOfClass(Cat.class, RevervoxBatGeoEntity.this.getBoundingBox().inflate(16.0D), EntitySelector.ENTITY_STILL_ALIVE);
-
-                        for(Cat cat : list) {
-                            cat.hiss();
-                        }
-
-                        this.isScaredOfCat = !list.isEmpty();
-                    }
-
-                    return !this.isScaredOfCat;
+                    return true;
                 }
             }
         }
@@ -372,7 +356,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         public void tick() {
             LivingEntity livingentity = RevervoxBatGeoEntity.this.getTarget();
             if (livingentity != null) {
-                Vec3i moveTargetPoint = new Vec3i((int) livingentity.getX(), (int) livingentity.getY(0.5D), (int) livingentity.getZ());
+                Vec3i moveTargetPoint = new Vec3i((int) Math.round(livingentity.getX()), (int) Math.round(livingentity.getY(0.5D)), (int) Math.round(livingentity.getZ()));
                 RevervoxBatGeoEntity.this.targetPosition = new BlockPos(moveTargetPoint);
                 moveToTarget();
 
