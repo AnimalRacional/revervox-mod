@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @ForgeVoicechatPlugin
 public class RevervoxVoicechatPlugin implements VoicechatPlugin {
+    public static final int SAMPLE_RATE = 48000;
     public static String REVERVOX_CATEGORY = "revervox";
     private static Map<UUID, RecordedPlayer> recordedPlayers;
     private static Map<UUID, Boolean> privacyMode;
@@ -54,7 +55,9 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
 
     private void onPlayerConnected(PlayerConnectedEvent e){
         UUID playerUuid = e.getConnection().getPlayer().getUuid();
-        recordedPlayers.put(playerUuid, new RecordedPlayer(playerUuid));
+        RecordedPlayer player = new RecordedPlayer(playerUuid);
+        recordedPlayers.put(playerUuid, player);
+        player.loadAudios();
         startRecording(playerUuid);
     }
 
@@ -141,7 +144,9 @@ public class RevervoxVoicechatPlugin implements VoicechatPlugin {
 
     public static void addAudio(UUID uuid, short[] audio){
         RecordedPlayer player = recordedPlayers.get(uuid);
-        if(player == null){ return; }
+        if(player == null){
+            return;
+        }
         if(getAudioCount() >= RevervoxModServerConfigs.RECORDING_LIMIT.get()){
             replaceRandomAudio(audio);
         } else {

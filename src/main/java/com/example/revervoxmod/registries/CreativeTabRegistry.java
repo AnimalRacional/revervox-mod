@@ -15,12 +15,13 @@ public class CreativeTabRegistry {
     public static final RegistryObject<CreativeModeTab> REVERVOX_MOD_TAB = REGISTRY.register("revervox_mod_tab", () -> {
         return CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup.revervoxMod"))
-                .icon(ItemRegistry.THINGY_SPAWN_EGG.get()::getDefaultInstance)
-                .icon(ItemRegistry.REVERVOX_SPAWN_EGG.get()::getDefaultInstance)
+                .icon(ItemRegistry.AUDIO_REPEATING_ITEM.get()::getDefaultInstance)
                 .displayItems((displayParam, output) -> {
                     output.accept(ItemRegistry.THINGY_SPAWN_EGG.get());
                     output.accept(ItemRegistry.REVERVOX_SPAWN_EGG.get());
                     output.accept(ItemRegistry.REVERVOX_BAT_SPAWN_EGG.get());
+                    output.accept(ItemRegistry.AUDIO_REPEATING_ITEM.get());
+                    output.accept(ItemRegistry.REVERVOX_SHARD.get());
                 }).build();
     });
     public static void register(IEventBus eventBus) {

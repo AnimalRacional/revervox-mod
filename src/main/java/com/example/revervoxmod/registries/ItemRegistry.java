@@ -1,6 +1,7 @@
 package com.example.revervoxmod.registries;
 
 import com.example.revervoxmod.RevervoxMod;
+import com.example.revervoxmod.items.AudioRepeatingItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -17,7 +18,14 @@ public class ItemRegistry {
             .register("revervox_bat_spawn_egg",
                     () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffffff, 0x000000,
                             new Item.Properties().stacksTo(64)));
-
+    public static final RegistryObject<AudioRepeatingItem> AUDIO_REPEATING_ITEM = REGISTRY.register(
+            "audio_repeating_item",
+            () -> new AudioRepeatingItem(new Item.Properties().stacksTo(1))
+    );
+    public static final RegistryObject<Item> REVERVOX_SHARD = REGISTRY.register(
+            "revervox_shard",
+            () -> new Item(new Item.Properties())
+    );
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);
     }

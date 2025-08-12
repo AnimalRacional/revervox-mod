@@ -33,10 +33,16 @@ public class RecordedPlayer {
         this.recording = new short[RECORDING_SIZE];
         this.recordedAudios = new ArrayList<>();
         this.lastSpoke = NOT_SPOKEN_YET;
+        RevervoxMod.LOGGER.debug("Created RecordedPlayer {}", uuid);
+    }
+
+    public void loadAudios(){
         Path userPath = audiosPath.resolve(this.uuid.toString());
         if(Files.exists(userPath)){
+            RevervoxMod.LOGGER.debug("userpath exists");
             try(DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)){
                 List<Future<short[]>> audios = new ArrayList<>();
+                RevervoxMod.LOGGER.debug("getting audios...");
                 for (Path cur : stream) {
                     String filename = cur.getFileName().toString();
                     RevervoxMod.LOGGER.debug("Reading {} {}/{} ({})", filename, filename.startsWith("audio-"), filename.endsWith(".pcm"), cur);
@@ -45,7 +51,7 @@ public class RecordedPlayer {
                         AudioReader reader = new AudioReader(cur, true);
                         audios.add(reader.read());
                     } else {
-                        RevervoxMod.LOGGER.warn("Unkown file {} in audio folder for {}, deleting", cur, uuid);
+                        RevervoxMod.LOGGER.warn("Unknown file {} in audio folder for {}, deleting", cur, uuid);
                         Files.delete(cur);
                     }
                 }
