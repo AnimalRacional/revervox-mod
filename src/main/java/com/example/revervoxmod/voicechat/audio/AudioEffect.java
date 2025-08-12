@@ -9,6 +9,9 @@ public class AudioEffect {
     private int reverbRepeats;
     private boolean pitchEnabled, reverbEnabled;
     private static final int SAMPLE_RATE = 48000;
+    private boolean robotEnabled;
+    private float robotLfoFreq;
+
 
     public AudioEffect(){
         this.pitchFactor = 1;
@@ -33,9 +36,16 @@ public class AudioEffect {
         return this;
     }
 
+    public AudioEffect setRobotEnabled(float lfoFreqHz) {
+        this.robotEnabled = true;
+        this.robotLfoFreq = lfoFreqHz;
+        return this;
+    }
+
     public short[] applyEffects(short[] pcm) {
         if (pitchEnabled) pcm = changePitch(pcm, pitchFactor);
         if (reverbEnabled) pcm = addReverb(pcm, reverbDecay, reverbDelayMs, reverbRepeats);
+        if (robotEnabled) pcm = robotize(pcm, robotLfoFreq);
         return pcm;
     }
 
@@ -51,7 +61,6 @@ public class AudioEffect {
             float frac = srcIndex - index;
 
             if (index + 1 < pcm.length) {
-                // Linear interpolation
                 result[i] = (short)((1 - frac) * pcm[index] + frac * pcm[index + 1]);
             } else {
                 result[i] = pcm[index];
@@ -61,9 +70,6 @@ public class AudioEffect {
         return result;
     }
 
-    /**
-     * Adds a simple reverb using delayed echo taps.
-     */
     public static short[] addReverb(short[] input, float decay, int delayMs, int repeats) {
         if (decay <= 0 || decay >= 1) throw new IllegalArgumentException("Decay must be between 0 and 1");
         if (delayMs <= 0 || repeats <= 0) throw new IllegalArgumentException("Delay and repeats must be > 0");
@@ -78,11 +84,33 @@ public class AudioEffect {
             for (int i = 0; i < input.length - offset; i++) {
                 int delayedIndex = i + offset;
                 int mixed = output[delayedIndex] + (int)(input[i] * currentDecay);
-                // Clip to 16-bit signed
                 output[delayedIndex] = (short)Math.max(Math.min(mixed, Short.MAX_VALUE), Short.MIN_VALUE);
             }
         }
 
         return output;
     }
+
+    public static short[] robotize(short[] pcm, float lfoFreqHz) {
+        if (lfoFreqHz <= 0) throw new IllegalArgumentException("LFO frequency must be > 0");
+
+        short[] output = new short[pcm.length];
+        double lfoPhase = 0;
+        double lfoIncrement = 2.0 * Math.PI * lfoFreqHz / SAMPLE_RATE;
+
+        for (int i = 0; i < pcm.length; i++) {
+            double modulator = Math.cos(lfoPhase);
+            lfoPhase += lfoIncrement;
+            if (lfoPhase >= 2.0 * Math.PI) lfoPhase -= 2.0 * Math.PI;
+
+            int sample = (int) (pcm[i] * modulator);
+            if (sample > Short.MAX_VALUE) sample = Short.MAX_VALUE;
+            else if (sample < Short.MIN_VALUE) sample = Short.MIN_VALUE;
+
+            output[i] = (short) sample;
+        }
+
+        return output;
+    }
+
 }
