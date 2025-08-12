@@ -7,6 +7,7 @@ import com.example.revervoxmod.entity.ai.RVClimbNavigation;
 import com.example.revervoxmod.entity.goals.RandomRepeatGoal;
 import com.example.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
+import com.example.revervoxmod.particle.ParticleManager;
 import com.example.revervoxmod.registries.ParticleRegistry;
 import com.example.revervoxmod.registries.SoundRegistry;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
@@ -16,7 +17,6 @@ import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -90,7 +90,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     @Override
     public void onRemovedFromWorld() {
         super.onRemovedFromWorld();
-        this.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 2);
+        ParticleManager.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 2, this);
     }
 
     @Override
@@ -407,32 +407,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
             }
             return flag1;
 
-        }
-    }
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption) {
-        addParticlesAroundSelf(pParticleOption, 1.0);
-    }
-
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius) {
-        addParticlesAroundSelf(pParticleOption, radius, 30);
-    }
-
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius, int particleCount) {
-        for(int i = 0; i < particleCount; i++) {
-            double offsetX = (this.random.nextDouble() - 0.5) * 2.0 * radius;
-            double offsetY = (this.random.nextDouble() - 0.5) * 2.0 * radius;
-            double offsetZ = (this.random.nextDouble() - 0.5) * 2.0 * radius;
-
-            double particleX = this.getX() + offsetX;
-            double particleY = this.getY() + 1.0 + offsetY;
-            double particleZ = this.getZ() + offsetZ;
-
-            double velocityScale = radius * 0.1;
-            double velX = (this.random.nextDouble() - 0.5) * velocityScale;
-            double velY = (this.random.nextDouble() - 0.5) * velocityScale;
-            double velZ = (this.random.nextDouble() - 0.5) * velocityScale;
-
-            this.level().addParticle(pParticleOption, particleX, particleY, particleZ, velX, velY, velZ);
         }
     }
 }

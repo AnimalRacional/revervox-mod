@@ -2,20 +2,28 @@ package com.example.revervoxmod.entity.custom;
 
 import com.example.revervoxmod.RevervoxMod;
 import com.example.revervoxmod.entity.goals.TargetSpokeGoal;
+import com.example.revervoxmod.particle.ParticleManager;
 import com.example.revervoxmod.registries.ParticleRegistry;
 import com.example.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import com.example.revervoxmod.voicechat.audio.AudioEffect;
 import com.example.revervoxmod.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
-import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.target.TargetGoal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.Cat;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -23,25 +31,64 @@ import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.EnumSet;
+import java.util.List;
 import java.util.UUID;
 
-public class RevervoxBatGeoEntity extends Bat implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
     @Nullable
     private UUID persistentAngerTarget;
-    public RevervoxBatGeoEntity(EntityType<? extends Bat> pEntityType, Level pLevel) {
+    @Nullable
+    private BlockPos targetPosition;
+    public RevervoxBatGeoEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
     @Override
     protected void registerGoals() {
+        this.goalSelector.addGoal(1, new RVBatSweepAttackGoal());
+        this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 3.0F));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt));
+        this.targetSelector.addGoal(2, new RVHurtByTargetGoal(this, Player.class));
         super.registerGoals();
+    }
+
+    public static AttributeSupplier.Builder createAttributes() {
+        return Mob.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 6.0D)
+                .add(Attributes.ATTACK_DAMAGE, 3D)
+                .add(Attributes.FLYING_SPEED, 2.5D)
+                .add(Attributes.ATTACK_SPEED, 1.8D);
+    }
+
+    @Override
+    public int getCurrentSwingDuration() {
+        int ANIMATION_TICKS = 13;
+        int TRANSITION_TICKS = 5;
+        int IDK_TICKS = 1;
+        return ANIMATION_TICKS + TRANSITION_TICKS + IDK_TICKS;
+    }
+
+    @Override
+    public void checkDespawn() {
+
+    }
+
+    @Override
+    public boolean removeWhenFarAway(double pDistanceToClosestPlayer) {
+        if (pDistanceToClosestPlayer > 200.0D) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -72,8 +119,17 @@ public class RevervoxBatGeoEntity extends Bat implements GeoEntity, NeutralMob, 
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        AnimationController<RevervoxBatGeoEntity> controller = new AnimationController<>(this, "Attack", 5, state -> {
+            if (this.swinging)
+                return state.setAndContinue(DefaultAnimations.ATTACK_BITE);
+
+            state.getController().forceAnimationReset();
+
+            return PlayState.STOP;
+        });
+        controller.triggerableAnim("attack.bite", DefaultAnimations.ATTACK_BITE);
         controllers.add(DefaultAnimations.genericFlyIdleController(this).transitionLength(5),
-                DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_BITE).transitionLength(5));
+                controller);
     }
 
     @Override
@@ -110,7 +166,7 @@ public class RevervoxBatGeoEntity extends Bat implements GeoEntity, NeutralMob, 
     @Override
     public void onRemovedFromWorld() {
         super.onRemovedFromWorld();
-        this.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 1);
+        ParticleManager.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 1, this);
     }
 
     @Override
@@ -133,34 +189,182 @@ public class RevervoxBatGeoEntity extends Bat implements GeoEntity, NeutralMob, 
         this.currentAudioPlayer = player;
     }
 
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption) {
-        addParticlesAroundSelf(pParticleOption, 1.0);
+    @Override
+    public boolean doHurtTarget(Entity target) {
+        boolean result = super.doHurtTarget(target);
+        // Trigger the GeckoLib attack animation
+        triggerAnim("Attack", "attack.bite");
+        return result;
     }
 
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius) {
-        addParticlesAroundSelf(pParticleOption, radius, 30);
+    public void tick() {
+        super.tick();
+        this.setDeltaMovement(this.getDeltaMovement().multiply(1.0D, 0.6D, 1.0D));
     }
 
-    public void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius, int particleCount) {
-        for(int i = 0; i < particleCount; i++) {
-            double offsetX = (this.random.nextDouble() - 0.5) * 2.0 * radius;
-            double offsetY = (this.random.nextDouble() - 0.5) * 2.0 * radius;
-            double offsetZ = (this.random.nextDouble() - 0.5) * 2.0 * radius;
+    protected void customServerAiStep() {
+        super.customServerAiStep();
+        if (this.getTarget() == null) {
+            if (this.targetPosition != null && (!this.level().isEmptyBlock(this.targetPosition) || this.targetPosition.getY() <= this.level().getMinBuildHeight())) {
+                this.targetPosition = null;
+            }
 
-            double particleX = this.getX() + offsetX;
-            double particleY = this.getY() + 1.0 + offsetY;
-            double particleZ = this.getZ() + offsetZ;
+            if (this.targetPosition == null || this.random.nextInt(30) == 0 || this.targetPosition.closerToCenterThan(this.position(), 2.0D)) {
+                this.targetPosition = BlockPos.containing(this.getX() + (double)this.random.nextInt(7) - (double)this.random.nextInt(7), this.getY() + (double)this.random.nextInt(6) - 2.0D, this.getZ() + (double)this.random.nextInt(7) - (double)this.random.nextInt(7));
+            }
 
-            double velocityScale = radius * 0.1;
-            double velX = (this.random.nextDouble() - 0.5) * velocityScale;
-            double velY = (this.random.nextDouble() - 0.5) * velocityScale;
-            double velZ = (this.random.nextDouble() - 0.5) * velocityScale;
-
-            this.level().addParticle(pParticleOption, particleX, particleY, particleZ, velX, velY, velZ);
+            moveToTarget();
         }
     }
 
+    public void moveToTarget(){
+        double d2 = (double)this.targetPosition.getX() + 0.5D - this.getX();
+        double d0 = (double)this.targetPosition.getY() + 0.1D - this.getY();
+        double d1 = (double)this.targetPosition.getZ() + 0.5D - this.getZ();
+        Vec3 vec3 = this.getDeltaMovement();
+        Vec3 vec31 = vec3.add((Math.signum(d2) * 0.5D - vec3.x) * (double)0.1F, (Math.signum(d0) * (double)0.7F - vec3.y) * (double)0.1F, (Math.signum(d1) * 0.5D - vec3.z) * (double)0.1F);
+        this.setDeltaMovement(vec31);
+        float f = (float)(Mth.atan2(vec31.z, vec31.x) * (double)(180F / (float)Math.PI)) - 90.0F;
+        float f1 = Mth.wrapDegrees(f - this.getYRot());
+        this.zza = 0.5F;
+        this.setYRot(this.getYRot() + f1);
+    }
+
+
     @Override
     public void onSpeak(long audioDuration) {
+    }
+
+    static class RVHurtByTargetGoal extends TargetGoal {
+
+        private static final TargetingConditions HURT_BY_TARGETING = TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting();
+        private int timestamp;
+        private final Class<?>[] toTarget;
+        public RVHurtByTargetGoal(RevervoxBatGeoEntity pMob, Class<?>... target) {
+            super(pMob, true);
+            this.toTarget = target;
+        }
+
+        public boolean canUse() {
+            int i = this.mob.getLastHurtByMobTimestamp();
+            LivingEntity livingentity = this.mob.getLastHurtByMob();
+            if (i != this.timestamp && livingentity != null) {
+                if (livingentity.getType() == EntityType.PLAYER && this.mob.level().getGameRules().getBoolean(GameRules.RULE_UNIVERSAL_ANGER)) {
+                    return false;
+                } else {
+                    for(Class<?> oclass : toTarget) {
+                        if (oclass.isAssignableFrom(livingentity.getClass())) {
+                            return this.canAttack(livingentity, HURT_BY_TARGETING);
+                        }
+                    }
+
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        public void start() {
+            this.mob.setTarget(this.mob.getLastHurtByMob());
+            this.targetMob = this.mob.getTarget();
+            this.timestamp = this.mob.getLastHurtByMobTimestamp();
+            this.unseenMemoryTicks = 300;
+
+            super.start();
+        }
+    }
+
+    class RVBatSweepAttackGoal extends Goal{
+        private static final int CAT_SEARCH_TICK_DELAY = 20;
+        private boolean isScaredOfCat;
+        private int catSearchTick;
+        private int attackCooldown = 0; // in ticks
+        public RVBatSweepAttackGoal() {
+            this.setFlags(EnumSet.of(Goal.Flag.MOVE));
+        }
+
+        /**
+         * Returns whether execution should begin. You can also read and cache any state necessary for execution in this
+         * method as well.
+         */
+        public boolean canUse() {
+            return RevervoxBatGeoEntity.this.getTarget() != null;
+        }
+
+        /**
+         * Returns whether an in-progress EntityAIBase should continue executing
+         */
+        public boolean canContinueToUse() {
+            LivingEntity livingentity = RevervoxBatGeoEntity.this.getTarget();
+            if (livingentity == null) {
+                return false;
+            } else if (!livingentity.isAlive()) {
+                return false;
+            } else {
+                if (livingentity instanceof Player) {
+                    Player player = (Player)livingentity;
+                    if (livingentity.isSpectator() || player.isCreative()) {
+                        return false;
+                    }
+                }
+
+                if (!this.canUse()) {
+                    return false;
+                } else {
+                    if (RevervoxBatGeoEntity.this.tickCount > this.catSearchTick) {
+                        this.catSearchTick = RevervoxBatGeoEntity.this.tickCount + 20;
+                        List<Cat> list = RevervoxBatGeoEntity.this.level().getEntitiesOfClass(Cat.class, RevervoxBatGeoEntity.this.getBoundingBox().inflate(16.0D), EntitySelector.ENTITY_STILL_ALIVE);
+
+                        for(Cat cat : list) {
+                            cat.hiss();
+                        }
+
+                        this.isScaredOfCat = !list.isEmpty();
+                    }
+
+                    return !this.isScaredOfCat;
+                }
+            }
+        }
+
+        /**
+         * Execute a one shot task or start executing a continuous task
+         */
+        public void start() {
+        }
+
+        /**
+         * Reset the task's internal state. Called when this task is interrupted by another one
+         */
+        public void stop() {
+            RevervoxBatGeoEntity.this.setTarget((LivingEntity)null);
+        }
+
+        /**
+         * Keep ticking a continuous task that has already been started
+         */
+        public void tick() {
+            LivingEntity livingentity = RevervoxBatGeoEntity.this.getTarget();
+            if (livingentity != null) {
+                Vec3i moveTargetPoint = new Vec3i((int) livingentity.getX(), (int) livingentity.getY(0.5D), (int) livingentity.getZ());
+                RevervoxBatGeoEntity.this.targetPosition = new BlockPos(moveTargetPoint);
+                moveToTarget();
+
+                if (attackCooldown <= 0 && RevervoxBatGeoEntity.this.getBoundingBox().inflate(0.5F, 0.0D, 0.5F).intersects(livingentity.getBoundingBox())) {
+
+                    RevervoxBatGeoEntity.this.doHurtTarget(livingentity);
+
+                    double attackSpeed = RevervoxBatGeoEntity.this.getAttributeValue(Attributes.ATTACK_SPEED);
+                    attackCooldown = (int)(getCurrentSwingDuration() / attackSpeed);
+
+                    if (!RevervoxBatGeoEntity.this.isSilent()) {
+                        RevervoxBatGeoEntity.this.level().levelEvent(1039, RevervoxBatGeoEntity.this.blockPosition(), 0);
+                    }
+                }
+                if (attackCooldown > 0) {
+                    attackCooldown--;
+                }
+            }
+        }
     }
 }
