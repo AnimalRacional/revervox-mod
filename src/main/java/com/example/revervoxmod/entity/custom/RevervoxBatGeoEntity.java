@@ -87,11 +87,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
 
     @Override
     public boolean removeWhenFarAway(double pDistanceToClosestPlayer) {
-        if (pDistanceToClosestPlayer > 200.0D) {
-            return true;
-        } else {
-            return false;
-        }
+        return pDistanceToClosestPlayer > 200.0D;
     }
 
     @Override
@@ -140,9 +136,13 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         return this.geoCache;
     }
 
-    public void onKilledPlayer(Player player, VoicechatServerApi api){
-        playPlayerAudio(player, api, createLocationalAudioChannel(api), new AudioEffect().setPitchEnabled(1.7f));
-        this.remove(Entity.RemovalReason.DISCARDED);
+    @Override
+    public void awardKillScore(Entity pKilled, int pScoreValue, DamageSource pSource) {
+        if(pKilled instanceof Player player && RevervoxMod.vcApi instanceof VoicechatServerApi api){
+            playPlayerAudio(player, api, createLocationalAudioChannel(api), new AudioEffect().setPitchEnabled(1.7f));
+            this.remove(Entity.RemovalReason.DISCARDED);
+        }
+        super.awardKillScore(pKilled, pScoreValue, pSource);
     }
 
     private AudioChannel createLocationalAudioChannel(VoicechatServerApi api){
@@ -322,18 +322,13 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
             } else if (!livingentity.isAlive()) {
                 return false;
             } else {
-                if (livingentity instanceof Player) {
-                    Player player = (Player)livingentity;
+                if (livingentity instanceof Player player) {
                     if (livingentity.isSpectator() || player.isCreative()) {
                         return false;
                     }
                 }
 
-                if (!this.canUse()) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return this.canUse();
             }
         }
 
@@ -347,7 +342,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
          * Reset the task's internal state. Called when this task is interrupted by another one
          */
         public void stop() {
-            RevervoxBatGeoEntity.this.setTarget((LivingEntity)null);
+            RevervoxBatGeoEntity.this.setTarget(null);
         }
 
         /**

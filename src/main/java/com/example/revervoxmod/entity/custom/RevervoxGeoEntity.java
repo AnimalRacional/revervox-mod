@@ -114,7 +114,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get()));
-        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, Player.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 
@@ -185,18 +185,26 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     protected SoundEvent getHurtSound(@NotNull DamageSource dmgSrc) {
         return SoundRegistry.REVERVOX_HURT.get();
     }
+
+
     @Override
-    public void onKilledPlayer(Player player, VoicechatServerApi api){
-        Vec3 loc = this.getEyePosition();
-        AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
-        if(channel == null){
-            RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
-            return;
+    public void awardKillScore(Entity pEntity, int pScoreValue, DamageSource pSource) {
+        RevervoxMod.LOGGER.debug("killed entity {}", pEntity.getName());
+        if(pEntity instanceof Player player && RevervoxMod.vcApi instanceof VoicechatServerApi api){
+            RevervoxMod.LOGGER.debug("was player and server");
+            Vec3 loc = this.getEyePosition();
+            AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
+            if(channel == null){
+                RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
+            } else {
+                channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+                playPlayerAudio(player, api, channel, new AudioEffect().setPitchEnabled(0.7f));
+                this.remove(Entity.RemovalReason.DISCARDED);
+            }
         }
-        channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
-        playPlayerAudio(player, api, channel, new AudioEffect().setPitchEnabled(0.7f));
-        this.remove(Entity.RemovalReason.DISCARDED);
+        super.awardKillScore(pEntity, pScoreValue, pSource);
     }
+
 
     public boolean hasSpoken(){
         return firstSpeak != NOT_SPOKEN_YET;
@@ -286,13 +294,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
     @Override
     public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
-        if (!this.level().isClientSide){
-            if (pTarget == null && this.getTarget() != null) {
-                if (this.getTarget() instanceof Player player){
-                    this.onKilledPlayer(player, (VoicechatServerApi) RevervoxMod.vcApi);
-                }
-            }
-        }
         super.setTarget(pTarget);
     }
     @Override
@@ -308,7 +309,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
             double playerDirectionOffset = (this.getTarget().getY() - this.getY());
             double offset = Double.compare(playerDirectionOffset, 0.0D);
             offset = offset < 0.0D ? -1.0D : offset == 0 ? 0.0D : 1.0D;
-            boolean inWall = this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0));
+            this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0));
         }
 
         super.customServerAiStep();

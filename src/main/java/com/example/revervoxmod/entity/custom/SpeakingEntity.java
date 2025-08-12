@@ -11,7 +11,6 @@ import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.NotImplementedException;
 
 public interface SpeakingEntity {
-    public void onKilledPlayer(Player player, VoicechatServerApi api);
     public AudioPlayer getCurrentAudioPlayer();
     public void setCurrentAudioPlayer(AudioPlayer player);
 

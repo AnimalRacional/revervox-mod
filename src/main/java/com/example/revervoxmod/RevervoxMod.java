@@ -12,9 +12,7 @@ import com.example.revervoxmod.taskscheduler.TaskScheduler;
 import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -111,17 +109,6 @@ public class RevervoxMod {
         if (entity instanceof SpeakingEntity) {
             event.setCanceled(true); // Prevent default death behavior
             entity.remove(Entity.RemovalReason.KILLED); // Dissapear instantly
-        }
-    }
-
-    @SubscribeEvent
-    public void onSpeakingEntityKill(LivingDeathEvent e){
-        if(e.getEntity() instanceof Player player){
-            if(e.getSource().getEntity() instanceof SpeakingEntity speakingEntity){
-                if(!player.level().isClientSide() && RevervoxMod.vcApi instanceof VoicechatServerApi api){
-                    speakingEntity.onKilledPlayer(player, api);
-                }
-            }
         }
     }
 }
