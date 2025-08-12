@@ -222,7 +222,6 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         Level level = this.level();
         if(!level.isClientSide()){
             int rand = dropRng.nextInt(RevervoxModServerConfigs.REVERVOX_BAT_TEETH_DROP_CHANCE.get());
-            RevervoxMod.LOGGER.debug("random number: {}", rand);
             if(rand == 0){
                 ItemEntity item = new ItemEntity(level, this.getX(), this.getY(), this.getZ(), new ItemStack(ItemRegistry.REVERVOX_BAT_TEETH.get()));
                 level.addFreshEntity(item);

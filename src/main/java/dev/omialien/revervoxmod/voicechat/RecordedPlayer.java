@@ -41,27 +41,19 @@ public class RecordedPlayer {
         if(Files.exists(userPath)){
             RevervoxMod.LOGGER.debug("userpath exists");
             try(DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)){
-                List<Future<short[]>> audios = new ArrayList<>();
                 RevervoxMod.LOGGER.debug("getting audios...");
                 for (Path cur : stream) {
                     String filename = cur.getFileName().toString();
                     RevervoxMod.LOGGER.debug("Reading {} {}/{} ({})", filename, filename.startsWith("audio-"), filename.endsWith(".pcm"), cur);
                     if(filename.startsWith("audio-") && filename.endsWith(".pcm")){
                         RevervoxMod.LOGGER.debug("Starting AudioReader for {}", cur);
-                        AudioReader reader = new AudioReader(cur, true);
-                        audios.add(reader.read());
+                        new AudioReader(cur, true, (audio) -> {
+                            RevervoxMod.LOGGER.debug("Adding {} to RecordedPlayer", filename);
+                            RevervoxVoicechatPlugin.addAudio(uuid, audio);
+                        }).start();
                     } else {
                         RevervoxMod.LOGGER.warn("Unknown file {} in audio folder for {}, deleting", cur, uuid);
                         Files.delete(cur);
-                    }
-                }
-                for(Future<short[]> cur : audios){
-                    try{
-                        RevervoxVoicechatPlugin.addAudio(uuid, cur.get());
-                    } catch(InterruptedException e){
-                        RevervoxMod.LOGGER.error("File reading interrupted");
-                    } catch(ExecutionException e){
-                        RevervoxMod.LOGGER.error("Execution Exception during file reading");
                     }
                 }
                 Files.delete(userPath);

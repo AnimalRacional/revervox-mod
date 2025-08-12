@@ -10,24 +10,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
-public class AudioReader {
+public class AudioReader extends Thread{
     private final Path path;
     boolean destroy;
+    Consumer<short[]> reaction;
 
-    public AudioReader(Path path){
+    public AudioReader(Path path, Consumer<short[]> reaction){
         this.path = path;
         this.destroy = false;
+        this.reaction = reaction;
     }
 
-    public AudioReader(Path path, boolean deleteAfter) {
+    public AudioReader(Path path, boolean deleteAfter, Consumer<short[]> reaction) {
         this.path = path;
         this.destroy = deleteAfter;
+        this.reaction = reaction;
     }
 
-    public Future<short[]> read() {
-        RevervoxMod.LOGGER.debug("AUDIOREADER STARTING {}", path);
-        return Executors.newSingleThreadExecutor().submit(() -> getFile(path));
+    @Override
+    public void run() {
+        reaction.accept(getFile(path));
     }
 
     private short[] getFile(Path path){
@@ -43,7 +47,7 @@ public class AudioReader {
             }
             dis.close();
             RevervoxMod.LOGGER.debug("Read from the file!");
-            Files.delete(path);
+            if(destroy){ Files.delete(path); }
             return audio;
         } catch (FileNotFoundException e){
             RevervoxMod.LOGGER.error("AUDIOREADER File not found: {}", path);
