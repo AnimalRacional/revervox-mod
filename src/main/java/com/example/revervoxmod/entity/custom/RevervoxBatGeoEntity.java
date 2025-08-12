@@ -13,7 +13,6 @@ import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -200,7 +199,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
     @Nullable
     @Override
     public SoundEvent getAmbientSound() {
-        return this.random.nextInt(4) != 0 ? null : SoundEvents.BAT_AMBIENT;
+        return this.random.nextInt(4) != 0 ? null : SoundRegistry.REVERVOX_BAT_IDLE.get();
     }
 
     @Override

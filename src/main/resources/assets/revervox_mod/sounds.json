@@ -18,5 +18,13 @@
     "subtitle": "sounds.revervox_mod.thingy.hurt",
     "category": "hostile",
     "sounds": [ "revervox_mod:thingy_hurt" ]
+  },
+  "revervox_bat_idle": {
+    "subtitle": "sounds.revervox_mod.revervox_bat.idle",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:revervox_bat_idle1",
+                "revervox_mod:revervox_bat_idle2",
+                "revervox_mod:revervox_bat_idle3",
+                "revervox_mod:revervox_bat_idle4" ]
   }
 }
