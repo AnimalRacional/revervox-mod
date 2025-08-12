@@ -20,6 +20,7 @@ public class CreativeTabRegistry {
                 .displayItems((displayParam, output) -> {
                     output.accept(ItemRegistry.THINGY_SPAWN_EGG.get());
                     output.accept(ItemRegistry.REVERVOX_SPAWN_EGG.get());
+                    output.accept(ItemRegistry.REVERVOX_BAT_SPAWN_EGG.get());
                 }).build();
     });
     public static void register(IEventBus eventBus) {
