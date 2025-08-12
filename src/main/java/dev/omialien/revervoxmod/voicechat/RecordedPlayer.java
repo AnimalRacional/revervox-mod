@@ -10,10 +10,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class RecordedPlayer {
     public static Path audiosPath;
@@ -42,8 +39,10 @@ public class RecordedPlayer {
         if(Files.exists(userPath)){
             RevervoxMod.LOGGER.debug("userpath exists");
             try(DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)){
+                Iterator<Path> iter = stream.iterator();
                 RevervoxMod.LOGGER.debug("getting audios...");
-                for (Path cur : stream) {
+                while(iter.hasNext()) {
+                    Path cur = iter.next();
                     String filename = cur.getFileName().toString();
                     RevervoxMod.LOGGER.debug("Reading {} {}/{} ({})", filename, filename.startsWith("audio-"), filename.endsWith(".pcm"), cur);
                     if(filename.startsWith("audio-") && filename.endsWith(".pcm")){
@@ -51,13 +50,26 @@ public class RecordedPlayer {
                         new AudioReader(cur, true, (audio) -> {
                             RevervoxMod.LOGGER.debug("Adding {} to RecordedPlayer", filename);
                             RevervoxVoicechatPlugin.addAudio(uuid, audio);
+                            boolean deleteUser = false;
+                            try{
+                                DirectoryStream<Path> inner = Files.newDirectoryStream(userPath);
+                                if(!inner.iterator().hasNext()){
+                                    deleteUser = true;
+                                }
+                                inner.close();
+                                if(deleteUser){
+                                    RevervoxMod.LOGGER.debug("Deleting userPath for {}", uuid);
+                                    Files.delete(userPath);
+                                }
+                            } catch(IOException e){
+                                RevervoxMod.LOGGER.error("Error deleting userpath for {}:\r\n{}\r\n{}", uuid, e.getMessage(), e.getStackTrace());
+                            }
                         }).start();
                     } else {
                         RevervoxMod.LOGGER.warn("Unknown file {} in audio folder for {}, deleting", cur, uuid);
                         Files.delete(cur);
                     }
                 }
-                Files.delete(userPath);
             } catch(IOException e){
                 RevervoxMod.LOGGER.error("Error reading audios for {}:\r\n{}\r\n{}", uuid, e.getMessage(), e.getStackTrace());
             }
