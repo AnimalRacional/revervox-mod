@@ -1,5 +1,7 @@
 package dev.omialien.revervoxmod.entity.custom;
 
+import de.maxhenkel.voicechat.api.VoicechatServerApi;
+import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
@@ -8,13 +10,12 @@ import dev.omialien.revervoxmod.entity.goals.RandomRepeatGoal;
 import dev.omialien.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
 import dev.omialien.revervoxmod.particle.ParticleManager;
+import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import dev.omialien.revervoxmod.voicechat.audio.AudioEffect;
 import dev.omialien.revervoxmod.voicechat.audio.AudioPlayer;
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -57,7 +58,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);
@@ -186,6 +187,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         return SoundRegistry.REVERVOX_HURT.get();
     }
 
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        float amount = pAmount;
+        if(pSource.type() != damageSources().source(DamageTypeRegistry.REVERVOX_BONUS).type()){
+            amount /= 2;
+        }
+        return super.hurt(pSource, amount);
+    }
 
     @Override
     public void awardKillScore(Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {

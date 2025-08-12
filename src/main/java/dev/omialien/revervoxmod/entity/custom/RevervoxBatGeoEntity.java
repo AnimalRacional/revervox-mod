@@ -1,8 +1,10 @@
 package dev.omialien.revervoxmod.entity.custom;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
 import dev.omialien.revervoxmod.particle.ParticleManager;
+import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
@@ -25,7 +27,9 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -40,9 +44,10 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.EnumSet;
+import java.util.Random;
 import java.util.UUID;
 
-public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
     private int remainingPersistentAngerTime;
@@ -78,11 +83,6 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         int TRANSITION_TICKS = 5;
         int IDK_TICKS = 1;
         return ANIMATION_TICKS + TRANSITION_TICKS + IDK_TICKS;
-    }
-
-    @Override
-    public void checkDespawn() {
-
     }
 
     @Override
@@ -213,11 +213,21 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         this.currentAudioPlayer = player;
     }
 
+    Random dropRng = new Random();
     @Override
     public boolean doHurtTarget(@NotNull Entity target) {
         boolean result = super.doHurtTarget(target);
         // Trigger the GeckoLib attack animation
         triggerAnim("Attack", "attack.bite");
+        Level level = this.level();
+        if(!level.isClientSide()){
+            int rand = dropRng.nextInt(RevervoxModServerConfigs.REVERVOX_BAT_TEETH_DROP_CHANCE.get());
+            RevervoxMod.LOGGER.debug("random number: {}", rand);
+            if(rand == 0){
+                ItemEntity item = new ItemEntity(level, this.getX(), this.getY(), this.getZ(), new ItemStack(ItemRegistry.REVERVOX_BAT_TEETH.get()));
+                level.addFreshEntity(item);
+            }
+        }
         return result;
     }
 

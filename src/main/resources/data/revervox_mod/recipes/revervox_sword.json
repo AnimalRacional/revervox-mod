@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:smithing_transform",
+  "base": {
+    "item": "minecraft:diamond_sword"
+  },
+  "addition": {
+    "item": "revervox_mod:revervox_bat_teeth"
+  },
+  "template": {
+    "item": "revervox_mod:revervox_voice_box"
+  },
+  "result": {
+    "item": "revervox_mod:revervox_sword"
+  }
+}
