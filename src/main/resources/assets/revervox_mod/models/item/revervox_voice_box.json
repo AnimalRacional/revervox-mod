@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "revervox_mod:item/audio_repeating_item"
+    "layer0": "revervox_mod:item/revervox_voice_box"
   },
   "display": {
     "thirdperson_righthand": {
@@ -30,7 +30,7 @@
       "predicate": {
         "tooting": 1
       },
-      "model": "item/tooting_audio_repeating_item"
+      "model": "item/playing_revervox_voice_box"
     }
   ]
 }

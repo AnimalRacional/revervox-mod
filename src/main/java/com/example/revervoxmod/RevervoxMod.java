@@ -13,6 +13,7 @@ import com.example.revervoxmod.voicechat.RecordedPlayer;
 import com.mojang.logging.LogUtils;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Objects;
 
 @Mod(RevervoxMod.MOD_ID)
 public class RevervoxMod {
@@ -107,6 +109,9 @@ public class RevervoxMod {
     public void onSpeakingEntityDeath(LivingDeathEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof SpeakingEntity) {
+            if (entity instanceof LivingEntity livingEntity){
+                livingEntity.dropAllDeathLoot(Objects.requireNonNull(event.getSource()));
+            }
             event.setCanceled(true); // Prevent default death behavior
             entity.remove(Entity.RemovalReason.KILLED); // Dissapear instantly
         }

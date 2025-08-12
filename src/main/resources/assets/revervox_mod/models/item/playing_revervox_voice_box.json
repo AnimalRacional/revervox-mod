@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "item/audio_repeating_item"
+    "layer0": "item/revervox_voice_box"
   },
   "display": {
     "thirdperson_righthand": {

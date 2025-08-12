@@ -16,14 +16,14 @@ public class ItemRegistry {
     public static final RegistryObject<ForgeSpawnEggItem> REVERVOX_SPAWN_EGG = REGISTRY.register("revervox_spawn_egg", () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX_GEO, 0x3b3b3b, 0xffe591, new Item.Properties().stacksTo((64))));
     public static final RegistryObject<ForgeSpawnEggItem> REVERVOX_BAT_SPAWN_EGG = REGISTRY
             .register("revervox_bat_spawn_egg",
-                    () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffffff, 0x000000,
+                    () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
                             new Item.Properties().stacksTo(64)));
-    public static final RegistryObject<AudioRepeatingItem> AUDIO_REPEATING_ITEM = REGISTRY.register(
-            "audio_repeating_item",
+    public static final RegistryObject<AudioRepeatingItem> REVERVOX_VOICE_BOX = REGISTRY.register(
+            "revervox_voice_box",
             () -> new AudioRepeatingItem(new Item.Properties().stacksTo(1))
     );
-    public static final RegistryObject<Item> REVERVOX_SHARD = REGISTRY.register(
-            "revervox_shard",
+    public static final RegistryObject<Item> REVERVOX_EAR = REGISTRY.register(
+            "revervox_ear",
             () -> new Item(new Item.Properties())
     );
     public static void register(IEventBus eventBus) {

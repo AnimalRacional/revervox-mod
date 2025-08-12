@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "revervox:item/revervox_shard"
+    "layer0": "revervox_mod:item/revervox_ear"
   }
 }
