@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
+import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
@@ -19,6 +20,7 @@ public class ModEventBusEvents {
         event.put(EntityRegistry.THINGY.get(), ThingyEntity.createAttributes().build());
         event.put(EntityRegistry.REVERVOX_GEO.get(), RevervoxGeoEntity.createAttributes().build());
         event.put(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoEntity.createAttributes().build());
+        event.put(EntityRegistry.REVERVOX_FAKE_BAT.get(), RevervoxFakeBatEntity.createAttributes().build());
     }
     @SubscribeEvent
     public static void registerSpawnPlacement(SpawnPlacementRegisterEvent event) {

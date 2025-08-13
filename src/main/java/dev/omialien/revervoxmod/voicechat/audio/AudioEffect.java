@@ -22,13 +22,13 @@ public class AudioEffect {
         this.reverbEnabled = false;
     }
 
-    public AudioEffect setPitchEnabled(float pitchFactor) {
+    public AudioEffect changePitch(float pitchFactor) {
         this.pitchFactor = pitchFactor;
         this.pitchEnabled = true;
         return this;
     }
 
-    public AudioEffect setReverbEnabled(float decay, int delayMs, int repeats) {
+    public AudioEffect makeReverb(float decay, int delayMs, int repeats) {
         this.reverbDecay = decay;
         this.reverbDelayMs = delayMs;
         this.reverbRepeats = repeats;
@@ -36,7 +36,7 @@ public class AudioEffect {
         return this;
     }
 
-    public AudioEffect setRobotEnabled(float lfoFreqHz) {
+    public AudioEffect makeRobot(float lfoFreqHz) {
         this.robotEnabled = true;
         this.robotLfoFreq = lfoFreqHz;
         return this;

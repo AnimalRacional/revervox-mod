@@ -12,10 +12,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class EntityFollowingSoundInstance extends AbstractTickableSoundInstance {
     private final LivingEntity entity;
-    public EntityFollowingSoundInstance(LivingEntity entity, SoundEvent soundEvent, SoundSource soundSource) {
+    public EntityFollowingSoundInstance(LivingEntity entity, SoundEvent soundEvent, SoundSource soundSource, boolean looping) {
         super(soundEvent, soundSource, SoundInstance.createUnseededRandom());
         this.entity = entity;
-        this.looping = true;
+        this.looping = looping;
         this.delay = 0;
         this.volume = 0.8F;
         this.x = ((float)entity.getX());

@@ -14,6 +14,10 @@ import dev.omialien.revervoxmod.voicechat.audio.AudioEffect;
 import dev.omialien.revervoxmod.voicechat.audio.AudioPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -52,6 +56,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
     public static final int TICKS_PER_FLAP = Mth.ceil(2.4166098F);
+    private static final EntityDataAccessor<Byte> DATA_ID_FLAGS = SynchedEntityData.defineId(RevervoxBatGeoEntity.class, EntityDataSerializers.BYTE);
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
     @Nullable
@@ -60,6 +65,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     private BlockPos targetPosition;
     public RevervoxBatGeoEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        this.entityData.define(DATA_ID_FLAGS, (byte)0);
     }
 
     @Override
@@ -141,7 +147,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     @Override
     public void awardKillScore(@NotNull Entity pKilled, int pScoreValue, @NotNull DamageSource pSource) {
         if(pKilled instanceof Player player && RevervoxMod.vcApi instanceof VoicechatServerApi api){
-            playPlayerAudio(player, api, createLocationalAudioChannel(api), new AudioEffect().setPitchEnabled(1.7f));
+            playPlayerAudio(player, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.7f));
             this.remove(Entity.RemovalReason.DISCARDED);
         }
         super.awardKillScore(pKilled, pScoreValue, pSource);
@@ -163,7 +169,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         VoicechatServerApi api = (VoicechatServerApi) RevervoxMod.vcApi;
         short[] audio = RevervoxVoicechatPlugin.getRandomAudio(true);
         if (audio != null) {
-            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().setPitchEnabled(1.5f).setReverbEnabled(0.5f, 160, 2));
+            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
         }
         super.remove(pReason);
     }
@@ -233,9 +239,41 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
 
     public void tick() {
         super.tick();
-        this.setDeltaMovement(this.getDeltaMovement().multiply(1.0D, 0.6D, 1.0D));
+        if (this.isResting()) {
+            this.setDeltaMovement(Vec3.ZERO);
+            this.setPosRaw(this.getX(), (double)Mth.floor(this.getY()) + 1.0D - (double)this.getBbHeight(), this.getZ());
+        } else {
+            this.setDeltaMovement(this.getDeltaMovement().multiply(1.0D, 0.6D, 1.0D));
+        }
+
     }
 
+    public boolean isResting() {
+        return (this.entityData.get(DATA_ID_FLAGS) & 1) != 0;
+    }
+
+    public void setResting(boolean pIsResting) {
+        byte b0 = this.entityData.get(DATA_ID_FLAGS);
+        if (pIsResting) {
+            this.entityData.set(DATA_ID_FLAGS, (byte)(b0 | 1));
+        } else {
+            this.entityData.set(DATA_ID_FLAGS, (byte)(b0 & -2));
+        }
+    }
+
+    @Override
+    public void readAdditionalSaveData(@NotNull CompoundTag pCompound) {
+        super.readAdditionalSaveData(pCompound);
+        this.entityData.set(DATA_ID_FLAGS, pCompound.getByte("BatFlags"));
+    }
+
+    @Override
+    public void addAdditionalSaveData(@NotNull CompoundTag pCompound) {
+        super.addAdditionalSaveData(pCompound);
+        pCompound.putByte("BatFlags", this.entityData.get(DATA_ID_FLAGS));
+    }
+
+    @Override
     protected void customServerAiStep() {
         super.customServerAiStep();
         if (this.getTarget() == null) {

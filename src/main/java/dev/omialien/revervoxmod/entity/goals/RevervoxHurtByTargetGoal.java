@@ -48,7 +48,7 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
         if (!this.revervox.isAngry()){
             revervox.level().playSound(null, revervox.getX(), revervox.getY(), revervox.getZ(), SoundRegistry.REVERVOX_ALERT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
             RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this.mob),
-                    new AddSoundInstancePacket(this.mob.getId(), SoundRegistry.REVERVOX_LOOP.get(), SoundSource.HOSTILE));
+                    new AddSoundInstancePacket(this.mob.getId(), SoundRegistry.REVERVOX_LOOP.get(), SoundSource.HOSTILE, true));
         }
         timestamp = mob.getLastHurtByMobTimestamp();
         super.start();

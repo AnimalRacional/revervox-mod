@@ -27,6 +27,7 @@ public class ModEventBusClientEvents {
         EntityRenderers.register(EntityRegistry.THINGY.get(), ThingyRenderer::new);
         EntityRenderers.register(EntityRegistry.REVERVOX_GEO.get(), RevervoxGeoRenderer::new);
         EntityRenderers.register(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoRenderer::new);
+        EntityRenderers.register(EntityRegistry.REVERVOX_FAKE_BAT.get(), RevervoxFakeBatGeoRenderer::new);
     }
 
     @SubscribeEvent

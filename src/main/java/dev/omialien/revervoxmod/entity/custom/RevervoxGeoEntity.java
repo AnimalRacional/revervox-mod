@@ -211,7 +211,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
             } else {
                 channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
-                playPlayerAudio(player, api, channel, new AudioEffect().setPitchEnabled(0.7f));
+                playPlayerAudio(player, api, channel, new AudioEffect().changePitch(0.7f));
                 this.remove(Entity.RemovalReason.DISCARDED);
             }
         }

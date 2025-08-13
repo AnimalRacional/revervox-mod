@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
+import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
 import net.minecraft.world.entity.EntityType;
@@ -16,19 +17,22 @@ public class EntityRegistry {
     public static final float REVERVOX_HITBOX_WIDTH = 1.3F;
     public static final float REVERVOX_HITBOX_HEIGHT = 2.9F;
 
-    public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
+    private static final DeferredRegister<EntityType<?>> REGISTRY =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, RevervoxMod.MOD_ID);
     public static final RegistryObject<EntityType<ThingyEntity>> THINGY =
-            ENTITY_TYPES.register("thingy", () -> EntityType.Builder.of(ThingyEntity::new, MobCategory.CREATURE)
+            REGISTRY.register("thingy", () -> EntityType.Builder.of(ThingyEntity::new, MobCategory.CREATURE)
                     .sized(THINGY_HITBOX_SIZE, THINGY_HITBOX_SIZE).build("thingy"));
     public static final RegistryObject<EntityType<RevervoxGeoEntity>> REVERVOX_GEO =
-            ENTITY_TYPES.register("revervox_geo", () -> EntityType.Builder.of(RevervoxGeoEntity::new, MobCategory.MONSTER)
+            REGISTRY.register("revervox_geo", () -> EntityType.Builder.of(RevervoxGeoEntity::new, MobCategory.MONSTER)
                     .sized(REVERVOX_HITBOX_WIDTH, REVERVOX_HITBOX_HEIGHT).build("revervox_geo"));
     public static final RegistryObject<EntityType<RevervoxBatGeoEntity>> REVERVOX_BAT =
-            ENTITY_TYPES.register("revervox_bat", () -> EntityType.Builder.of(RevervoxBatGeoEntity::new, MobCategory.AMBIENT)
+            REGISTRY.register("revervox_bat", () -> EntityType.Builder.of(RevervoxBatGeoEntity::new, MobCategory.AMBIENT)
+                    .sized(0.5F, 1).build("revervox_bat"));
+    public static final RegistryObject<EntityType<RevervoxFakeBatEntity>> REVERVOX_FAKE_BAT =
+            REGISTRY.register("revervox_fake_bat", () -> EntityType.Builder.of(RevervoxFakeBatEntity::new, MobCategory.CREATURE)
                     .sized(0.5F, 1).build("revervox_bat"));
     public static void register(IEventBus eventBus) {
-        ENTITY_TYPES.register(eventBus);
+        REGISTRY.register(eventBus);
     }
 
 }

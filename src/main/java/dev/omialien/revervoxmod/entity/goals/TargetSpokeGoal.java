@@ -61,7 +61,7 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
         }
         if (this.soundToLoop != null){
             RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this.mob),
-                    new AddSoundInstancePacket(this.mob.getId(), soundToLoop, SoundSource.HOSTILE));
+                    new AddSoundInstancePacket(this.mob.getId(), soundToLoop, SoundSource.HOSTILE, true));
         }
         super.start();
     }

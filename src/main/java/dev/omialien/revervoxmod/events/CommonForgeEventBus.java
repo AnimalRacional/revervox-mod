@@ -60,7 +60,7 @@ public class CommonForgeEventBus {
         StopRecordingCommand.register(event.getDispatcher());
         isRecordingCommand.register(event.getDispatcher());
         ScheduleLogCommand.register(event.getDispatcher());
-
+        SummonFakeEntityCommand.register(event.getDispatcher());
     }
 
     @SubscribeEvent

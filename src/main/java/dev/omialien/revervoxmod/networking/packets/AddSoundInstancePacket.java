@@ -18,11 +18,13 @@ public class AddSoundInstancePacket {
     private final int entityID;
     private final SoundEvent sound;
     private final SoundSource soundSource;
-    public AddSoundInstancePacket(int entityID, SoundEvent sound, SoundSource soundSource) {
+    private final boolean looping;
+    public AddSoundInstancePacket(int entityID, SoundEvent sound, SoundSource soundSource, boolean looping) {
         RevervoxMod.LOGGER.debug("Created AddSoundInstancePacket");
         this.entityID = entityID;
         this.sound = sound;
         this.soundSource = soundSource;
+        this.looping = looping;
     }
 
     public void encode(FriendlyByteBuf buffer){
@@ -31,12 +33,13 @@ public class AddSoundInstancePacket {
         buffer.writeInt(entityID);
         buffer.writeResourceLocation(sound.getLocation());
         buffer.writeInt(soundSource.ordinal());
+        buffer.writeBoolean(looping);
     }
 
     public static AddSoundInstancePacket decode(FriendlyByteBuf buffer){
         // Create the packet from the buffer
         RevervoxMod.LOGGER.debug("Decoded AddSoundInstancePacket");
-        return new AddSoundInstancePacket(buffer.readInt(), SoundEvent.createVariableRangeEvent(buffer.readResourceLocation()) , SoundSource.values()[buffer.readInt()]);
+        return new AddSoundInstancePacket(buffer.readInt(), SoundEvent.createVariableRangeEvent(buffer.readResourceLocation()) , SoundSource.values()[buffer.readInt()], buffer.readBoolean());
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -48,7 +51,7 @@ public class AddSoundInstancePacket {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->{
                 Level level = net.minecraft.client.Minecraft.getInstance().level;
                 if (level != null && level.getEntity(entityID) instanceof LivingEntity entity){
-                    net.minecraft.client.Minecraft.getInstance().getSoundManager().play(new EntityFollowingSoundInstance(entity, sound, soundSource));
+                    net.minecraft.client.Minecraft.getInstance().getSoundManager().play(new EntityFollowingSoundInstance(entity, sound, soundSource, looping));
                 } else {
                     RevervoxMod.LOGGER.error("Could not find entity with id {}", entityID);
                 }
