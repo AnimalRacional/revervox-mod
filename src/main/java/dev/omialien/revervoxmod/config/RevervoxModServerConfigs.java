@@ -23,7 +23,7 @@ public class RevervoxModServerConfigs {
         REVERVOX_SPAWN_CHANCE = BUILDER.comment("Minimum distance between every Revervox").define("Revervox Spawn Chance", 100);
         RECORDING_LIMIT = BUILDER.comment("Maximum audios that will be saved in memory").define("Max Saved Recordings", 200);
         SILENCE_THRESHOLD = BUILDER.comment("Amplitude threshold to detect speech. Change this if you feel like Revervox notices you even when you're not speaking").define("Silence Threshold", 700);
-        REVERVOX_BAT_SPAWN_CHANCE = BUILDER.comment("Chance of Revervox Bat spawning (1 in x)").define("Revervox Bat Spawn Chance", 10);
+        REVERVOX_BAT_SPAWN_CHANCE = BUILDER.comment("Chance of Revervox Bat spawning (1 in x)").define("Revervox Bat Spawn Chance", 5);
         REVERVOX_SWORD_BONUS_DAMAGE = BUILDER.comment("How much extra damage the revervox sword deals to revervox entities").define("Revervox Sword Bonus Damage", 7);
         REVERVOX_BAT_TEETH_DROP_CHANCE = BUILDER.comment("The chance of a revervox bat dropping a teeth on attack (1 in x)").define("Revervox Bat Teeth Drop Chance", 10);
         AUDIO_READER_THREAD_COUNT = BUILDER.comment("How many threads are used to read the saved audios from a player that joins the server. Lower this if a player joining the server lags, and raise it if it doesn't but audio reading is too slow.").define("Audio Reading Thread Count", 4);

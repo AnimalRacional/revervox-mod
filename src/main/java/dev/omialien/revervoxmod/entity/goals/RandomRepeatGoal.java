@@ -71,8 +71,10 @@ public class RandomRepeatGoal extends Goal {
 
                 if (nearestPlayer != null) {
                     RevervoxMod.LOGGER.debug("Teleporting towards nearest player: " + nearestPlayer.getName());
-                    RevervoxMod.LOGGER.debug("TeleportTowards: " + this.mob.teleportTowards(nearestPlayer));
-                    audiosPlayed = 0;
+                    if (this.mob.teleportTowards(nearestPlayer)){
+                        this.mob.playPlayerAudio(nearestPlayer, api, channel);
+                        audiosPlayed++;
+                    }
                 }
             } else {
                 if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {

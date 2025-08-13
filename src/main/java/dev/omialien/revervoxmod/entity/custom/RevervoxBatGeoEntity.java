@@ -51,6 +51,7 @@ import java.util.UUID;
 public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
+    public static final int TICKS_PER_FLAP = Mth.ceil(2.4166098F);
     private int remainingPersistentAngerTime;
     private AudioPlayer currentAudioPlayer;
     @Nullable
@@ -181,6 +182,11 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
             }
         }
         return false;
+    }
+
+    @Override
+    protected boolean isFlapping() {
+        return this.tickCount % TICKS_PER_FLAP == 0;
     }
 
     @Nullable

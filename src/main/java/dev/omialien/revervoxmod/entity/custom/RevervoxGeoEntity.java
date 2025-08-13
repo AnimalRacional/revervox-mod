@@ -72,7 +72,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
     private AudioPlayer currentAudioPlayer;
-
     @Nullable
     private UUID persistentAngerTarget;
 
