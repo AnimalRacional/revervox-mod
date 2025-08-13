@@ -2,34 +2,58 @@ package dev.omialien.revervoxmod.voicechat.audio;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class AudioReader extends Thread{
     private final Path path;
     boolean destroy;
     Consumer<short[]> reaction;
+    Predicate<Path> shouldRead;
 
-    public AudioReader(Path path, Consumer<short[]> reaction){
+    public AudioReader(Path path, Consumer<short[]> reaction, Predicate<Path> shouldRead){
         this.path = path;
         this.destroy = false;
         this.reaction = reaction;
+        this.shouldRead = shouldRead;
     }
 
-    public AudioReader(Path path, boolean deleteAfter, Consumer<short[]> reaction) {
+    public AudioReader(Path path, boolean deleteAfter, Consumer<short[]> reaction, Predicate<Path> shouldRead) {
         this.path = path;
         this.destroy = deleteAfter;
         this.reaction = reaction;
+        this.shouldRead = shouldRead;
     }
 
     @Override
     public void run() {
-        reaction.accept(getFile(path));
+        try(DirectoryStream<Path> stream = Files.newDirectoryStream(path)){
+            Iterator<Path> iter = stream.iterator();
+            RevervoxMod.LOGGER.debug("getting audios...");
+            while(iter.hasNext()) {
+                Path cur = iter.next();
+                if(shouldRead.test(cur)){
+                    reaction.accept(getFile(cur));
+                }
+                if(destroy){
+                    Files.delete(cur);
+                }
+            }
+        } catch(IOException e){
+            RevervoxMod.LOGGER.error("Error reading audio\r\n{}\r\n{}", e.getMessage(), e.getStackTrace());
+        }
+        if(destroy){
+            try{
+                Files.delete(path);
+            } catch(IOException e){
+                RevervoxMod.LOGGER.error("Couldn't delete {}\r\n{}\r\n{}", path, e.getMessage(), e.getStackTrace());
+            }
+        }
     }
 
     private short[] getFile(Path path){
@@ -45,7 +69,6 @@ public class AudioReader extends Thread{
             }
             dis.close();
             RevervoxMod.LOGGER.debug("Read from the file!");
-            if(destroy){ Files.delete(path); }
             return audio;
         } catch (FileNotFoundException e){
             RevervoxMod.LOGGER.error("AUDIOREADER File not found: {}", path);

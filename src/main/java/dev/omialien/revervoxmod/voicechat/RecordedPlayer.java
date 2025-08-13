@@ -7,10 +7,12 @@ import dev.omialien.revervoxmod.voicechat.audio.AudioReader;
 import dev.omialien.revervoxmod.voicechat.audio.AudioSaver;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class RecordedPlayer {
     public static Path audiosPath;
@@ -18,7 +20,8 @@ public class RecordedPlayer {
     public static final int RECORDING_SIZE = 1024*1024;
     private OpusDecoder decoder = null;
     private final short[] recording;
-    private int currentRecordingIndex;
+    private int currentRecordingIndex; // The total recording size including pauses between words
+    private int recordingSize; // The recording size only including until the last active packet
     private boolean isRecording = false;
     private final UUID uuid;
     private long lastSpoke;
@@ -38,41 +41,13 @@ public class RecordedPlayer {
         Path userPath = audiosPath.resolve(this.uuid.toString());
         if(Files.exists(userPath)){
             RevervoxMod.LOGGER.debug("userpath exists");
-            try(DirectoryStream<Path> stream = Files.newDirectoryStream(userPath)){
-                Iterator<Path> iter = stream.iterator();
-                RevervoxMod.LOGGER.debug("getting audios...");
-                while(iter.hasNext()) {
-                    Path cur = iter.next();
-                    String filename = cur.getFileName().toString();
-                    RevervoxMod.LOGGER.debug("Reading {} {}/{} ({})", filename, filename.startsWith("audio-"), filename.endsWith(".pcm"), cur);
-                    if(filename.startsWith("audio-") && filename.endsWith(".pcm")){
-                        RevervoxMod.LOGGER.debug("Starting AudioReader for {}", cur);
-                        new AudioReader(cur, true, (audio) -> {
-                            RevervoxMod.LOGGER.debug("Adding {} to RecordedPlayer", filename);
-                            RevervoxVoicechatPlugin.addAudio(uuid, audio);
-                            boolean deleteUser = false;
-                            try{
-                                DirectoryStream<Path> inner = Files.newDirectoryStream(userPath);
-                                if(!inner.iterator().hasNext()){
-                                    deleteUser = true;
-                                }
-                                inner.close();
-                                if(deleteUser){
-                                    RevervoxMod.LOGGER.debug("Deleting userPath for {}", uuid);
-                                    Files.delete(userPath);
-                                }
-                            } catch(IOException e){
-                                RevervoxMod.LOGGER.error("Error deleting userpath for {}:\r\n{}\r\n{}", uuid, e.getMessage(), e.getStackTrace());
-                            }
-                        }).start();
-                    } else {
-                        RevervoxMod.LOGGER.warn("Unknown file {} in audio folder for {}, deleting", cur, uuid);
-                        Files.delete(cur);
-                    }
-                }
-            } catch(IOException e){
-                RevervoxMod.LOGGER.error("Error reading audios for {}:\r\n{}\r\n{}", uuid, e.getMessage(), e.getStackTrace());
-            }
+            (new AudioReader(userPath, true,
+                    (audio) -> RevervoxVoicechatPlugin.addAudio(uuid, audio),
+                    (path) -> {
+                        String filename = path.getFileName().toString();
+                        RevervoxMod.LOGGER.debug("Reading {} {}/{} ({})", filename, filename.startsWith("audio-"), filename.endsWith(".pcm"), path);
+                        return filename.startsWith("audio-") && filename.endsWith(".pcm");
+            })).start();
         }
     }
 
@@ -114,8 +89,8 @@ public class RecordedPlayer {
 
              */
             if (filterAudio()){
-                short[] savedRecording = new short[currentRecordingIndex];
-                System.arraycopy(recording, 0, savedRecording, 0, currentRecordingIndex);
+                short[] savedRecording = new short[recordingSize];
+                System.arraycopy(recording, 0, savedRecording, 0, recordingSize);
                 RevervoxVoicechatPlugin.addAudio(uuid, savedRecording);
                 RevervoxMod.LOGGER.debug("Added audio to MEMORY for player: " + uuid.toString());
             } else {
@@ -148,6 +123,9 @@ public class RecordedPlayer {
                     }
                     System.arraycopy(decodedPacket, 0, recording, currentRecordingIndex, decodedPacket.length);
                     currentRecordingIndex += decodedPacket.length;
+                    if(active){
+                        recordingSize = currentRecordingIndex;
+                    }
                 } else {
                     RevervoxMod.LOGGER.warn("Recording buffer full!");
                     stopRecording();
@@ -219,7 +197,7 @@ public class RecordedPlayer {
         final double MAX_DURATION = 10;
         final double MIN_RMS = 500;      // loudness threshold
 
-        double durationSeconds = (double) currentRecordingIndex / SAMPLE_RATE;
+        double durationSeconds = (double) recordingSize / SAMPLE_RATE;
         if (durationSeconds <= MIN_DURATION) {
             RevervoxMod.LOGGER.debug("Audio too short: " + durationSeconds + "s");
             return false;
@@ -230,12 +208,12 @@ public class RecordedPlayer {
         }
 
         int start = 0;
-        while (start < currentRecordingIndex &&
+        while (start < recordingSize &&
                 Math.abs(recording[start]) < RevervoxModServerConfigs.SILENCE_THRESHOLD.get()) {
             start++;
         }
 
-        int end = currentRecordingIndex - 1;
+        int end = recordingSize - 1;
         while (end > start &&
                 Math.abs(recording[end]) < RevervoxModServerConfigs.SILENCE_THRESHOLD.get()) {
             end--;
