@@ -15,6 +15,7 @@ import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
@@ -64,7 +65,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new RVBatSweepAttackGoal());
         this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 3.0F));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundEvents.BAT_TAKEOFF));
         this.targetSelector.addGoal(2, new RVHurtByTargetGoal(this, Player.class));
         super.registerGoals();
     }
@@ -188,13 +189,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         if (pDamageSource.is(DamageTypes.FALL)){
             return null;
         }
-        return SoundRegistry.REVERVOX_HURT.get();
-    }
-
-    @Nullable
-    @Override
-    protected SoundEvent getDeathSound() {
-        return null;
+        return SoundRegistry.REVERVOX_BAT_HURT.get();
     }
 
     @Nullable

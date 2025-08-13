@@ -4,7 +4,6 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.HearingEntity;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
-import dev.omialien.revervoxmod.registries.SoundRegistry;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -54,7 +53,7 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
         this.aggroTime = this.adjustedTickDelay(5);
         if (this.soundToPlay != null){
             RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this.mob),
-                    new AddSoundInstancePacket(this.mob.getId(), SoundRegistry.REVERVOX_ALERT.get(), SoundSource.HOSTILE));
+                    new AddSoundInstancePacket(this.mob.getId(), soundToPlay, SoundSource.HOSTILE));
         }
         super.start();
     }

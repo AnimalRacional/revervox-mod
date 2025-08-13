@@ -26,5 +26,10 @@
                 "revervox_mod:revervox_bat_idle2",
                 "revervox_mod:revervox_bat_idle3",
                 "revervox_mod:revervox_bat_idle4" ]
+  },
+  "revervox_bat_hurt": {
+    "subtitle": "sounds.revervox_mod.revervox_bat.hurt",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:revervox_bat_hurt" ]
   }
 }
