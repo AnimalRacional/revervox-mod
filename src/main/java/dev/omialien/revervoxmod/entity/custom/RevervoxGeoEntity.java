@@ -94,7 +94,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
-                        RevervoxMod.LOGGER.info("Setting animation to Climb");
                         return state.setAndContinue(REVERVO_CLIMB);
                     }
 
@@ -116,7 +115,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
     @Override
     protected void registerGoals() {
-        RevervoxMod.LOGGER.info("(!!!) Revervox Spawned");
+        RevervoxMod.LOGGER.info("Revervox Spawned");
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
@@ -130,7 +129,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get()));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, Player.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
@@ -409,7 +408,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 null,
                 pPos.getX(),
                 pPos.getY(), pPos.getZ(),
-                new AABB(pPos).inflate(100)) != null) {
+                new AABB(pPos).inflate(RevervoxModServerConfigs.REVERVOX_SPAWN_CHANCE.get())) != null) {
 
             return false;
         }

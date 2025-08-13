@@ -22,14 +22,16 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
     private int aggroTime;
     private Player pendingTarget;
     private final SoundEvent soundToPlay;
+    private final SoundEvent soundToLoop;
     private final Predicate<LivingEntity> isAngerInducing;
     private final TargetingConditions startAggroTargetConditions;
     private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
 
-    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay) {
+    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, SoundEvent soundToLoop) {
         super(entity, Player.class, 10, false, false, pSelectionPredicate);
         this.entity = entity;
         this.soundToPlay = soundToPlay;
+        this.soundToLoop = soundToLoop;
         this.isAngerInducing = (player) -> {
             boolean isSpeakingAtMe = entity.isSpeakingAtMe((Player)player);
             boolean isAngryAt = entity.isAngryAt(player);
@@ -39,8 +41,11 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
         };
         this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(this.isAngerInducing);
     }
+    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay) {
+        this(entity, pSelectionPredicate, soundToPlay, null);
+    }
     public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate) {
-        this(entity, pSelectionPredicate, null);
+        this(entity, pSelectionPredicate, null, null);
     }
     @Override
     public boolean canUse() {
@@ -52,8 +57,11 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
     public void start() {
         this.aggroTime = this.adjustedTickDelay(5);
         if (this.soundToPlay != null){
+            entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), soundToPlay, SoundSource.HOSTILE, 1.0F, 1.0F);
+        }
+        if (this.soundToLoop != null){
             RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this.mob),
-                    new AddSoundInstancePacket(this.mob.getId(), soundToPlay, SoundSource.HOSTILE));
+                    new AddSoundInstancePacket(this.mob.getId(), soundToLoop, SoundSource.HOSTILE));
         }
         super.start();
     }

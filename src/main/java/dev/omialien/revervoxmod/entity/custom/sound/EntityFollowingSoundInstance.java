@@ -15,9 +15,9 @@ public class EntityFollowingSoundInstance extends AbstractTickableSoundInstance 
     public EntityFollowingSoundInstance(LivingEntity entity, SoundEvent soundEvent, SoundSource soundSource) {
         super(soundEvent, soundSource, SoundInstance.createUnseededRandom());
         this.entity = entity;
-        this.looping = false;
+        this.looping = true;
         this.delay = 0;
-        this.volume = 1.0F;
+        this.volume = 0.8F;
         this.x = ((float)entity.getX());
         this.y = ((float)entity.getY());
         this.z = ((float)entity.getZ());

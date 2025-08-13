@@ -14,6 +14,11 @@
     "category": "hostile",
     "sounds": [ "revervox_mod:revervox_alert" ]
   },
+  "revervox_loop": {
+    "subtitle": "sounds.revervox_mod.revervox.alert",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:revervox_loop" ]
+  },
   "thingy_hurt": {
     "subtitle": "sounds.revervox_mod.thingy.hurt",
     "category": "hostile",
@@ -31,5 +36,10 @@
     "subtitle": "sounds.revervox_mod.revervox_bat.hurt",
     "category": "hostile",
     "sounds": [ "revervox_mod:revervox_bat_hurt" ]
+  },
+  "revervox_bat_alert": {
+    "subtitle": "sounds.revervox_mod.revervox_bat.alert",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:revervox_bat_alert" ]
   }
 }

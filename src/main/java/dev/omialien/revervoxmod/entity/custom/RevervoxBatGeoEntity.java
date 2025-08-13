@@ -1,5 +1,7 @@
 package dev.omialien.revervoxmod.entity.custom;
 
+import de.maxhenkel.voicechat.api.VoicechatServerApi;
+import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
@@ -10,8 +12,6 @@ import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import dev.omialien.revervoxmod.voicechat.audio.AudioEffect;
 import dev.omialien.revervoxmod.voicechat.audio.AudioPlayer;
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.sounds.SoundEvent;
@@ -65,7 +65,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new RVBatSweepAttackGoal());
         this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 3.0F));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundEvents.BAT_TAKEOFF));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundEvents.BAT_LOOP));
         this.targetSelector.addGoal(2, new RVHurtByTargetGoal(this, Player.class));
         super.registerGoals();
     }
@@ -74,7 +74,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 6.0D)
                 .add(Attributes.ATTACK_DAMAGE, 3D)
-                .add(Attributes.FLYING_SPEED, 2.5D)
+                .add(Attributes.FLYING_SPEED, 3.5D)
                 .add(Attributes.ATTACK_SPEED, 1.8D);
     }
 
@@ -162,7 +162,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         VoicechatServerApi api = (VoicechatServerApi) RevervoxMod.vcApi;
         short[] audio = RevervoxVoicechatPlugin.getRandomAudio(true);
         if (audio != null) {
-            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().setPitchEnabled(1.5f).setReverbEnabled(0.5f, 160, 3));
+            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().setPitchEnabled(1.5f).setReverbEnabled(0.5f, 160, 2));
         }
         super.remove(pReason);
     }
@@ -170,7 +170,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     @Override
     public void onRemovedFromWorld() {
         super.onRemovedFromWorld();
-        ParticleManager.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 1, this);
+        ParticleManager.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 0.7D, this);
     }
 
     @Override
@@ -248,13 +248,30 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     public void moveToTarget(){
         BlockPos blockpos = this.targetPosition;
         if (blockpos != null) {
-            double d2 = (double)blockpos.getX() + 0.5D - this.getX();
-            double d0 = (double)blockpos.getY() + 0.1D - this.getY();
-            double d1 = (double)blockpos.getZ() + 0.5D - this.getZ();
+            double d2 = blockpos.getX() + 0.5D - this.getX();
+            double d0 = blockpos.getY() + 0.1D - this.getY();
+            double d1 = blockpos.getZ() + 0.5D - this.getZ();
             Vec3 vec3 = this.getDeltaMovement();
-            Vec3 vec31 = vec3.add((Math.signum(d2) * 0.5D - vec3.x) * (double)0.1F, (Math.signum(d0) * (double)0.7F - vec3.y) * (double)0.1F, (Math.signum(d1) * 0.5D - vec3.z) * (double)0.1F);
+
+            double xzSpeed = 0.5D;
+            double ySpeed  = 0.7D;
+            float accel    = 0.1F;
+
+            // Speed boost when it is alerted
+            if (this.getTarget() != null) {
+                xzSpeed = 0.75D;
+                ySpeed  = 1.05D;
+                accel   = 0.15F;
+            }
+
+            Vec3 vec31 = vec3.add(
+                    (Math.signum(d2) * xzSpeed - vec3.x) * accel,
+                    (Math.signum(d0) * ySpeed - vec3.y) * accel,
+                    (Math.signum(d1) * xzSpeed - vec3.z) * accel
+            );
+
             this.setDeltaMovement(vec31);
-            float f = (float)(Mth.atan2(vec31.z, vec31.x) * (double)(180F / (float)Math.PI)) - 90.0F;
+            float f = (float)(Mth.atan2(vec31.z, vec31.x) * (180F / Math.PI)) - 90.0F;
             float f1 = Mth.wrapDegrees(f - this.getYRot());
             this.zza = 0.5F;
             this.setYRot(this.getYRot() + f1);

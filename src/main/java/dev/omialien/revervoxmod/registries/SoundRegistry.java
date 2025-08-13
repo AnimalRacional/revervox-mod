@@ -14,8 +14,10 @@ public class SoundRegistry {
     public static final RegistryObject<SoundEvent> THINGY_HURT = registerSound("thingy_hurt");
     public static final RegistryObject<SoundEvent> REVERVOX_HURT = registerSound("revervox_hurt");
     public static final RegistryObject<SoundEvent> REVERVOX_ALERT = registerSound("revervox_alert");
+    public static final RegistryObject<SoundEvent> REVERVOX_LOOP = registerSound("revervox_loop");
     public static final RegistryObject<SoundEvent> REVERVOX_BAT_IDLE = registerSound("revervox_bat_idle");
     public static final RegistryObject<SoundEvent> REVERVOX_BAT_HURT = registerSound("revervox_bat_hurt");
+    public static final RegistryObject<SoundEvent> REVERVOX_BAT_ALERT = registerSound("revervox_bat_alert");
 
     private static RegistryObject<SoundEvent> registerSound(String name){
         return REGISTRY.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, name)));

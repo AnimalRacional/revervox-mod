@@ -7,13 +7,15 @@
   "item.revervox_mod.revervox_ear": "Revervox Ear",
   "item.revervox_mod.revervox_sword": "Revervox Sword",
   "item.revervox_mod.revervox_bat_teeth": "Revervox Bat Teeth",
-  "revervox_mod.subtitle.sound.thingy_death": "Thingy dies",
-  "revervox_mod.subtitle.sound.thingy_hurt": "Thingy hurts",
+  "sound.revervox_mod.thingy.death": "Thingy dies",
+  "sound.revervox_mod.thingy.hurt": "Thingy hurts",
   "entity.revervox_mod.thingy": "Thingy",
   "entity.revervox_mod.revervox_geo": "Revervox",
+  "entity.revervox_mod.revervox_bat": "Revervox Bat",
   "sounds.revervox_mod.revervox.death": "Revervox dies",
   "sounds.revervox_mod.revervox.hurt": "Revervox hurt",
   "sounds.revervox_mod.revervox.alert": "Revervox alerted",
-  "entity.revervox_mod.revervox_bat": "Revervox Bat",
-  "sounds.revervox_mod.revervox_bat.idle": "Bat shrieks"
+  "sounds.revervox_mod.revervox_bat.idle": "Bat shrieks",
+  "sounds.revervox_mod.revervox_bat.hurt": "Revervox Bat hurts",
+  "sounds.revervox_mod.revervox_bat.alert": "Revervox Bat alerted"
 }
