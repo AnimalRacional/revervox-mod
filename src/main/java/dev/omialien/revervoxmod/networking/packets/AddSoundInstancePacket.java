@@ -48,6 +48,7 @@ public class AddSoundInstancePacket {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->{
                 Level level = net.minecraft.client.Minecraft.getInstance().level;
                 if (level != null && level.getEntity(entityID) instanceof LivingEntity entity){
+                    //TODO dar loop ao som e fazer generico na EntityFollowingSoundInstance
                     net.minecraft.client.Minecraft.getInstance().getSoundManager().play(new EntityFollowingSoundInstance(entity, sound, soundSource));
                 } else {
                     RevervoxMod.LOGGER.error("Could not find entity with id {}", entityID);
