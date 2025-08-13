@@ -97,6 +97,9 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                         RevervoxMod.LOGGER.info("Setting animation to Climb");
                         return state.setAndContinue(REVERVO_CLIMB);
                     }
+
+                    state.resetCurrentAnimation();
+
                     return PlayState.STOP;
                 }));
     }
@@ -280,7 +283,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             net.minecraftforge.event.entity.EntityTeleportEvent.EnderEntity event = net.minecraftforge.event.ForgeEventFactory.onEnderTeleport(this, pX, pY, pZ);
             if (event.isCanceled()) return false;
             Vec3 vec3 = this.position();
-            boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true);
+            boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false);
             //RevervoxMod.LOGGER.debug("flag2: " + flag2);
             if (flag2) {
                 this.level().gameEvent(GameEvent.TELEPORT, vec3, GameEvent.Context.of(this));
@@ -305,6 +308,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
+
 
             Vec3i offset = this.getDirection().getNormal();
             boolean isFacingSolid = !this.level().getBlockState(blockPosition().relative(getDirection())).isAir();
@@ -338,7 +342,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     protected void customServerAiStep() {
-        if (this.getTarget() != null && !this.hasLineOfSight(this.getTarget())) {
+        boolean targetDirectlyAboveThreeBlocks = this.getTarget() != null && this.getTarget().getY() - this.getY() >= 3.0D;
+        if (this.getTarget() != null && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks) {
             double playerDirectionOffset = (this.getTarget().getY() - this.getY());
             double offset = Double.compare(playerDirectionOffset, 0.0D);
             offset = offset < 0.0D ? -1.0D : offset == 0 ? 0.0D : 1.0D;
