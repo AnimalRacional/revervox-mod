@@ -34,8 +34,8 @@ public class ItemRegistry {
             "revervox_sword",
             () -> new RevervoxSword(Tiers.DIAMOND, 3, -2.4F, new Item.Properties())
     );
-    public static final RegistryObject<Item> REVERVOX_BAT_TEETH = REGISTRY.register(
-            "revervox_bat_teeth",
+    public static final RegistryObject<Item> REVERVOX_BAT_TOOTH = REGISTRY.register(
+            "revervox_bat_tooth",
             () -> new Item(new Item.Properties().stacksTo(16))
     );
 

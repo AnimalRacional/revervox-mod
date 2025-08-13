@@ -4,7 +4,7 @@
     "item": "minecraft:diamond_sword"
   },
   "addition": {
-    "item": "revervox_mod:revervox_bat_teeth"
+    "item": "revervox_mod:revervox_bat_tooth"
   },
   "template": {
     "item": "revervox_mod:revervox_voice_box"

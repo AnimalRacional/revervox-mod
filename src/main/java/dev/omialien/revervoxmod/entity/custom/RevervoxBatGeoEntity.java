@@ -222,9 +222,9 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         triggerAnim("Attack", "attack.bite");
         Level level = this.level();
         if(!level.isClientSide()){
-            int rand = dropRng.nextInt(RevervoxModServerConfigs.REVERVOX_BAT_TEETH_DROP_CHANCE.get());
+            int rand = dropRng.nextInt(RevervoxModServerConfigs.REVERVOX_BAT_TOOTH_DROP_CHANCE.get());
             if(rand == 0){
-                ItemEntity item = new ItemEntity(level, this.getX(), this.getY(), this.getZ(), new ItemStack(ItemRegistry.REVERVOX_BAT_TEETH.get()));
+                ItemEntity item = new ItemEntity(level, this.getX(), this.getY(), this.getZ(), new ItemStack(ItemRegistry.REVERVOX_BAT_TOOTH.get()));
                 level.addFreshEntity(item);
             }
         }

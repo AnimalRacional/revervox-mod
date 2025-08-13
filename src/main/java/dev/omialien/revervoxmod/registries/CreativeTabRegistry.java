@@ -23,7 +23,7 @@ public class CreativeTabRegistry {
                 output.accept(ItemRegistry.REVERVOX_VOICE_BOX.get());
                 output.accept(ItemRegistry.REVERVOX_EAR.get());
                 output.accept(ItemRegistry.REVERVOX_SWORD.get());
-                output.accept(ItemRegistry.REVERVOX_BAT_TEETH.get());
+                output.accept(ItemRegistry.REVERVOX_BAT_TOOTH.get());
             }).build());
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);
