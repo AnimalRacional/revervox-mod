@@ -41,7 +41,7 @@ public class CommonForgeEventBus {
 
     @SubscribeEvent
     public void mobSpawnEvent(MobSpawnEvent.FinalizeSpawn event){
-        if (event.getEntity() instanceof Bat) {
+        if (event.getEntity() instanceof Bat && !event.getLevel().isClientSide()) {
             if (new Random().nextInt(RevervoxModServerConfigs.REVERVOX_BAT_SPAWN_CHANCE.get()) == 0){
                 RevervoxBatGeoEntity bat = new RevervoxBatGeoEntity(EntityRegistry.REVERVOX_BAT.get(), event.getLevel().getLevel());
                 bat.moveTo(event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
@@ -91,10 +91,15 @@ public class CommonForgeEventBus {
         if(!event.getEntity().level().isClientSide() && event.getEntity() instanceof Player victim){
             DamageSource source = event.getSource();
             RevervoxMod.LOGGER.debug("damage source: {}", source);
-            if(source == null){ return; }
-            RevervoxMod.LOGGER.debug("damage netity: {}", source.getEntity());
-            if(source.getEntity() == null){ return; }
-            if(victim.getLastDamageSource().getEntity() instanceof Player attacker && RevervoxMod.vcApi instanceof VoicechatServerApi api){
+            if(source == null){
+                return;
+            }
+            RevervoxMod.LOGGER.debug("attacker entity: {}", source.getEntity());
+            if(source.getEntity() == null){
+                RevervoxMod.LOGGER.debug("no entity source");
+                return;
+            }
+            if(source.getEntity() instanceof Player attacker && RevervoxMod.vcApi instanceof VoicechatServerApi api){
                 RevervoxMod.LOGGER.debug("is player && serverapi");
                 if(attacker.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IRevervoxWeapon){
                     short[] audio = RevervoxVoicechatPlugin.getRandomAudio(victim.getUUID(), false);
