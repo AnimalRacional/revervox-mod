@@ -3,7 +3,7 @@ package dev.omialien.revervoxmod.voicechat;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
-import dev.omialien.revervoxmod.voicechat.audio.AudioReader;
+import dev.omialien.revervoxmod.voicechat.audio.AudioDirectoryReader;
 import dev.omialien.revervoxmod.voicechat.audio.AudioSaver;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class RecordedPlayer {
         Path userPath = audiosPath.resolve(this.uuid.toString());
         if(Files.exists(userPath)){
             RevervoxMod.LOGGER.debug("userpath exists");
-            (new AudioReader(userPath, true,
+            (new AudioDirectoryReader(userPath, true,
                     (audio) -> RevervoxVoicechatPlugin.addAudio(uuid, audio),
                     (path) -> {
                         String filename = path.getFileName().toString();
