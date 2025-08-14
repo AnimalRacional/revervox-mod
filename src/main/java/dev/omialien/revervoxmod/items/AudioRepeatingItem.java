@@ -1,8 +1,8 @@
 package dev.omialien.revervoxmod.items;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
-import dev.omialien.revervoxmod.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.stats.Stats;

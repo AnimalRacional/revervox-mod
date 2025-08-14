@@ -9,9 +9,9 @@ import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.SpeakingEntity;
 import dev.omialien.revervoxmod.items.IRevervoxWeapon;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
-import dev.omialien.revervoxmod.voicechat.RecordedPlayer;
-import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
-import dev.omialien.revervoxmod.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
+import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -87,11 +87,6 @@ public class CommonForgeEventBus {
 
     @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
-        NearestEntityPlayVoiceCommand.register(event.getDispatcher());
-        StartRecordingCommand.register(event.getDispatcher());
-        StopRecordingCommand.register(event.getDispatcher());
-        isRecordingCommand.register(event.getDispatcher());
-        ScheduleLogCommand.register(event.getDispatcher());
         SummonFakeEntityCommand.register(event.getDispatcher());
     }
 

@@ -9,7 +9,7 @@ import dev.omialien.revervoxmod.events.ClientForgeEventBus;
 import dev.omialien.revervoxmod.events.CommonForgeEventBus;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.*;
-import dev.omialien.revervoxmod.taskscheduler.TaskScheduler;
+import dev.omialien.voicechat_recording.taskscheduler.TaskScheduler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;

@@ -1,10 +1,10 @@
 package dev.omialien.revervoxmod.entity.custom;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.voicechat.RecordedPlayer;
-import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
-import dev.omialien.revervoxmod.voicechat.audio.AudioEffect;
-import dev.omialien.revervoxmod.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
+import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
+import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.world.entity.player.Player;
