@@ -16,9 +16,9 @@ import java.util.function.Predicate;
 
 public class AudioDirectoryReader extends Thread{
     private final Path path;
-    boolean destroy;
-    Consumer<short[]> reaction;
-    Predicate<Path> shouldRead;
+    final boolean destroy;
+    final Consumer<short[]> reaction;
+    final Predicate<Path> shouldRead;
 
     public AudioDirectoryReader(Path path, Consumer<short[]> reaction, Predicate<Path> shouldRead){
         this.path = path;

@@ -57,7 +57,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
+    public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor pLevel, @NotNull DifficultyInstance pDifficulty, @NotNull MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         setRotation(getYRot());
         if(!target.level().isClientSide()){
             RevervoxPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) target), new AddSoundInstancePacket(this.getId(), SoundEvents.ENDERMAN_DEATH, SoundSource.HOSTILE, false));
@@ -66,13 +66,13 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
     }
 
     @Override
-    public void push(Entity pEntity) {    }
+    public void push(@NotNull Entity pEntity) {    }
 
     @Override
     protected void pushEntities() {    }
 
     @Override
-    protected void doPush(Entity p_20971_) {    }
+    protected void doPush(@NotNull Entity p_20971_) {    }
 
     @Override
     public boolean isPushable() {return false; }
@@ -103,13 +103,15 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
     }
 
     @Override
-    public void remove(RemovalReason pReason) {
+    public void remove(@NotNull RemovalReason pReason) {
         if(!this.level().isClientSide() && pReason == RemovalReason.KILLED && RevervoxMod.vcApi instanceof VoicechatServerApi api){
             AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(this.getX(), this.getY(), this.getZ()));
-            channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
-            short[] audio = RevervoxVoicechatPlugin.getRandomAudio(false);
-            if(audio != null){
-                this.playAudio(audio, api, channel, new AudioEffect().changePitch(1.7f));
+            if(channel != null){
+                channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+                short[] audio = RevervoxVoicechatPlugin.getRandomAudio(false);
+                if(audio != null){
+                    this.playAudio(audio, api, channel, new AudioEffect().changePitch(1.7f));
+                }
             }
         }
         super.remove(pReason);
@@ -157,7 +159,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
 
 
     @Override
-    public boolean isInvisibleTo(Player pPlayer) {
+    public boolean isInvisibleTo(@NotNull Player pPlayer) {
         if(target == null){ return false; }
         return pPlayer != target;
 

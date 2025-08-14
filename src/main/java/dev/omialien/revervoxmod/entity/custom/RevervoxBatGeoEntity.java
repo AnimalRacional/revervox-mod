@@ -186,7 +186,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
+    public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor pLevel, @NotNull DifficultyInstance pDifficulty, @NotNull MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         this.spawnTime = System.currentTimeMillis();
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
@@ -243,7 +243,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         this.currentAudioPlayer = player;
     }
 
-    Random dropRng = new Random();
+    final Random dropRng = new Random();
     @Override
     public boolean doHurtTarget(@NotNull Entity target) {
         boolean result = super.doHurtTarget(target);

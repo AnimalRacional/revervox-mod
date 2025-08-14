@@ -30,7 +30,7 @@ public class RevervoxMod {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final LevelResource AUDIO_DIRECTORY = new LevelResource("player_audios");
     public static VoicechatApi vcApi = null;
-    public static TaskScheduler TASKS = new TaskScheduler();
+    final public static TaskScheduler TASKS = new TaskScheduler();
 
     public RevervoxMod(FMLJavaModLoadingContext context) {
         MinecraftForge.EVENT_BUS.addListener(this::setup);
