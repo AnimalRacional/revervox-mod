@@ -161,6 +161,11 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     @Override
+    public boolean removeWhenFarAway(double pDistanceToClosestPlayer) {
+        return pDistanceToClosestPlayer > 200.0D;
+    }
+
+    @Override
     public int getRemainingPersistentAngerTime() {
         return remainingPersistentAngerTime;
     }
@@ -284,50 +289,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false);
             if (flag2) {
                 this.level().gameEvent(GameEvent.TELEPORT, vec3, GameEvent.Context.of(this));
-                if (!this.isSilent()) {
-                    this.level().playSound(null, this.xo, this.yo, this.zo, SoundEvents.GLASS_STEP, this.getSoundSource(), 1.0F, 1.0F);
-                    SoundEvent[] genericSounds = new SoundEvent[] {
-                            SoundEvents.WOOD_STEP,
-                            SoundEvents.STONE_STEP,
-                            SoundEvents.GRASS_STEP,
-                            SoundEvents.GRAVEL_STEP,
-                            SoundEvents.SAND_STEP,
-                            SoundEvents.SNOW_STEP,
-                            SoundEvents.WOOL_STEP,
-                            SoundEvents.BAMBOO_WOOD_STEP,
-                            SoundEvents.LADDER_STEP,
-                            SoundEvents.SCAFFOLDING_STEP,
-                            SoundEvents.MUD_STEP,
-                            SoundEvents.MUD_BRICKS_STEP,
-                            SoundEvents.MOSS_CARPET_STEP,
-                            SoundEvents.WOOD_PLACE,
-                            SoundEvents.STONE_PLACE,
-                            SoundEvents.GRASS_PLACE,
-                            SoundEvents.GRAVEL_PLACE,
-                            SoundEvents.SAND_PLACE,
-                            SoundEvents.SNOW_PLACE,
-                            SoundEvents.WOOL_PLACE,
-                            SoundEvents.BAMBOO_WOOD_PLACE,
-                            SoundEvents.ITEM_PICKUP,
-                            SoundEvents.ITEM_FRAME_ADD_ITEM,
-                            SoundEvents.ITEM_FRAME_REMOVE_ITEM,
-                            SoundEvents.ITEM_FRAME_ROTATE_ITEM,
-                            SoundEvents.CHEST_OPEN,
-                            SoundEvents.CHEST_CLOSE,
-                            SoundEvents.BARREL_OPEN,
-                            SoundEvents.BARREL_CLOSE,
-                            SoundEvents.SHULKER_BOX_OPEN,
-                            SoundEvents.SHULKER_BOX_CLOSE,
-                            SoundEvents.WOODEN_BUTTON_CLICK_ON,
-                            SoundEvents.WOODEN_BUTTON_CLICK_OFF,
-                            SoundEvents.STONE_BUTTON_CLICK_ON,
-                            SoundEvents.STONE_BUTTON_CLICK_OFF,
-                            SoundEvents.LEVER_CLICK,
-                    };
-                    SoundEvent randomSound = genericSounds[this.level().random.nextInt(genericSounds.length)];
-                    this.level().playSound(null, this.getX(), this.getY(), this.getZ(), randomSound, this.getSoundSource(), 1.0F, 1.0F
-                    );
-                }
             }
 
             return flag2;
