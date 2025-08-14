@@ -22,9 +22,9 @@ public class EntityRegistry {
     public static final RegistryObject<EntityType<ThingyEntity>> THINGY =
             REGISTRY.register("thingy", () -> EntityType.Builder.of(ThingyEntity::new, MobCategory.CREATURE)
                     .sized(THINGY_HITBOX_SIZE, THINGY_HITBOX_SIZE).build("thingy"));
-    public static final RegistryObject<EntityType<RevervoxGeoEntity>> REVERVOX_GEO =
-            REGISTRY.register("revervox_geo", () -> EntityType.Builder.of(RevervoxGeoEntity::new, MobCategory.MONSTER)
-                    .sized(REVERVOX_HITBOX_WIDTH, REVERVOX_HITBOX_HEIGHT).build("revervox_geo"));
+    public static final RegistryObject<EntityType<RevervoxGeoEntity>> REVERVOX =
+            REGISTRY.register("revervox", () -> EntityType.Builder.of(RevervoxGeoEntity::new, MobCategory.MONSTER)
+                    .sized(REVERVOX_HITBOX_WIDTH, REVERVOX_HITBOX_HEIGHT).build("revervox"));
     public static final RegistryObject<EntityType<RevervoxBatGeoEntity>> REVERVOX_BAT =
             REGISTRY.register("revervox_bat", () -> EntityType.Builder.of(RevervoxBatGeoEntity::new, MobCategory.AMBIENT)
                     .sized(0.5F, 1).build("revervox_bat"));

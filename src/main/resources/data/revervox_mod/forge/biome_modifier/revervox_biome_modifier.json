@@ -3,7 +3,7 @@
   "biomes": "#minecraft:is_overworld",
   "spawners":
   {
-    "type": "revervox_mod:revervox_geo",
+    "type": "revervox_mod:revervox",
     "weight": 100,
     "minCount": 1,
     "maxCount": 1
