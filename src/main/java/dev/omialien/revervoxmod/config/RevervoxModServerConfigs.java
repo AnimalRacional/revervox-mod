@@ -16,6 +16,7 @@ public class RevervoxModServerConfigs {
     public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_BAT_TOOTH_DROP_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<Integer> AUDIO_READER_THREAD_COUNT;
     public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_SPAWN_CHANCE;
+    public static final ForgeConfigSpec.ConfigValue<Float> FAKE_BAT_EVENT_CHANCE;
 
     static {
         BUILDER.push("Server Configs for Revervox Mod");
@@ -30,6 +31,7 @@ public class RevervoxModServerConfigs {
         REVERVOX_SWORD_BONUS_DAMAGE = BUILDER.comment("How much extra damage the revervox sword deals to revervox entities").define("Revervox Sword Bonus Damage", 7);
         REVERVOX_BAT_TOOTH_DROP_CHANCE = BUILDER.comment("The chance of a revervox bat dropping its tooth on attack (1 in x)").define("Revervox Bat Tooth Drop Chance", 10);
         AUDIO_READER_THREAD_COUNT = BUILDER.comment("How many threads are used to read the saved audios from a player that joins the server. Lower this if a player joining the server lags, and raise it if it doesn't but audio reading is too slow.").define("Audio Reading Thread Count", 4);
+        FAKE_BAT_EVENT_CHANCE = BUILDER.comment("Chance of fake bat event occuring. Higher is less likely, lower is more likely").define("Fake Bat Event Chance", 1.0f);
 
         BUILDER.pop();
         SPEC = BUILDER.build();
