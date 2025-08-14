@@ -57,8 +57,11 @@ public class AudioRepeatingItem extends Item {
 
     private void playAudio(Player pPlayer, VoicechatServerApi api, short[] audio){
         AudioChannel channel = api.createEntityAudioChannel(UUID.randomUUID(), api.fromEntity(pPlayer));
-        if(audio != null){
-            new AudioPlayer(audio, api, channel).start();
+        if(channel != null){
+            channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+            if(audio != null){
+                new AudioPlayer(audio, api, channel).start();
+            }
         }
     }
 }

@@ -108,7 +108,10 @@ public class CommonForgeEventBus {
                             UUID.randomUUID(),
                             api.fromServerLevel(victim.level()),
                             api.createPosition(victim.getX(), victim.getY(), victim.getZ()));
-                    new AudioPlayer(audio, api, channel).start();
+                    if(channel != null){
+                        channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+                        new AudioPlayer(audio, api, channel).start();
+                    }
                 }
             }
         }
