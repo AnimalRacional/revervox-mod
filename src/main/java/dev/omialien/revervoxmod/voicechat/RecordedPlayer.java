@@ -41,6 +41,7 @@ public class RecordedPlayer {
         Path userPath = audiosPath.resolve(this.uuid.toString());
         if(Files.exists(userPath)){
             RevervoxMod.LOGGER.debug("userpath exists");
+            // TODO if a player records 200 audios alone, leaves, and then joins back later after other players started recording their own audios, all the audios will be added, leading to all audios in the server belonging to the same player
             (new AudioDirectoryReader(userPath, true,
                     (audio) -> RevervoxVoicechatPlugin.addAudio(uuid, audio),
                     (path) -> {
@@ -144,15 +145,19 @@ public class RecordedPlayer {
     }
 
     public short[] getAudio(int idx, boolean remove){
-        RevervoxMod.LOGGER.debug("getting audio {}: {}", idx, recordedAudios.get(idx).length);
+
         if(idx < 0 || idx >= recordedAudios.size()){
             return null;
         }
-        if(remove){
+        if(remove && RevervoxVoicechatPlugin.getAudioCount() > RevervoxModServerConfigs.MINIMUM_AUDIO_COUNT.get()){
             RevervoxMod.LOGGER.debug("removing audio {}", idx);
-            return removeAudio(idx);
+            short[] audio = removeAudio(idx);
+            RevervoxMod.LOGGER.debug("REMOVING audio {}: {}", idx, audio.length);
+            return audio;
         }
-        return recordedAudios.get(idx);
+        short[] audio = recordedAudios.get(idx);
+        RevervoxMod.LOGGER.debug("getting audio {}: {}", idx, audio.length);
+        return audio;
     }
     public short[] getRandomAudio(boolean remove){
         if(recordedAudios.isEmpty()){ return null; }
