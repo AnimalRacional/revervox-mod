@@ -1,6 +1,6 @@
 package dev.omialien.revervoxmod.voicechat.audio;
 
-import java.util.Arrays;
+import java.util.Random;
 
 public class AudioEffect {
     private float pitchFactor;
@@ -42,6 +42,38 @@ public class AudioEffect {
         return this;
     }
 
+    public AudioEffect addRandomEffects() {
+        Random random = new Random();
+
+        boolean added = false;
+
+        if (random.nextBoolean()) {
+            changePitch(0.7f);
+            added = true;
+        }
+
+        if (random.nextBoolean()) {
+            makeReverb(0.5f, 160, 2);
+            added = true;
+        }
+
+        if (random.nextBoolean()) {
+            makeRobot(30f);
+            added = true;
+        }
+
+        if (!added) {
+            int forced = random.nextInt(3);
+            switch (forced) {
+                case 0 -> changePitch(0.7f);
+                case 1 -> makeReverb(0.5f, 160, 2);
+                case 2 -> makeRobot(30f);
+            }
+        }
+
+        return this;
+    }
+
     public short[] applyEffects(short[] pcm) {
         if (pitchEnabled) pcm = changePitch(pcm, pitchFactor);
         if (reverbEnabled) pcm = addReverb(pcm, reverbDecay, reverbDelayMs, reverbRepeats);
@@ -75,16 +107,21 @@ public class AudioEffect {
         if (delayMs <= 0 || repeats <= 0) throw new IllegalArgumentException("Delay and repeats must be > 0");
 
         int delaySamples = (SAMPLE_RATE * delayMs) / 1000;
-        short[] output = Arrays.copyOf(input, input.length);
+
+        int totalLength = input.length + delaySamples * repeats;
+        short[] output = new short[totalLength];
+
+        System.arraycopy(input, 0, output, 0, input.length);
 
         for (int r = 1; r <= repeats; r++) {
             int offset = delaySamples * r;
-            float currentDecay = (float)Math.pow(decay, r);
+            float currentDecay = (float) Math.pow(decay, r);
 
-            for (int i = 0; i < input.length - offset; i++) {
+            for (int i = 0; i < input.length; i++) {
                 int delayedIndex = i + offset;
-                int mixed = output[delayedIndex] + (int)(input[i] * currentDecay);
-                output[delayedIndex] = (short)Math.max(Math.min(mixed, Short.MAX_VALUE), Short.MIN_VALUE);
+                if (delayedIndex >= output.length) break;
+                int mixed = output[delayedIndex] + (int) (input[i] * currentDecay);
+                output[delayedIndex] = (short) Math.max(Math.min(mixed, Short.MAX_VALUE), Short.MIN_VALUE);
             }
         }
 

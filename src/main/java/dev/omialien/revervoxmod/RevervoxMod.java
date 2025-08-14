@@ -60,7 +60,7 @@ public class RevervoxMod {
             for(int i = 0; i <= 2; i++){
                 for(int j = -1; j <= 1; j++){
                     RevervoxFakeBatEntity ent = new RevervoxFakeBatEntity(EntityRegistry.REVERVOX_FAKE_BAT.get(), player.level());
-                    Vec3 batpos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, 6, i, j);
+                    Vec3 batpos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, 10, i, j);
                     float rotat = player.getYRot() + 180;
                     ent.setYBodyRot(rotat);
                     ent.setYHeadRot(rotat);
