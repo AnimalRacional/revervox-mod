@@ -25,7 +25,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -137,7 +136,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createLivingAttributes()
                 .add(Attributes.MAX_HEALTH, 100.0D)
-                .add(Attributes.FOLLOW_RANGE, 24.0D)
+                .add(Attributes.FOLLOW_RANGE, 50.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
                 .add(Attributes.ATTACK_DAMAGE, 14D)
