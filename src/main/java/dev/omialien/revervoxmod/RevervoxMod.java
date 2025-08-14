@@ -60,7 +60,7 @@ public class RevervoxMod {
             for(int i = 0; i <= 2; i++){
                 for(int j = -1; j <= 1; j++){
                     RevervoxFakeBatEntity ent = new RevervoxFakeBatEntity(EntityRegistry.REVERVOX_FAKE_BAT.get(), player.level());
-                    Vec3 batpos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, 10, (float) i /2, (float) j /2);
+                    Vec3 batpos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, 10, i, j);
                     float rotat = player.getYRot() + 180;
                     ent.setYBodyRot(rotat);
                     ent.setYHeadRot(rotat);
@@ -82,7 +82,7 @@ public class RevervoxMod {
         float f4 = Mth.cos((-vec2.x + 90.0F) * ((float)Math.PI / 180F));
         float f5 = Mth.sin((-vec2.x + 90.0F) * ((float)Math.PI / 180F));
         Vec3 vec31 = new Vec3((f * f2), f3, (f1 * f2));
-        Vec3 vec32 = new Vec3((f * f4), 5, f1 * f4);
+        Vec3 vec32 = new Vec3((f * f4), f5, (f1 * f4));
         Vec3 vec33 = vec31.cross(vec32).scale(-1.0D);
         double d0 = vec31.x * forwards + vec32.x * up + vec33.x * left;
         double d1 = vec31.y * forwards + vec32.y * up + vec33.y * left;
