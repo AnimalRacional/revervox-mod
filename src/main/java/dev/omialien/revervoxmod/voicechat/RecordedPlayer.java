@@ -180,7 +180,7 @@ public class RecordedPlayer {
     }
 
     public boolean isSpeaking() {
-        return getLastSpoke() != NOT_SPOKEN_YET && System.currentTimeMillis() - getLastSpoke() < 2000;
+        return getLastSpoke() != NOT_SPOKEN_YET && System.currentTimeMillis() - getLastSpoke() < 500;
     }
 
     public long getLastSpoke() {

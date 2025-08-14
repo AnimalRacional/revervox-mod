@@ -9,6 +9,7 @@ import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
+import dev.omialien.revervoxmod.voicechat.RecordedPlayer;
 import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import dev.omialien.revervoxmod.voicechat.audio.AudioEffect;
 import dev.omialien.revervoxmod.voicechat.audio.AudioPlayer;
@@ -23,6 +24,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.TimeUtil;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
@@ -37,6 +39,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,6 +64,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     private AudioPlayer currentAudioPlayer;
     @Nullable
     private UUID persistentAngerTarget;
+    private long spawnTime;
     @Nullable
     private BlockPos targetPosition;
     public RevervoxBatGeoEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
@@ -167,7 +171,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
         VoicechatServerApi api = (VoicechatServerApi) RevervoxMod.vcApi;
-        short[] audio = RevervoxVoicechatPlugin.getRandomAudio(true);
+        short[] audio = RevervoxVoicechatPlugin.getRandomAudio(false);
         if (audio != null) {
             playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
         }
@@ -180,12 +184,31 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         ParticleManager.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 0.7D, this);
     }
 
+    @Nullable
+    @Override
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
+        this.spawnTime = System.currentTimeMillis();
+        return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
+    }
+
+    public long getSpawnTime(){
+        return spawnTime;
+    }
+
+    public long getGracePeriodEnd(){
+        long grace = (long)(RevervoxModServerConfigs.REVERVOX_BAT_AFTER_SPAWN_GRACE_PERIOD.get()*1000);
+        return (getSpawnTime() + grace); // Bats grace periods start on spawn instead of on first speak
+    }
+
     @Override
     public boolean isSpeakingAtMe(Player player) {
-        if (this.hasLineOfSight(player)){
-            if (RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
-                return RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
-            }
+        long time = System.currentTimeMillis();
+        if(time >= getGracePeriodEnd()){
+            RecordedPlayer rec = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
+            if (rec != null){
+                return rec.isSpeaking() &&
+                        rec.getLastSpoke() >= getGracePeriodEnd();
+            } else return false;
         }
         return false;
     }

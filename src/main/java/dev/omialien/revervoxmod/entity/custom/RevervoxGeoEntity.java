@@ -13,6 +13,7 @@ import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
+import dev.omialien.revervoxmod.voicechat.RecordedPlayer;
 import dev.omialien.revervoxmod.voicechat.RevervoxVoicechatPlugin;
 import dev.omialien.revervoxmod.voicechat.audio.AudioEffect;
 import dev.omialien.revervoxmod.voicechat.audio.AudioPlayer;
@@ -246,10 +247,11 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     @Override
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
-        long diff = time - getFirstSpoken();
-        if(hasSpoken() && diff >= getGracePeriod()){
-            if (RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()) != null){
-                return RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID()).isSpeaking();
+        if(hasSpoken() && time >= getGracePeriodEnd()){
+            RecordedPlayer rec = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
+            if (rec != null){
+                return rec.isSpeaking() &&
+                        rec.getLastSpoke() >= getGracePeriodEnd();
             } else return false;
         }
         return false;
@@ -396,8 +398,9 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
 
-    public static int getGracePeriod(){
-        return (int) (RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000);
+    public long getGracePeriodEnd(){
+        long grace = (long)(RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000);
+        return (getFirstSpoken() + grace);
     }
 
 
