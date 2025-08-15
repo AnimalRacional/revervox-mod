@@ -102,6 +102,7 @@ public class CommonForgeEventBus {
                 RevervoxMod.LOGGER.error("Error creating audios directory: " + e.getMessage());
             }
         }
+        RecordingSimpleVoiceChatPlugin.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null, (VoicechatServerApi) RecordingSimpleVoiceChat.vcApi);
     }
 
     @SubscribeEvent
@@ -137,7 +138,7 @@ public class CommonForgeEventBus {
                             api.fromServerLevel(victim.level()),
                             api.createPosition(victim.getX(), victim.getY(), victim.getZ()));
                     if(channel != null){
-                        channel.setCategory(RecordingSimpleVoiceChatPlugin.REVERVOX_CATEGORY);
+                        channel.setCategory(RevervoxMod.MOD_ID);
                         new AudioPlayer(audio, api, channel).start();
                     }
                 }
