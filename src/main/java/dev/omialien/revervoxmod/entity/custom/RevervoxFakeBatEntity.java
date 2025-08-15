@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.entity.custom;
 
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
+import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;

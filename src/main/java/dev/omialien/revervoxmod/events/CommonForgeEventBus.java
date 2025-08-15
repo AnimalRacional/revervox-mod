@@ -50,7 +50,7 @@ public class CommonForgeEventBus {
             if (new Random().nextInt(RevervoxModServerConfigs.REVERVOX_BAT_SPAWN_CHANCE.get()) == 0){
                 RevervoxBatGeoEntity bat = new RevervoxBatGeoEntity(EntityRegistry.REVERVOX_BAT.get(), event.getLevel().getLevel());
                 bat.moveTo(event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
-                RevervoxMod.LOGGER.info("Spawning Revervox Bat! at " + event.getEntity().getX() + ", " + event.getEntity().getY() + ", " + event.getEntity().getZ());
+                RevervoxMod.LOGGER.debug("Spawning Revervox Bat! at " + event.getEntity().getX() + ", " + event.getEntity().getY() + ", " + event.getEntity().getZ());
                 event.setSpawnCancelled(true);
                 event.getLevel().addFreshEntity(bat);
             }

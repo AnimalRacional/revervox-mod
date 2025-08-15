@@ -115,7 +115,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
     @Override
     protected void registerGoals() {
-        RevervoxMod.LOGGER.info("Revervox Spawned");
+        RevervoxMod.LOGGER.debug("Revervox Spawned");
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
@@ -419,7 +419,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                     if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100, 50, 100)).isEmpty()){
                         boolean flag = checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
                         if (flag) {
-                            RevervoxMod.LOGGER.info("Trying to Spawn Revervox on alone player: " + player.getName() + " at " + pPos);
+                            RevervoxMod.LOGGER.debug("Trying to Spawn Revervox on alone player: " + player.getName() + " at " + pPos);
                         }
                         return flag;
                     }
@@ -437,7 +437,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             }
             boolean flag1 = i <= pRandom.nextInt(j) && checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
             if (flag1) {
-                RevervoxMod.LOGGER.info("Trying to Spawn Revervox at " + pPos);
+                RevervoxMod.LOGGER.debug("Trying to Spawn Revervox at " + pPos);
             }
             return flag1;
 
