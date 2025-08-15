@@ -38,3 +38,5 @@ This mod is not trying to be in your face all the time. The spawn rates are conf
 - Programming by: Omiao, Nalien
 - Assets by: Nalien
 - Pathfinding from [Mowzie's Mobs](https://www.curseforge.com/minecraft/mc-mods/mowzies-mobs) (Made by Bob Mowzie and pau101)
+- [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) Mod by: Hankel Max
+- [Geckolib](https://modrinth.com/mod/geckolib) by the Geckolib Team
