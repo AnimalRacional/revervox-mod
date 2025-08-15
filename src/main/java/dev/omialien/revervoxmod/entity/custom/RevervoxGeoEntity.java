@@ -13,6 +13,7 @@ import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
+import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
 import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
@@ -209,7 +210,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     public void awardKillScore(@NotNull Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {
-        if(pEntity instanceof Player player && RevervoxMod.vcApi instanceof VoicechatServerApi api){
+        if(pEntity instanceof Player player && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
             Vec3 loc = this.getEyePosition();
             AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
             if(channel == null){

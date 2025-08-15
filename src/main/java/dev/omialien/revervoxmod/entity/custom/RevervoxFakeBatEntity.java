@@ -2,12 +2,12 @@ package dev.omialien.revervoxmod.entity.custom;
 
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
-import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
+import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
@@ -91,6 +91,9 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
         setDeltaMovement(movement);
         ticksToDie--;
         if(ticksToDie <= 0){
+            if (target != null && target.isAlive()){
+                target.hurt(this.level().damageSources().mobAttack(this), 1);
+            }
             this.remove(RemovalReason.KILLED);
         }
         super.customServerAiStep();
@@ -104,7 +107,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
-        if(!this.level().isClientSide() && pReason == RemovalReason.KILLED && RevervoxMod.vcApi instanceof VoicechatServerApi api){
+        if(!this.level().isClientSide() && pReason == RemovalReason.KILLED && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
             AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(this.getX(), this.getY(), this.getZ()));
             if(channel != null){
                 channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);

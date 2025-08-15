@@ -9,6 +9,7 @@ import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.SpeakingEntity;
 import dev.omialien.revervoxmod.items.IRevervoxWeapon;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
+import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
 import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
@@ -126,7 +127,7 @@ public class CommonForgeEventBus {
                 RevervoxMod.LOGGER.debug("no entity source");
                 return;
             }
-            if(source.getEntity() instanceof Player attacker && RevervoxMod.vcApi instanceof VoicechatServerApi api){
+            if(source.getEntity() instanceof Player attacker && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
                 RevervoxMod.LOGGER.debug("is player && serverapi");
                 if(attacker.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IRevervoxWeapon){
                     short[] audio = RevervoxVoicechatPlugin.getRandomAudio(victim.getUUID(), false);

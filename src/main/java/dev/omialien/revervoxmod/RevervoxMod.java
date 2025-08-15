@@ -1,7 +1,6 @@
 package dev.omialien.revervoxmod;
 
 import com.mojang.logging.LogUtils;
-import de.maxhenkel.voicechat.api.VoicechatApi;
 import dev.omialien.revervoxmod.config.RevervoxModClientConfigs;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
@@ -11,6 +10,8 @@ import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.*;
 import dev.omialien.voicechat_recording.taskscheduler.TaskScheduler;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.Vec2;
@@ -29,7 +30,6 @@ public class RevervoxMod {
     public static final String MOD_ID = "revervox_mod";
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final LevelResource AUDIO_DIRECTORY = new LevelResource("player_audios");
-    public static VoicechatApi vcApi = null;
     final public static TaskScheduler TASKS = new TaskScheduler();
 
     public RevervoxMod(FMLJavaModLoadingContext context) {
@@ -68,6 +68,7 @@ public class RevervoxMod {
                     ent.setRotation(rotat);
                     ent.setTarget(player);
                     player.level().addFreshEntity(ent);
+                    player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 27, 100, false, false), player);
                 }
             }
         }

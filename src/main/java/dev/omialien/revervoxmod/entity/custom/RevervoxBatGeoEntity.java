@@ -9,6 +9,7 @@ import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
+import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
 import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
@@ -150,7 +151,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
 
     @Override
     public void awardKillScore(@NotNull Entity pKilled, int pScoreValue, @NotNull DamageSource pSource) {
-        if(pKilled instanceof Player player && RevervoxMod.vcApi instanceof VoicechatServerApi api){
+        if(pKilled instanceof Player player && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
             playPlayerAudio(player, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.7f));
             this.remove(Entity.RemovalReason.DISCARDED);
         }
@@ -170,7 +171,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
-        VoicechatServerApi api = (VoicechatServerApi) RevervoxMod.vcApi;
+        VoicechatServerApi api = (VoicechatServerApi) RecordingSimpleVoiceChat.vcApi;
         short[] audio = RevervoxVoicechatPlugin.getRandomAudio(false);
         if (audio != null) {
             playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));

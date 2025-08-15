@@ -1,10 +1,10 @@
 package dev.omialien.revervoxmod.items;
 
-import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
+import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
+import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -29,7 +29,7 @@ public class AudioRepeatingItem extends Item {
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack item = pPlayer.getItemInHand(pUsedHand);
         boolean audioPlayed = false;
-        if (!pLevel.isClientSide() && RevervoxMod.vcApi instanceof VoicechatServerApi api) {
+        if (!pLevel.isClientSide() && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api) {
             short[] audio = RevervoxVoicechatPlugin.getRandomAudio(false);
             if(audio != null){
                 this.audioDuration =  audio.length / RevervoxVoicechatPlugin.SAMPLE_RATE;
