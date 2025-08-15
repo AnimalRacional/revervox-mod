@@ -11,7 +11,7 @@ import dev.omialien.revervoxmod.items.IRevervoxWeapon;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -130,14 +130,14 @@ public class CommonForgeEventBus {
             if(source.getEntity() instanceof Player attacker && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
                 RevervoxMod.LOGGER.debug("is player && serverapi");
                 if(attacker.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IRevervoxWeapon){
-                    short[] audio = RevervoxVoicechatPlugin.getRandomAudio(victim.getUUID(), false);
+                    short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(victim.getUUID(), false);
                     if(audio == null) { return; }
                     AudioChannel channel = api.createLocationalAudioChannel(
                             UUID.randomUUID(),
                             api.fromServerLevel(victim.level()),
                             api.createPosition(victim.getX(), victim.getY(), victim.getZ()));
                     if(channel != null){
-                        channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+                        channel.setCategory(RecordingSimpleVoiceChatPlugin.REVERVOX_CATEGORY);
                         new AudioPlayer(audio, api, channel).start();
                     }
                 }

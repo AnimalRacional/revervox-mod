@@ -1,7 +1,7 @@
 package dev.omialien.revervoxmod.networking.packets;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
@@ -36,7 +36,7 @@ public class PrivacyModePacket {
             ServerPlayer sender = ctx.get().getSender();
             if(sender != null){
                 RevervoxMod.LOGGER.debug("Setting privacy mode for {} to {}", sender.getName(), state);
-                RevervoxVoicechatPlugin.setPrivacy(sender.getUUID(), state);
+                RecordingSimpleVoiceChatPlugin.setPrivacy(sender.getUUID(), state);
             } else {
                 RevervoxMod.LOGGER.warn("Received PrivacyModePacket without sender?");
             }

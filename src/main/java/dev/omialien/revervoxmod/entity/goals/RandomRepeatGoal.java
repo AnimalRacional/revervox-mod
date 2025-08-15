@@ -4,7 +4,7 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
-import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
@@ -39,7 +39,7 @@ public class RandomRepeatGoal extends Goal {
     public void start() {
         if (RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
             UUID channelID = UUID.randomUUID();
-            channel = createChannel(api, channelID, RevervoxVoicechatPlugin.REVERVOX_CATEGORY, this.mob);
+            channel = createChannel(api, channelID, RevervoxMod.MOD_ID, this.mob);
         }
     }
 
@@ -96,7 +96,7 @@ public class RandomRepeatGoal extends Goal {
                     }
                 }
                 RevervoxMod.LOGGER.debug("Playing audio from random player that is not near...");
-                Set<UUID> recordedPlayers = RevervoxVoicechatPlugin.getRecordedPlayers().keySet();
+                Set<UUID> recordedPlayers = RecordingSimpleVoiceChatPlugin.getRecordedPlayers().keySet();
                 Set<UUID> nearbyPlayerUUIDs = nearbyPlayers.stream().map(Player::getUUID).collect(Collectors.toSet());
                 Set<UUID> otherPlayers = new HashSet<>(recordedPlayers);
                 otherPlayers.removeAll(nearbyPlayerUUIDs);
@@ -105,7 +105,7 @@ public class RandomRepeatGoal extends Goal {
                     playRandomAudioFromSet(api, otherPlayers);
                 } else {
                     RevervoxMod.LOGGER.debug("No other players to play sounds from");
-                    short[] audio = RevervoxVoicechatPlugin.getRandomAudio(true);
+                    short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(true);
                     if (audio == null) return;
                     this.mob.playAudio(audio, api, channel, new AudioEffect());
                 }

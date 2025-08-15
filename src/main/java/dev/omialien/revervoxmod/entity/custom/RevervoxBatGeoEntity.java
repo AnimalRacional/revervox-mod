@@ -11,7 +11,7 @@ import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.core.BlockPos;
@@ -165,14 +165,14 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
             RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
             return null;
         }
-        channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+        channel.setCategory(RevervoxMod.MOD_ID);
         return channel;
     }
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
         VoicechatServerApi api = (VoicechatServerApi) RecordingSimpleVoiceChat.vcApi;
-        short[] audio = RevervoxVoicechatPlugin.getRandomAudio(false);
+        short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
         if (audio != null) {
             playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
         }
@@ -205,7 +205,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(time >= getGracePeriodEnd()){
-            RecordedPlayer rec = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
+            RecordedPlayer rec = RecordingSimpleVoiceChatPlugin.getRecordedPlayer(player.getUUID());
             if (rec != null){
                 return rec.isSpeaking() &&
                         rec.getLastSpoke() >= getGracePeriodEnd();

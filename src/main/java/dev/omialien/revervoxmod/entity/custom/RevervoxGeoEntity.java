@@ -15,7 +15,7 @@ import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.RevervoxVoicechatPlugin;
+import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.core.BlockPos;
@@ -216,7 +216,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             if(channel == null){
                 RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
             } else {
-                channel.setCategory(RevervoxVoicechatPlugin.REVERVOX_CATEGORY);
+                channel.setCategory(RecordingSimpleVoiceChatPlugin.REVERVOX_CATEGORY);
                 playPlayerAudio(player, api, channel, new AudioEffect().addRandomEffects());
                 this.remove(Entity.RemovalReason.DISCARDED);
             }
@@ -253,7 +253,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(hasSpoken() && time >= getGracePeriodEnd()){
-            RecordedPlayer rec = RevervoxVoicechatPlugin.getRecordedPlayer(player.getUUID());
+            RecordedPlayer rec = RecordingSimpleVoiceChatPlugin.getRecordedPlayer(player.getUUID());
             if (rec != null){
                 return rec.isSpeaking() &&
                         rec.getLastSpoke() >= getGracePeriodEnd();
