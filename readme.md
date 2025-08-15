@@ -19,7 +19,8 @@ He can hear you, and yearns for your flesh.
 - [Voice Chat Recording](https://modrinth.com/mod/voice-chat-recording)
 
 # FAQ
-
+### Does this mod use AI?
+No, it is using a very simple filter to try and only record sentences. Turning on noise suppression is recommended.
 ### Can I play this mod in singleplayer?
 Yes, but the mod was made with multiplayer in mind.
 ### Does this mod store my voice?
@@ -40,3 +41,4 @@ This mod is not trying to be in your face all the time. The spawn rates are conf
 - Pathfinding from [Mowzie's Mobs](https://www.curseforge.com/minecraft/mc-mods/mowzies-mobs) (Made by Bob Mowzie and pau101)
 - [Simple Voice Chat](https://modrinth.com/plugin/simple-voice-chat) Mod by: Hankel Max
 - [Geckolib](https://modrinth.com/mod/geckolib) by the Geckolib Team
+
