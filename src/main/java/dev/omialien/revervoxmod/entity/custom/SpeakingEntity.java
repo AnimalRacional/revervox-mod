@@ -1,12 +1,12 @@
 package dev.omialien.revervoxmod.entity.custom;
 
-import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
+import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
+import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
+import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
+import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.NotImplementedException;
 
@@ -37,12 +37,12 @@ public interface SpeakingEntity {
     }
 
     default void playPlayerAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioEffect effect){
-        RecordedPlayer record = RecordingSimpleVoiceChatPlugin.getRecordedPlayer(player.getUUID());
+        RecordedPlayer record = VoiceChatRecordingPlugin.getRecordedPlayer(player.getUUID());
         if (record == null) return;
         short[] audio = record.getRandomAudio(true);
         if(audio == null){
             RevervoxMod.LOGGER.error("No audio found for {}, choosing random player", player.getName());
-            audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(true);
+            audio = VoiceChatRecordingPlugin.getRandomAudio(true);
             if (audio == null) return;
         }
         RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());
