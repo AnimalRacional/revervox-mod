@@ -6,10 +6,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.level.pathfinder.PathFinder;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ public class MMPathNavigateGround extends GroundPathNavigation {
     @Override
     @NotNull
     protected PathFinder createPathFinder(int maxVisitedNodes) {
-        this.nodeEvaluator = new MMWalkNodeProcessor();
+        this.nodeEvaluator = new MMWalkNodeProcessor(level);
         this.nodeEvaluator.setCanPassDoors(true);
         return new MMPathFinder(this.nodeEvaluator, maxVisitedNodes);
     }
@@ -143,14 +143,16 @@ public class MMPathNavigateGround extends GroundPathNavigation {
                 for (int z = z0; z != z1; z += stepz) {
                     for (int y = y0; y != y1; y += stepy) {
                         BlockState block = this.level.getBlockState(pos.set(x, y, z));
-                        if (!block.isPathfindable(this.level, pos, PathComputationType.LAND)) return false;
+                        // TODO changed in neoforge port - this is most definitely wrong
+                        if (!block.isPathfindable(PathComputationType.LAND)) return false;
                     }
-                    BlockPathTypes below = this.nodeEvaluator.getBlockPathType(this.level, x, y0 - 1, z, this.mob);
-                    if (below == BlockPathTypes.WATER || below == BlockPathTypes.LAVA || below == BlockPathTypes.OPEN) return false;
-                    BlockPathTypes in = this.nodeEvaluator.getBlockPathType(this.level, x, y0, z, this.mob);
+                    // TODO changed in neoforge port - is this correct?
+                    PathType below = this.nodeEvaluator.getPathType(this.mob, new BlockPos(x, y0 - 1, z));
+                    if (below == PathType.WATER || below == PathType.LAVA || below == PathType.OPEN) return false;
+                    PathType in = this.nodeEvaluator.getPathType(this.mob, new BlockPos(x, y0, z));
                     float priority = this.mob.getPathfindingMalus(in);
                     if (priority < 0.0F || priority >= 8.0F) return false;
-                    if (in == BlockPathTypes.DAMAGE_FIRE || in == BlockPathTypes.DANGER_FIRE || in == BlockPathTypes.DAMAGE_OTHER) return false;
+                    if (in == PathType.DAMAGE_FIRE || in == PathType.DANGER_FIRE || in == PathType.DAMAGE_OTHER) return false;
                 }
             }
         } while (t <= max_t);

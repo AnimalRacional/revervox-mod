@@ -1,12 +1,13 @@
 package dev.omialien.revervoxmod.entity.ai;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.MoveControl;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.NodeEvaluator;
+import net.minecraft.world.level.pathfinder.PathType;
 
 import java.util.Objects;
 
@@ -41,7 +42,8 @@ public class MMEntityMoveHelper extends MoveControl {
             PathNavigation pathnavigate = this.mob.getNavigation();
 
             NodeEvaluator nodeprocessor = pathnavigate.getNodeEvaluator();
-            if (nodeprocessor.getBlockPathType(this.mob.level(), Mth.floor(this.mob.getX() + (double) f7), Mth.floor(this.mob.getY()), Mth.floor(this.mob.getZ() + (double) f8)) != BlockPathTypes.WALKABLE) {
+            // TODO changed in neoforge port - is this correct?
+            if (nodeprocessor.getPathType(this.mob, new BlockPos(Mth.floor(this.mob.getX() + (double) f7), Mth.floor(this.mob.getY()), Mth.floor(this.mob.getZ() + (double) f8))) != PathType.WALKABLE) {
                 this.strafeForwards = 1.0F;
                 this.strafeRight = 0.0F;
                 f1 = f;
@@ -68,7 +70,7 @@ public class MMEntityMoveHelper extends MoveControl {
             this.mob.setYRot(this.rotlerp(this.mob.getYRot(), f9, maxRotate));
             this.mob.setSpeed((float) (this.speedModifier * Objects.requireNonNull(this.mob.getAttribute(Attributes.MOVEMENT_SPEED)).getValue()));
 
-            if (d2 > (double) this.mob.getStepHeight() && d0 * d0 + d1 * d1 < (double) Math.max(1.0F, this.mob.getBbWidth())) {
+            if (d2 > (double) this.mob.maxUpStep() && d0 * d0 + d1 * d1 < (double) Math.max(1.0F, this.mob.getBbWidth())) {
                 this.mob.getJumpControl().jump();
                 this.operation = Operation.JUMPING;
             }
