@@ -227,8 +227,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         }
         super.awardKillScore(pEntity, pScoreValue, pSource);
     }
-
-
     public boolean hasSpoken(){
         return firstSpeak != NOT_SPOKEN_YET;
     }
@@ -401,6 +399,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
 
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
+        // TODO maybe see if a custom MobCategory is possible so revervox doesn't get affected by the normal mob cap
+        // https://docs.neoforged.net/docs/entities/livingentity/#natural-spawning
         if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
                 TargetingConditions.DEFAULT,
                 null,

@@ -1,16 +1,12 @@
 package dev.omialien.revervoxmod.entity.custom.sound;
 
 
-import dev.omialien.revervoxmod.RevervoxMod;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.common.Mod;
 
-@Mod(value = RevervoxMod.MOD_ID, dist = Dist.CLIENT)
 public class EntityFollowingSoundInstance extends AbstractTickableSoundInstance {
     private final LivingEntity entity;
     public EntityFollowingSoundInstance(LivingEntity entity, SoundEvent soundEvent, SoundSource soundSource, boolean looping) {

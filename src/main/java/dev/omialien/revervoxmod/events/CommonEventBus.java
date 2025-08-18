@@ -9,7 +9,6 @@ import dev.omialien.revervoxmod.entity.custom.*;
 import dev.omialien.revervoxmod.items.IRevervoxWeapon;
 import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
-import dev.omialien.revervoxmod.networking.packets.SoundInstancePacketCodec;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
@@ -45,13 +44,12 @@ import java.util.UUID;
 @EventBusSubscriber(modid = RevervoxMod.MOD_ID)
 public class CommonEventBus {
     @SubscribeEvent
-    public void tickEvent(ServerTickEvent.Post event){
+    public static void tickEvent(ServerTickEvent.Post event){
         RevervoxMod.TASKS.tick();
-
     }
 
     @SubscribeEvent
-    public void revervoxBatSpawnEvent(FinalizeSpawnEvent event){
+    public static void revervoxBatSpawnEvent(FinalizeSpawnEvent event){
         if (event.getEntity() instanceof Bat && !event.getLevel().isClientSide()) {
             if (new Random().nextInt(RevervoxModServerConfigs.REVERVOX_BAT_SPAWN_CHANCE.get()) == 0){
                 RevervoxBatGeoEntity bat = new RevervoxBatGeoEntity(EntityRegistry.REVERVOX_BAT.get(), event.getLevel().getLevel());
@@ -64,14 +62,14 @@ public class CommonEventBus {
     }
 
     @SubscribeEvent
-    public void onRegisterEvents(ServerStartingEvent event) {
+    public static void onRegisterEvents(ServerStartingEvent event) {
         RevervoxMod.TASKS.schedule(fakeBatEventSpawnRequest(
                 event.getServer().getLevel(Level.OVERWORLD)),
                 new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
                         (int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get())));
     }
 
-    private Runnable fakeBatEventSpawnRequest(ServerLevel level){
+    private static Runnable fakeBatEventSpawnRequest(ServerLevel level){
         return () -> {
             RevervoxMod.LOGGER.debug("Starting fake bat event!");
             List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
@@ -93,18 +91,18 @@ public class CommonEventBus {
     }
 
     @SubscribeEvent
-    public void onRegisterCommands(RegisterCommandsEvent event) {
+    public static void onRegisterCommands(RegisterCommandsEvent event) {
         SummonFakeEntityCommand.register(event.getDispatcher());
     }
 
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
+    public static void onServerStarting(ServerStartingEvent event) {
         VoiceChatRecordingPlugin.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null, (VoicechatServerApi) VoiceChatRecording.vcApi);
     }
 
     // TODO neoforge might have a better way of doing this
     @SubscribeEvent
-    public void onSpeakingEntityDeath(LivingDeathEvent event) {
+    public static void onSpeakingEntityDeath(LivingDeathEvent event) {
         LivingEntity entity = event.getEntity();
         if (entity instanceof SpeakingEntity) {
             if(!entity.level().isClientSide()){
@@ -117,7 +115,7 @@ public class CommonEventBus {
 
     // TODO neoforge might have a better way to do this
     @SubscribeEvent
-    public void onPlayerDeath(LivingDeathEvent event){
+    public static void onPlayerDeath(LivingDeathEvent event){
         if(!event.getEntity().level().isClientSide() && event.getEntity() instanceof Player victim){
             DamageSource source = event.getSource();
             RevervoxMod.LOGGER.debug("damage source: {}", source);

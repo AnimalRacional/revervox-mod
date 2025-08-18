@@ -1,9 +1,7 @@
 package dev.omialien.revervoxmod.items;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
-import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
@@ -11,6 +9,7 @@ import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -54,7 +53,7 @@ public class AudioRepeatingItem extends Item {
     }
 
     @Override
-    public int getUseDuration(@NotNull ItemStack pStack) {
+    public int getUseDuration(ItemStack stack, LivingEntity entity) {
         return (this.audioDuration + 1) * 20;
     }
 

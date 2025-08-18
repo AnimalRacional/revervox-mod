@@ -39,6 +39,9 @@ repositories {
             includeGroup("com.eliotlash.mclib")
         }
     }
+    maven {
+        url 'https://maven.blamejared.com/'
+    }
     flatDir {
         name 'libs'
         dirs 'libs'
@@ -159,10 +162,11 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     runtimeOnly ("maven.modrinth:simple-voice-chat:${voicechat_dependency}")
-    runtimeOnly ("maven.modrinth:jade:15.10.3+neoforge")
+    localRuntime ("maven.modrinth:jade:15.10.3+neoforge")
     implementation ("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
     implementation("com.eliotlash.mclib:mclib:20")
     implementation ("blank:voicechatrecording:1.0.0")
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:19.22.1.316"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

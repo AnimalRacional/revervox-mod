@@ -3,7 +3,6 @@ package dev.omialien.revervoxmod.entity.goals;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.HearingEntity;
 import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
-import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -13,7 +12,6 @@ import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.function.Predicate;

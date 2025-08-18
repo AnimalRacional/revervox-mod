@@ -5,11 +5,8 @@ import dev.omialien.revervoxmod.entity.custom.sound.EntityFollowingSoundInstance
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-@Mod(value = RevervoxMod.MOD_ID, dist = Dist.CLIENT)
 public class RevervoxClientPacketHandler {
     public static void handleSoundInstancePacket(final SoundInstancePacket packet, final IPayloadContext ctx){
         ctx.enqueueWork(() -> {

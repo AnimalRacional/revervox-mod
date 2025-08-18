@@ -1,16 +1,20 @@
 {
     "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "#J#"
-    ],
+    "category": "misc",
     "key": {
         "#": {
             "item": "revervox_mod:revervox_ear"
         },
-        "J": {
+        "X": {
             "item": "minecraft:jukebox"
         }
     },
+    "pattern": [
+        "#X#"
+    ],
     "result": {
-        "item": "revervox_mod:revervox_voice_box"}
+        "count": 1,
+        "id": "revervox_mod:revervox_voice_box"
+    },
+    "show_notification": true
 }

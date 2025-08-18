@@ -26,7 +26,6 @@ public class RevervoxMod {
     public static final String MOD_ID = "revervox_mod";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
-
     public static final TaskScheduler TASKS = new TaskScheduler();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.

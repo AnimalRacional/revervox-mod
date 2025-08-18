@@ -92,8 +92,8 @@ public class ThingyModel<T extends Entity> extends HierarchicalModel<T> {
 	}
 
 	@Override
-	public void renderToBuffer(@NotNull PoseStack poseStack, @NotNull VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		thingy.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+		thingy.render(poseStack, buffer, packedLight, packedOverlay, color);
 	}
 
 	@Override
