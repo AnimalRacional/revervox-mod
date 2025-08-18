@@ -1,8 +1,7 @@
 package dev.omialien.revervoxmod.entity.goals;
 
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
-import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
-import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
+import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
@@ -10,7 +9,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.GameRules;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
     private static final TargetingConditions HURT_BY_TARGETING = TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting();
@@ -47,8 +46,12 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
     public void start() {
         if (!this.revervox.isAngry()){
             revervox.level().playSound(null, revervox.getX(), revervox.getY(), revervox.getZ(), SoundRegistry.REVERVOX_ALERT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
-            RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this.mob),
-                    new AddSoundInstancePacket(this.mob.getId(), SoundRegistry.REVERVOX_LOOP.get(), SoundSource.HOSTILE, true));
+            PacketDistributor.sendToPlayersTrackingEntity(this.mob, new SoundInstancePacket(
+                    this.mob.getId(),
+                    SoundRegistry.REVERVOX_LOOP.get(),
+                    SoundSource.HOSTILE,
+                    true
+            ));
         }
         timestamp = mob.getLastHurtByMobTimestamp();
         super.start();

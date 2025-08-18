@@ -2,8 +2,9 @@ package dev.omialien.revervoxmod.entity.goals;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.HearingEntity;
-import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
+import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
+import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,6 +14,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.function.Predicate;
 
@@ -60,8 +62,15 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
             entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), soundToPlay, SoundSource.HOSTILE, 1.0F, 1.0F);
         }
         if (this.soundToLoop != null){
-            RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this.mob),
-                    new AddSoundInstancePacket(this.mob.getId(), soundToLoop, SoundSource.HOSTILE, true));
+            PacketDistributor.sendToPlayersTrackingEntity(
+                    this.mob,
+                    new SoundInstancePacket(
+                            this.mob.getId(),
+                            soundToLoop,
+                            SoundSource.HOSTILE,
+                            true
+                    )
+            );
         }
         super.start();
     }

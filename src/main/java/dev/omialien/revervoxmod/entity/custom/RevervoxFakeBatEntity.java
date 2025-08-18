@@ -3,8 +3,7 @@ package dev.omialien.revervoxmod.entity.custom;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
-import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
+import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
@@ -24,7 +23,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -75,7 +74,13 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
     public void tick() {
         if (target != null && target.isAlive()){
             if(!this.level().isClientSide() && !hasPlayedSpawnSound){
-                RevervoxPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) target), new AddSoundInstancePacket(this.getId(), SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundSource.HOSTILE, false));
+                PacketDistributor.sendToPlayer((ServerPlayer)target,
+                        new SoundInstancePacket(
+                                this.getId(),
+                                SoundRegistry.REVERVOX_BAT_ALERT.get(),
+                                SoundSource.HOSTILE,
+                                false)
+                );
                 hasPlayedSpawnSound = true;
             }
         }

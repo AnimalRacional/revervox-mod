@@ -7,6 +7,9 @@ import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.*;
 import dev.omialien.revervoxmod.items.IRevervoxWeapon;
+import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
+import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
+import dev.omialien.revervoxmod.networking.packets.SoundInstancePacketCodec;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
@@ -31,6 +34,8 @@ import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +43,7 @@ import java.util.Random;
 import java.util.UUID;
 
 @EventBusSubscriber(modid = RevervoxMod.MOD_ID)
-public class CommonForgeEventBus {
+public class CommonEventBus {
     @SubscribeEvent
     public void tickEvent(ServerTickEvent.Post event){
         RevervoxMod.TASKS.tick();
@@ -155,5 +160,15 @@ public class CommonForgeEventBus {
                 SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 RevervoxGeoEntity::checkRevervoxSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE);
+    }
+
+    @SubscribeEvent
+    public static void registerPayloads(RegisterPayloadHandlersEvent event){
+        final PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToClient(
+                SoundInstancePacket.TYPE,
+                SoundInstancePacket.STREAM_CODEC,
+                RevervoxClientPacketHandler::handleSoundInstancePacket
+        );
     }
 }
