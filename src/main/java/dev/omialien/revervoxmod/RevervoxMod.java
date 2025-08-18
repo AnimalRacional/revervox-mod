@@ -1,57 +1,45 @@
 package dev.omialien.revervoxmod;
 
-import com.mojang.logging.LogUtils;
-import dev.omialien.revervoxmod.config.RevervoxModClientConfigs;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
-import dev.omialien.revervoxmod.events.ClientForgeEventBus;
-import dev.omialien.revervoxmod.events.CommonForgeEventBus;
-import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.*;
 import dev.omialien.voicechat_recording.taskscheduler.TaskScheduler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
+import com.mojang.logging.LogUtils;
+
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.ModContainer;
+
+// The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(RevervoxMod.MOD_ID)
 public class RevervoxMod {
+    // Define mod id in a common place for everything to reference
     public static final String MOD_ID = "revervox_mod";
+    // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final LevelResource AUDIO_DIRECTORY = new LevelResource("player_audios");
-    final public static TaskScheduler TASKS = new TaskScheduler();
 
-    public RevervoxMod(FMLJavaModLoadingContext context) {
-        MinecraftForge.EVENT_BUS.addListener(this::setup);
-        MinecraftForge.EVENT_BUS.register(this);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new ClientForgeEventBus()));
-        MinecraftForge.EVENT_BUS.register(new CommonForgeEventBus());
+    public static final TaskScheduler TASKS = new TaskScheduler();
 
-        EntityRegistry.register(context.getModEventBus());
-        SoundRegistry.register(context.getModEventBus());
-        ItemRegistry.register(context.getModEventBus());
-        CreativeTabRegistry.register(context.getModEventBus());
-        ParticleRegistry.register(context.getModEventBus());
+    // The constructor for the mod class is the first code that is run when your mod is loaded.
+    // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
+    public RevervoxMod(IEventBus modEventBus, ModContainer modContainer) {
+        EntityRegistry.register(modEventBus);
+        SoundRegistry.register(modEventBus);
+        ItemRegistry.register(modEventBus);
+        CreativeTabRegistry.register(modEventBus);
+        ParticleRegistry.register(modEventBus);
 
-        RevervoxPacketHandler.registerPackets();
-
-        context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox-client.toml");
-        context.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC, "revervox-server.toml");
-    }
-
-    private void setup(FMLCommonSetupEvent event) {
-        LOGGER.debug("Setting up Revervox Mod");
+        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
+        modContainer.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC);
     }
 
     public static void summonBatWave(Player player){
@@ -73,7 +61,6 @@ public class RevervoxMod {
             }
         }
     }
-
     public static Vec3 applyLocalCoordinates(float yRot, Vec3 vec3, float forwards, float up, float left){
         Vec2 vec2 = new Vec2(0,yRot);
         float f = Mth.cos((vec2.y + 90.0F) * ((float)Math.PI / 180F));
@@ -90,21 +77,4 @@ public class RevervoxMod {
         double d2 = vec31.z * forwards + vec32.z * up + vec33.z * left;
         return new Vec3(vec3.x + d0, vec3.y + d1, vec3.z + d2);
     }
-
-
-    //TODO salvar audios quando server crasha, rn o onPlayerDisconnected é chamado mas n vai a tempo de salvar os audios
-    /*
-    @SubscribeEvent
-    public void onServerCrash(ServerStoppedEvent event) {
-            RevervoxMod.LOGGER.debug("Saving audios from player");
-            if (RevervoxVoicechatPlugin.ran) {
-                RevervoxMod.LOGGER.debug("ran is true");
-                return;
-            }
-            for (UUID uuid : RevervoxVoicechatPlugin.getRecordedPlayers().keySet()){
-                RevervoxVoicechatPlugin.getRecordedPlayer(uuid).saveAudios();
-            }
-    }
-
-     */
 }

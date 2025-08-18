@@ -9,9 +9,9 @@ import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
-import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
+import dev.omialien.voicechat_recording.VoiceChatRecording;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
+import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.core.BlockPos;
@@ -45,11 +45,11 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.constant.DefaultAnimations;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimatableManager;
-import software.bernie.geckolib.core.animation.AnimationController;
-import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.EnumSet;
@@ -70,7 +70,12 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     private BlockPos targetPosition;
     public RevervoxBatGeoEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        this.entityData.define(DATA_ID_FLAGS, (byte)0);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_ID_FLAGS, (byte)0);
     }
 
     @Override
@@ -151,7 +156,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
 
     @Override
     public void awardKillScore(@NotNull Entity pKilled, int pScoreValue, @NotNull DamageSource pSource) {
-        if(pKilled instanceof Player player && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
+        if(pKilled instanceof Player player && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
             playPlayerAudio(player, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.7f));
             this.remove(Entity.RemovalReason.DISCARDED);
         }
@@ -171,8 +176,8 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
-        VoicechatServerApi api = (VoicechatServerApi) RecordingSimpleVoiceChat.vcApi;
-        short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
+        VoicechatServerApi api = (VoicechatServerApi) VoiceChatRecording.vcApi;
+        short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
         if (audio != null) {
             playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
         }
@@ -180,16 +185,16 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     }
 
     @Override
-    public void onRemovedFromWorld() {
-        super.onRemovedFromWorld();
+    public void onRemovedFromLevel() {
+        super.onRemovedFromLevel();
         ParticleManager.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), 0.7D, this);
     }
 
     @Nullable
     @Override
-    public SpawnGroupData finalizeSpawn(@NotNull ServerLevelAccessor pLevel, @NotNull DifficultyInstance pDifficulty, @NotNull MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
         this.spawnTime = System.currentTimeMillis();
-        return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
+        return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
     public long getSpawnTime(){
@@ -205,7 +210,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(time >= getGracePeriodEnd()){
-            RecordedPlayer rec = RecordingSimpleVoiceChatPlugin.getRecordedPlayer(player.getUUID());
+            RecordedPlayer rec = VoiceChatRecordingPlugin.getRecordedPlayer(player.getUUID());
             if (rec != null){
                 return rec.isSpeaking() &&
                         rec.getLastSpoke() >= getGracePeriodEnd();

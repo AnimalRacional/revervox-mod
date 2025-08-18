@@ -3,17 +3,17 @@ package dev.omialien.revervoxmod.registries;
 import dev.omialien.revervoxmod.RevervoxMod;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ParticleRegistry {
 
     public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES =
-            DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, RevervoxMod.MOD_ID);
+            DeferredRegister.create(BuiltInRegistries.PARTICLE_TYPE, RevervoxMod.MOD_ID);
 
-    public static final RegistryObject<SimpleParticleType> REVERVOX_PARTICLES =
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> REVERVOX_PARTICLES =
             PARTICLE_TYPES.register("revervox", () -> new SimpleParticleType(true));
 
     public static void register(IEventBus eventBus) {

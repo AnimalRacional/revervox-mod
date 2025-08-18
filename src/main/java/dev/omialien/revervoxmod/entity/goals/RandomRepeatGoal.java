@@ -1,13 +1,13 @@
 package dev.omialien.revervoxmod.entity.goals;
 
+import de.maxhenkel.voicechat.api.VoicechatServerApi;
+import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
-import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
-import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
+import dev.omialien.voicechat_recording.VoiceChatRecording;
+import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -37,7 +37,7 @@ public class RandomRepeatGoal extends Goal {
     }
 
     public void start() {
-        if (RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
+        if (VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
             UUID channelID = UUID.randomUUID();
             channel = createChannel(api, channelID, RevervoxMod.MOD_ID, this.mob);
         }
@@ -45,10 +45,10 @@ public class RandomRepeatGoal extends Goal {
 
     public void tick() {
         canSpeak = false;
-        if (audiosPlayed >= RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS_TO_PLAY.get()) this.mob.remove(Entity.RemovalReason.DISCARDED);
-        RevervoxMod.LOGGER.debug("Less than " + RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS_TO_PLAY.get() + " audios!");
+        if (audiosPlayed >= RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get()) this.mob.remove(Entity.RemovalReason.DISCARDED);
+        RevervoxMod.LOGGER.debug("Less than " + RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get() + " audios!");
         if (this.mob.getCurrentAudioPlayer() != null && this.mob.getCurrentAudioPlayer().isPlaying()) return;
-        if (RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
+        if (VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
 
             List<Player> nearbyPlayers = new ArrayList<>(this.mob.level().
                     getNearbyPlayers(TargetingConditions.forNonCombat(), this.mob, this.mob.getBoundingBox()
@@ -96,7 +96,7 @@ public class RandomRepeatGoal extends Goal {
                     }
                 }
                 RevervoxMod.LOGGER.debug("Playing audio from random player that is not near...");
-                Set<UUID> recordedPlayers = RecordingSimpleVoiceChatPlugin.getRecordedPlayers().keySet();
+                Set<UUID> recordedPlayers = VoiceChatRecordingPlugin.getRecordedPlayers().keySet();
                 Set<UUID> nearbyPlayerUUIDs = nearbyPlayers.stream().map(Player::getUUID).collect(Collectors.toSet());
                 Set<UUID> otherPlayers = new HashSet<>(recordedPlayers);
                 otherPlayers.removeAll(nearbyPlayerUUIDs);
@@ -105,7 +105,7 @@ public class RandomRepeatGoal extends Goal {
                     playRandomAudioFromSet(api, otherPlayers);
                 } else {
                     RevervoxMod.LOGGER.debug("No other players to play sounds from");
-                    short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(true);
+                    short[] audio = VoiceChatRecordingPlugin.getRandomAudio(true);
                     if (audio == null) return;
                     this.mob.playAudio(audio, api, channel, new AudioEffect());
                 }

@@ -2,7 +2,9 @@ package dev.omialien.revervoxmod.items;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
+import dev.omialien.voicechat_recording.VoiceChatRecording;
 import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
+import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
@@ -30,10 +32,10 @@ public class AudioRepeatingItem extends Item {
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack item = pPlayer.getItemInHand(pUsedHand);
         boolean audioPlayed = false;
-        if (!pLevel.isClientSide() && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api) {
-            short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
+        if (!pLevel.isClientSide() && VoiceChatRecording.vcApi instanceof VoicechatServerApi api) {
+            short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
             if(audio != null){
-                this.audioDuration =  audio.length / RecordingSimpleVoiceChatPlugin.SAMPLE_RATE;
+                this.audioDuration =  audio.length / VoiceChatRecordingPlugin.SAMPLE_RATE;
                 playAudio(pPlayer, api, audio);
                 audioPlayed = true;
                 pPlayer.startUsingItem(pUsedHand);

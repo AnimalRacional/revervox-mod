@@ -6,35 +6,34 @@ import dev.omialien.revervoxmod.items.RevervoxSword;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ItemRegistry {
-    private static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, RevervoxMod.MOD_ID);
+    private static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(RevervoxMod.MOD_ID);
 
-    public static final RegistryObject<ForgeSpawnEggItem> THINGY_SPAWN_EGG = REGISTRY.register("thingy_spawn_egg", () -> new ForgeSpawnEggItem(EntityRegistry.THINGY, 0xdfe610, 0x1b3fff, new Item.Properties().stacksTo(64)));
-    public static final RegistryObject<ForgeSpawnEggItem> REVERVOX_SPAWN_EGG = REGISTRY.register("revervox_spawn_egg", () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX, 0x3b3b3b, 0xffe591, new Item.Properties().stacksTo((64))));
-    public static final RegistryObject<ForgeSpawnEggItem> REVERVOX_BAT_SPAWN_EGG = REGISTRY
+    public static final DeferredItem<DeferredSpawnEggItem> THINGY_SPAWN_EGG = REGISTRY.register("thingy_spawn_egg", () -> new DeferredSpawnEggItem(EntityRegistry.THINGY, 0xdfe610, 0x1b3fff, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> REVERVOX_SPAWN_EGG = REGISTRY.register("revervox_spawn_egg", () -> new DeferredSpawnEggItem(EntityRegistry.REVERVOX, 0x3b3b3b, 0xffe591, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> REVERVOX_BAT_SPAWN_EGG = REGISTRY
             .register("revervox_bat_spawn_egg",
-                    () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
-                            new Item.Properties().stacksTo(64)));
-    public static final RegistryObject<AudioRepeatingItem> REVERVOX_VOICE_BOX = REGISTRY.register(
+                    () -> new DeferredSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
+                            new Item.Properties()));
+    public static final DeferredItem<AudioRepeatingItem> REVERVOX_VOICE_BOX = REGISTRY.register(
             "revervox_voice_box",
             () -> new AudioRepeatingItem(new Item.Properties().stacksTo(1))
     );
-    public static final RegistryObject<Item> REVERVOX_EAR = REGISTRY.register(
+    public static final DeferredItem<Item> REVERVOX_EAR = REGISTRY.register(
             "revervox_ear",
             () -> new Item(new Item.Properties())
     );
 
-    public static final RegistryObject<SwordItem> REVERVOX_SWORD = REGISTRY.register(
+    public static final DeferredItem<SwordItem> REVERVOX_SWORD = REGISTRY.register(
             "revervox_sword",
             () -> new RevervoxSword(Tiers.DIAMOND, 3, -2.4F, new Item.Properties())
     );
-    public static final RegistryObject<Item> REVERVOX_BAT_TOOTH = REGISTRY.register(
+    public static final DeferredItem<Item> REVERVOX_BAT_TOOTH = REGISTRY.register(
             "revervox_bat_tooth",
             () -> new Item(new Item.Properties().stacksTo(16))
     );

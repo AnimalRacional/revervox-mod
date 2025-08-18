@@ -1,13 +1,15 @@
 package dev.omialien.revervoxmod.particle.custom;
 
+import dev.omialien.revervoxmod.RevervoxMod;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 
+@Mod(value = RevervoxMod.MOD_ID, dist = Dist.CLIENT)
 public class RevervoxParticles extends TextureSheetParticle {
     private final SpriteSet spriteSet;
     private final float rotationSpeed;
@@ -77,7 +79,7 @@ public class RevervoxParticles extends TextureSheetParticle {
         return 15728880; // Full brightness
     }
 
-    @OnlyIn(Dist.CLIENT)
+
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
 

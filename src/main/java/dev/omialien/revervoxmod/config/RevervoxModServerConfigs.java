@@ -1,33 +1,17 @@
 package dev.omialien.revervoxmod.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class RevervoxModServerConfigs {
-    public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-    public static final ForgeConfigSpec SPEC;
-    public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_MAX_AUDIOS_TO_PLAY;
+    public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    public static final ModConfigSpec.IntValue REVERVOX_MAX_AUDIOS = BUILDER.defineInRange("revervoxMaxAudios", 12, 1, 100);
     // TODO grace periods não aparecem na config screen, talvez por serem floats
-    public static final ForgeConfigSpec.ConfigValue<Float> REVERVOX_AFTER_SPEAK_GRACE_PERIOD;
-    public static final ForgeConfigSpec.ConfigValue<Float> REVERVOX_BAT_AFTER_SPAWN_GRACE_PERIOD;
-    public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_BAT_SPAWN_CHANCE;
-    public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_SWORD_BONUS_DAMAGE;
-    public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_BAT_TOOTH_DROP_CHANCE;
-    public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_SPAWN_CHANCE;
-    public static final ForgeConfigSpec.ConfigValue<Float> FAKE_BAT_EVENT_CHANCE;
-
-    static {
-        BUILDER.push("Server Configs for Revervox Mod");
-
-        REVERVOX_MAX_AUDIOS_TO_PLAY = BUILDER.comment("Maximum audios that Revervox will play before disappearing").define("Revervox Max Audios", 20);
-        REVERVOX_AFTER_SPEAK_GRACE_PERIOD = BUILDER.comment("Time in seconds that Revervox will wait after speaking before being able to get angry").define("Revervox After Speaking Grace Period", 1.5f);
-        REVERVOX_BAT_AFTER_SPAWN_GRACE_PERIOD = BUILDER.comment("Time in seconds that Revervox Bat will wait after spawn before being able to get angry").define("Revervox Bat After Spawning Grace Period", 0.5f);
-        REVERVOX_SPAWN_CHANCE = BUILDER.comment("Minimum distance between every Revervox").define("Revervox Spawn Chance", 100);
-        REVERVOX_BAT_SPAWN_CHANCE = BUILDER.comment("Chance of Revervox Bat spawning (1 in x)").define("Revervox Bat Spawn Chance", 5);
-        REVERVOX_SWORD_BONUS_DAMAGE = BUILDER.comment("How much extra damage the revervox sword deals to revervox entities").define("Revervox Sword Bonus Damage", 7);
-        REVERVOX_BAT_TOOTH_DROP_CHANCE = BUILDER.comment("The chance of a revervox bat dropping its tooth on attack (1 in x)").define("Revervox Bat Tooth Drop Chance", 10);
-        FAKE_BAT_EVENT_CHANCE = BUILDER.comment("Chance of fake bat event occuring. Higher is less likely, lower is more likely").define("Fake Bat Event Chance", 1.0f);
-        BUILDER.pop();
-        SPEC = BUILDER.build();
-    }
-
+    public static final ModConfigSpec.DoubleValue REVERVOX_AFTER_SPEAK_GRACE_PERIOD = BUILDER.defineInRange("revervoxGracePeriod", 1.5d, 0d, 5d);
+    public static final ModConfigSpec.DoubleValue REVERVOX_BAT_AFTER_SPAWN_GRACE_PERIOD = BUILDER.defineInRange("revervoxBatGracePeriod", 0.5d, 0d, 5d);
+    public static final ModConfigSpec.IntValue REVERVOX_BAT_SPAWN_CHANCE = BUILDER.defineInRange("revervoxBatSpawnChance", 5, 2, 500);
+    public static final ModConfigSpec.IntValue REVERVOX_SWORD_BONUS_DAMAGE = BUILDER.defineInRange("revervoxSwordBonus", 7, 1, 20);
+    public static final ModConfigSpec.IntValue REVERVOX_BAT_TOOTH_DROP_CHANCE = BUILDER.defineInRange("batToothDropChance", 10, 1, 20);
+    public static final ModConfigSpec.IntValue REVERVOX_SPAWN_CHANCE = BUILDER.defineInRange("revervoxMinimumDistance", 100, 0, 500);
+    public static final ModConfigSpec.DoubleValue FAKE_BAT_EVENT_CHANCE = BUILDER.defineInRange("batEventChance", 1d, 0.1d, 20d);
+    public static final ModConfigSpec SPEC = BUILDER.build();
 }
