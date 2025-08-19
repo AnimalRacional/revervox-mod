@@ -42,10 +42,6 @@ repositories {
     maven {
         url 'https://maven.blamejared.com/'
     }
-    flatDir {
-        name 'libs'
-        dirs 'libs'
-    }
 }
 
 base {
@@ -160,12 +156,12 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     runtimeOnly ("maven.modrinth:simple-voice-chat:${voicechat_dependency}")
     localRuntime ("maven.modrinth:jade:15.10.3+neoforge")
     implementation ("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
     implementation("com.eliotlash.mclib:mclib:20")
-    implementation ("maven.modrinth:voice-chat-recording:1.1.0")
+    implementation ("maven.modrinth:voice-chat-recording:${voicechatrecording_version}")
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:19.22.1.316"
 }
 
@@ -184,7 +180,8 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_authors            : mod_authors,
             mod_description        : mod_description,
             voicechat_dependency   : voicechat_dependency,
-            geckolib_version       : geckolib_version
+            geckolib_version       : geckolib_version,
+            voicechatrecording_version: voicechatrecording_version
     ]
     inputs.properties replaceProperties
     expand replaceProperties

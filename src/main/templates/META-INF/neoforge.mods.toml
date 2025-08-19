@@ -94,9 +94,13 @@ description='''${mod_description}'''
 [[dependencies.${mod_id}]]
     modId="voicechatrecording"
     mandatory=true
-    versionRange="[1.0.0,)"
+    versionRange="[${voicechatrecording_version},)"
     ordering="AFTER"
     side="BOTH"
+[[dependencies.${mod_id}]]
+    modId="geckolib"
+    mandatory=true
+    versionRange="[${geckolib_version},)"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
