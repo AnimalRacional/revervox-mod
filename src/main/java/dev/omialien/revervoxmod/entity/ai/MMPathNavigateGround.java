@@ -143,10 +143,8 @@ public class MMPathNavigateGround extends GroundPathNavigation {
                 for (int z = z0; z != z1; z += stepz) {
                     for (int y = y0; y != y1; y += stepy) {
                         BlockState block = this.level.getBlockState(pos.set(x, y, z));
-                        // TODO changed in neoforge port - this is most definitely wrong
                         if (!block.isPathfindable(PathComputationType.LAND)) return false;
                     }
-                    // TODO changed in neoforge port - is this correct?
                     PathType below = this.nodeEvaluator.getPathType(this.mob, new BlockPos(x, y0 - 1, z));
                     if (below == PathType.WATER || below == PathType.LAVA || below == PathType.OPEN) return false;
                     PathType in = this.nodeEvaluator.getPathType(this.mob, new BlockPos(x, y0, z));

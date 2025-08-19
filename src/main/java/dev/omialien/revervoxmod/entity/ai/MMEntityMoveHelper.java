@@ -42,7 +42,6 @@ public class MMEntityMoveHelper extends MoveControl {
             PathNavigation pathnavigate = this.mob.getNavigation();
 
             NodeEvaluator nodeprocessor = pathnavigate.getNodeEvaluator();
-            // TODO changed in neoforge port - is this correct?
             if (nodeprocessor.getPathType(this.mob, new BlockPos(Mth.floor(this.mob.getX() + (double) f7), Mth.floor(this.mob.getY()), Mth.floor(this.mob.getZ() + (double) f8))) != PathType.WALKABLE) {
                 this.strafeForwards = 1.0F;
                 this.strafeRight = 0.0F;

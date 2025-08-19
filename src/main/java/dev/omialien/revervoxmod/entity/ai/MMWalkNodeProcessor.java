@@ -10,6 +10,7 @@ import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,10 +41,9 @@ public class MMWalkNodeProcessor extends WalkNodeEvaluator {
             BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(Mth.floor(this.mob.getX()), y, Mth.floor(this.mob.getZ()));
             BlockState blockState = this.level.getBlockState(pos);
             while (y > 0 && (blockState.isAir() ||
-                    // TODO changed in neoforge port - is this correct?
                     blockState.getCollisionShape(
                             this.currentContext.level(),
-                            pos
+                            pos, CollisionContext.empty()
                     ) != Shapes.empty()
                             )) {
                 pos.setY(y--);
