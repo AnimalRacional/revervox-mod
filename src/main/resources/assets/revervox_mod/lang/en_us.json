@@ -22,7 +22,6 @@
   "revervox_mod.configuration.batEventChance": "Fake Bat Event Chance",
   "revervox_mod.configuration.batEventChance.tooltip": "Chance of fake bat event occuring. Higher is less likely, lower is more likely",
 
-  "itemGroup.revervoxMod": "Revervox",
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",
   "item.revervox_mod.revervox_spawn_egg": "Revervox Spawn Egg",
