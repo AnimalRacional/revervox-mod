@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_revervox_ear": {
+      "conditions": {
+        "items": [
+          {
+            "items": "revervox_mod:revervox_ear"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "revervox_mod:revervox_voice_box"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_revervox_ear"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "revervox_mod:revervox_voice_box"
+    ]
+  }
+}
