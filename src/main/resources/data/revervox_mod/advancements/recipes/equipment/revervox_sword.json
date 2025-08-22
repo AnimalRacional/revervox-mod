@@ -1,0 +1,48 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_tooth": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "revervox_mod:revervox_bat_tooth"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_voicebox": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "revervox_mod:revervox_voice_box"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "revervox_mod:revervox_sword"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_voicebox",
+      "has_tooth",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "revervox_mod:revervox_sword"
+    ]
+  },
+  "sends_telemetry_event": false
+}
