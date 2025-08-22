@@ -24,6 +24,8 @@
   "revervox_mod.configuration.batEventChance.tooltip": "Chance of fake bat event occuring. Higher is less likely, lower is more likely",
   "revervox_mod.configuration.revervoxBreaksBlocks": "Revervox breaks blocks",
   "revervox_mod.configuration.revervoxBreaksBlocks.tooltip": "Whether Revervox breaks blocks to get to you",
+  "revervox_mod.configuration.revervoxAboveGround": "Revervox Spawns Above Ground",
+  "revervox_mod.configuration.revervoxAboveGround.tooltip": "Whether Revervox spawns above ground",
 
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",
