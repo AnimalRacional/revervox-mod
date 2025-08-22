@@ -1,13 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_hay_block": {
+    "has_revervox_ear": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "revervox_mod:revervox_ear"
-            ]
+            "items": ["revervox_mod:revervox_ear"]
           }
         ]
       },
@@ -22,14 +20,13 @@
   },
   "requirements": [
     [
-      "has_hay_block",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_revervox_ear"
     ]
   ],
   "rewards": {
     "recipes": [
       "revervox_mod:revervox_voice_box"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }
