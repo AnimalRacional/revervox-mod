@@ -416,7 +416,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             // Priority to spawn on alone player
             Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
             if (player != null){
-                if (player.position().y <= pLevel.getSeaLevel()){
+                if (!RevervoxModServerConfigs.REVERVOX_ABOVE_GROUND.get() && player.position().y <= pLevel.getSeaLevel()){
                     if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100, 50, 100)).isEmpty()){
                         boolean flag = checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
                         if (flag) {
@@ -427,7 +427,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 }
             }
         }
-        if (pPos.getY() >= pLevel.getSeaLevel()) {
+        if (!RevervoxModServerConfigs.REVERVOX_ABOVE_GROUND.get() && pPos.getY() >= pLevel.getSeaLevel()) {
             return false;
         } else {
             // Check if there are other Revervox around

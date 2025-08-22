@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 public class SummonFakeEntityCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
-                Commands.literal("summonFakeEntity").then(
+                Commands.literal("summonFakeEntity").requires((p) -> p.hasPermission(2)).then(
                     Commands.argument("target", GameProfileArgument.gameProfile()).executes((src) -> {
                         try{
                             GameProfile target = GameProfileArgument.getGameProfiles(src, "target").iterator().next();
