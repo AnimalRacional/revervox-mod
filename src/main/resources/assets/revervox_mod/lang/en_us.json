@@ -4,7 +4,8 @@
   "revervox_mod.configuration.title": "Revervox Configs",
   "revervox_mod.configuration.section.revervox_mod.common.toml": "Revervox Client Configs",
   "revervox_mod.configuration.section.revervox.mod.server.toml": "Revervox Server Configs",
-  "revervox_mod.configuration.section.revervox_mod.common.toml.title": "Revervox Configs",
+  "revervox_mod.configuration.section.revervox.mod.server.toml.title": "Revervox Server Configs",
+  "revervox_mod.configuration.section.revervox_mod.common.toml.title": "Revervox Common Configs",
   "revervox_mod.configuration.revervoxMaxAudios": "Revervox Max Audios",
   "revervox_mod.configuration.revervoxMaxAudios.tooltip": "Maximum audios that Revervox will play before disappearing",
   "revervox_mod.configuration.revervoxGracePeriod": "Revervox Grace Period",
@@ -21,6 +22,8 @@
   "revervox_mod.configuration.revervoxMinimumDistance.tooltip": "Minimum distance between every Revervox",
   "revervox_mod.configuration.batEventChance": "Fake Bat Event Chance",
   "revervox_mod.configuration.batEventChance.tooltip": "Chance of fake bat event occuring. Higher is less likely, lower is more likely",
+  "revervox_mod.configuration.revervoxBreaksBlocks": "Revervox breaks blocks",
+  "revervox_mod.configuration.revervoxBreaksBlocks.tooltip": "Whether Revervox breaks blocks to get to you",
 
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",

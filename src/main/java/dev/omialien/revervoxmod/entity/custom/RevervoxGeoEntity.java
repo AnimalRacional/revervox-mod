@@ -86,7 +86,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    protected void defineSynchedData(SynchedEntityData.@NotNull Builder builder) {
         super.defineSynchedData(builder);
         builder.define(CLIMBING_ACCESSOR, false);
     }
@@ -341,7 +341,9 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             double playerDirectionOffset = (this.getTarget().getY() - this.getY());
             double offset = Double.compare(playerDirectionOffset, 0.0D);
             offset = offset < 0.0D ? -1.0D : offset == 0 ? 0.0D : 1.0D;
-            this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0));
+            if(RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()){
+                this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0));
+            }
         }
 
         super.customServerAiStep();
