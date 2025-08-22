@@ -15,6 +15,7 @@ public class RevervoxModServerConfigs {
     public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_SPAWN_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<Float> FAKE_BAT_EVENT_CHANCE;
     public static final ForgeConfigSpec.ConfigValue<Boolean> REVERVOX_BREAKS_BLOCKS;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> REVERVOX_ABOVE_GROUND;
 
     static {
         BUILDER.push("Server Configs for Revervox Mod");
@@ -27,7 +28,8 @@ public class RevervoxModServerConfigs {
         REVERVOX_SWORD_BONUS_DAMAGE = BUILDER.comment("How much extra damage the revervox sword deals to revervox entities").define("Revervox Sword Bonus Damage", 7);
         REVERVOX_BAT_TOOTH_DROP_CHANCE = BUILDER.comment("The chance of a revervox bat dropping its tooth on attack (1 in x)").define("Revervox Bat Tooth Drop Chance", 10);
         FAKE_BAT_EVENT_CHANCE = BUILDER.comment("Chance of fake bat event occuring. Higher is less likely, lower is more likely").define("Fake Bat Event Chance", 1.0f);
-        REVERVOX_BREAKS_BLOCKS = BUILDER.comment("Whether revervox breaks blocks to get to you").define("Revervox breaks blocks", false);
+        REVERVOX_BREAKS_BLOCKS = BUILDER.comment("Whether Revervox breaks blocks to get to you").define("Revervox breaks blocks", false);
+        REVERVOX_ABOVE_GROUND = BUILDER.comment("Whether Revervox spawns above ground").define("Revervox above ground", false);
         BUILDER.pop();
         SPEC = BUILDER.build();
     }
