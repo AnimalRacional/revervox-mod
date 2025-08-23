@@ -30,7 +30,7 @@
       "predicate": {
         "tooting": 1
       },
-      "model": "item/playing_revervox_voice_box"
+      "model": "revervox_mod:item/playing_revervox_voice_box"
     }
   ]
 }
