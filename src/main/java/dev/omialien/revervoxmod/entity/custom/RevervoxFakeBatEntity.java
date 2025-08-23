@@ -114,11 +114,11 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
     @Override
     public void remove(@NotNull RemovalReason pReason) {
         if(!this.level().isClientSide() && pReason == RemovalReason.KILLED && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
-            AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(this.getX(), this.getY(), this.getZ()));
-            if(channel != null){
-                channel.setCategory(RevervoxMod.MOD_ID);
-                short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
-                if(audio != null){
+            short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
+            if(audio != null){
+                AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(this.getX(), this.getY(), this.getZ()));
+                if(channel != null) {
+                    channel.setCategory(RevervoxMod.MOD_ID);
                     this.playAudio(audio, api, channel, new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
                 }
             }

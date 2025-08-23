@@ -1,11 +1,10 @@
 package dev.omialien.revervoxmod.items;
 
-import dev.omialien.revervoxmod.RevervoxMod;
+import de.maxhenkel.voicechat.api.VoicechatServerApi;
+import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -21,6 +20,15 @@ import java.util.UUID;
 
 public class AudioRepeatingItem extends Item {
     private int audioDuration;
+    private AudioChannel audioChannel;
+    private Player playingPlayer;
+    private AudioChannel getChannel(Player plr){
+        if ((audioChannel == null || !plr.is(playingPlayer)) && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
+            playingPlayer = plr;
+            audioChannel = api.createEntityAudioChannel(UUID.randomUUID(), api.fromEntity(plr));
+        }
+        return audioChannel;
+    }
 
     public AudioRepeatingItem(Properties pProperties) {
         super(pProperties);
@@ -53,16 +61,14 @@ public class AudioRepeatingItem extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack stack, LivingEntity entity) {
+    public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
         return (this.audioDuration + 1) * 20;
     }
 
     private void playAudio(Player pPlayer, VoicechatServerApi api, short[] audio){
-        AudioChannel channel = api.createEntityAudioChannel(UUID.randomUUID(), api.fromEntity(pPlayer));
-        if(channel != null){
-            channel.setCategory(RevervoxMod.MOD_ID);
-            if(audio != null){
-                new AudioPlayer(audio, api, channel).start();
+        if(audio != null){
+            if(getChannel(pPlayer) != null) {
+                new AudioPlayer(audio, api, getChannel(pPlayer)).start();
             }
         }
     }

@@ -20,7 +20,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -158,7 +157,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     @Override
     public void awardKillScore(@NotNull Entity pKilled, int pScoreValue, @NotNull DamageSource pSource) {
         if(pKilled instanceof Player player && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
-            playPlayerAudio(player, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.7f));
+            playPlayerAudio(player, api, () -> createLocationalAudioChannel(api), new AudioEffect().changePitch(1.7f));
             this.remove(Entity.RemovalReason.DISCARDED);
         }
         super.awardKillScore(pKilled, pScoreValue, pSource);

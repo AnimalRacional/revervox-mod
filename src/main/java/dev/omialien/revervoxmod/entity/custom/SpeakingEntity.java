@@ -9,6 +9,9 @@ import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Supplier;
 
 public interface SpeakingEntity {
     AudioPlayer getCurrentAudioPlayer();
@@ -24,7 +27,7 @@ public interface SpeakingEntity {
 
     void onSpeak(long audioDuration);
 
-    default void playAudio(short[] audio, VoicechatServerApi api, AudioChannel channel, AudioEffect effect){
+    default void playAudio(short @NotNull [] audio, VoicechatServerApi api, AudioChannel channel, AudioEffect effect){
         short[] audioWithAppliedEffects = effect.applyEffects(audio);
         setCurrentAudioPlayer(new AudioPlayer(audioWithAppliedEffects, api, channel));
         getCurrentAudioPlayer().start();
@@ -32,11 +35,11 @@ public interface SpeakingEntity {
         onSpeak((audio.length / SAMPLE_RATE) * 1000);
     }
 
-    default void playPlayerAudio(Player player, VoicechatServerApi api, AudioChannel channel){
-        playPlayerAudio(player, api, channel, new AudioEffect());
+    default void playPlayerAudio(Player player, VoicechatServerApi api, Supplier<AudioChannel> channelSupp){
+        playPlayerAudio(player, api, channelSupp, new AudioEffect());
     }
 
-    default void playPlayerAudio(Player player, VoicechatServerApi api, AudioChannel channel, AudioEffect effect){
+    default void playPlayerAudio(Player player, VoicechatServerApi api, Supplier<AudioChannel> channelSupp, AudioEffect effect){
         RecordedPlayer record = VoiceChatRecordingPlugin.getRecordedPlayer(player.getUUID());
         if (record == null) return;
         short[] audio = record.getRandomAudio(true);
@@ -45,6 +48,8 @@ public interface SpeakingEntity {
             audio = VoiceChatRecordingPlugin.getRandomAudio(true);
             if (audio == null) return;
         }
+        AudioChannel channel = channelSupp.get();
+        if(channel == null){ return; }
         RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());
         playAudio(audio, api, channel, effect);
     }
