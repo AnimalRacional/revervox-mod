@@ -26,6 +26,8 @@
   "revervox_mod.configuration.revervoxBreaksBlocks.tooltip": "Whether Revervox breaks blocks to get to you",
   "revervox_mod.configuration.revervoxAboveGround": "Revervox Spawns Above Ground",
   "revervox_mod.configuration.revervoxAboveGround.tooltip": "Whether Revervox spawns above ground",
+  "revervox_mod.configuration.revervoxBreakNonSolid": "Revervox breaks non-solid",
+  "revervox_mod.configuration.revervoxBreakNonSolid.tooltip": "Whether revervox breaks non-solid blocks such as torches and leaves",
 
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",
