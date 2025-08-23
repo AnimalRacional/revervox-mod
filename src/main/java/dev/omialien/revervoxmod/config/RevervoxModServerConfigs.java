@@ -6,7 +6,6 @@ public class RevervoxModServerConfigs {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_MAX_AUDIOS_TO_PLAY;
-    // TODO grace periods não aparecem na config screen, talvez por serem floats
     public static final ForgeConfigSpec.ConfigValue<Double> REVERVOX_AFTER_SPEAK_GRACE_PERIOD;
     public static final ForgeConfigSpec.ConfigValue<Double> REVERVOX_BAT_AFTER_SPAWN_GRACE_PERIOD;
     public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_BAT_SPAWN_CHANCE;

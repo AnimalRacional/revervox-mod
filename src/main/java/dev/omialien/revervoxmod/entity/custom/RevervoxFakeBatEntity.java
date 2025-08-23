@@ -12,13 +12,14 @@ import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
 import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.FlyingMob;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -26,6 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -34,6 +36,7 @@ import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IRevervoxEntity, SpeakingEntity {
@@ -42,9 +45,10 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
     private int ticksLeft = 3;
     private final float MOVE_SPEED = 0.6f;
     private Vec3 movement = new Vec3(0,0,MOVE_SPEED);
-    private Player target;
     private int ticksToDie = 20;
     private boolean hasPlayedSpawnSound = false;
+    public static final EntityDataAccessor<Optional<UUID>> TARGET_ACCESSOR = SynchedEntityData.defineId(RevervoxFakeBatEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+    private Player targetCache;
 
     public RevervoxFakeBatEntity(EntityType<? extends FlyingMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -52,8 +56,32 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
         this.noPhysics = true;
     }
 
+    @Nullable
+    @Override
+    public LivingEntity getTarget() {
+        UUID tgt = entityData.get(TARGET_ACCESSOR).orElse(null);
+        if(targetCache != null && tgt != null && targetCache.getUUID().equals(tgt)){
+            return targetCache;
+        }
+        if(tgt == null){ return null; }
+        targetCache = level().getPlayerByUUID(tgt);
+        return targetCache;
+    }
+
+    private Player getPlayerTarget(){
+        LivingEntity t = getTarget();
+        return t instanceof Player ta ? ta : null;
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(TARGET_ACCESSOR, Optional.empty());
+    }
+
     public void setTarget(Player player){
-        this.target = player;
+        RevervoxMod.LOGGER.debug("setting target! {}", player.getName());
+        this.entityData.set(TARGET_ACCESSOR, Optional.of(player.getUUID()));
     }
 
     @Override
@@ -73,6 +101,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
 
     @Override
     public void tick() {
+        Player target = getPlayerTarget();
         if (target != null && target.isAlive()){
             if(!this.level().isClientSide() && !hasPlayedSpawnSound){
                 RevervoxPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) target), new AddSoundInstancePacket(this.getId(), SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundSource.HOSTILE, false));
@@ -92,6 +121,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
         setDeltaMovement(movement);
         ticksToDie--;
         if(ticksToDie <= 0){
+            Player target = getPlayerTarget();
             if (target != null && target.isAlive()){
                 target.hurt(this.level().damageSources().mobAttack(this), 1);
             }
@@ -102,21 +132,28 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
 
     @Override
     public void onRemovedFromWorld() {
-        ParticleManager.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), this);
+        if(!this.isInvisible()){
+            ParticleManager.addParticlesAroundSelf(ParticleRegistry.REVERVOX_PARTICLES.get(), this);
+        }
         super.onRemovedFromWorld();
     }
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
         if(!this.level().isClientSide() && pReason == RemovalReason.KILLED && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
+            Player target = getPlayerTarget();
+            if(target != null){
                 short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
                 if(audio != null){
                     AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(this.getX(), this.getY(), this.getZ()));
                     if(channel != null) {
+                        channel.setFilter((plr) -> ((ServerPlayer)plr.getPlayer()).is(target));
                         channel.setCategory(RevervoxMod.MOD_ID);
                         this.playAudio(audio, api, channel, new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
+                        api.createAudioPlayer(channel, api.createEncoder(), audio);
                     }
                 }
+            }
         }
         super.remove(pReason);
     }
@@ -162,11 +199,18 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
     }
 
     // TODO n funfa
-    @Override
-    public boolean isInvisibleTo(@NotNull Player pPlayer) {
-        if(target == null){ return false; }
-        return pPlayer != target;
 
+
+    @Override
+    public boolean isInvisible() {
+        if(level().isClientSide){
+            if(Minecraft.getInstance().player != null){
+                Player target = getPlayerTarget();
+                if(target == null){ return false; }
+                return !Minecraft.getInstance().player.getUUID().equals(target.getUUID());
+            }
+        }
+        return false;
     }
 
 
