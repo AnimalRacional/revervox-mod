@@ -214,15 +214,17 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     public void awardKillScore(@NotNull Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {
         if(pEntity instanceof Player player && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
             Vec3 loc = this.getEyePosition();
-            AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
-            if(channel == null){
-                RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
-            } else {
+            playPlayerAudio(player, api, () -> {
+                AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
+                if(channel == null){
+                    RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
+                    return null;
+                }
                 channel.setCategory(RevervoxMod.MOD_ID);
-                playPlayerAudio(player, api, channel, new AudioEffect().addRandomEffects());
-                this.remove(Entity.RemovalReason.DISCARDED);
-            }
-        }
+                return channel;
+            }, new AudioEffect().addRandomEffects());
+            this.remove(Entity.RemovalReason.DISCARDED);
+    }
         super.awardKillScore(pEntity, pScoreValue, pSource);
     }
 
