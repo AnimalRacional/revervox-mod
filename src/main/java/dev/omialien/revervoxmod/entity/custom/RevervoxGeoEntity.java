@@ -396,7 +396,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                                     }, 5);
                                     breakCooldown = 6;
                                 }
-                            } else if(RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get() && !blockstate.isSolid()){
+                            } else if(RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get() && (!blockstate.isSolid() || blockstate.is(BlockTags.LEAVES))){
                                 this.level().destroyBlock(blockpos, true, this);
                             }
                         }
