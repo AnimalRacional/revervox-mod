@@ -75,11 +75,13 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private AudioPlayer currentAudioPlayer;
     @Nullable
     private UUID persistentAngerTarget;
+    private int breakCooldown;
 
     public RevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         moveControl = new MMEntityMoveHelper(this, 90);
         firstSpeak = NOT_SPOKEN_YET;
+        breakCooldown = 0;
     }
 
     @Override
@@ -305,8 +307,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
-
-
             Vec3i offset = this.getDirection().getNormal();
             boolean isFacingSolid = !this.level().getBlockState(blockPosition().relative(getDirection())).isAir();
 
@@ -321,15 +321,19 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 this.setDeltaMovement(this.getDeltaMovement().scale(1.0D));
             }
 
-            this.setClimbing((this.horizontalCollision && this.getTarget() != null) && (isOffsetFacingTwoAboveSolid || !isFacingBelowSolid));
+            this.setClimbing((this.horizontalCollision && this.getTarget() != null) && (isOffsetFacingTwoAboveSolid || !isFacingBelowSolid) && (breakCooldown <= 0) && (this.getTarget().getY() > this.getY()));
             this.setSprinting(this.getTarget() != null);
         }
     }
 
     @Override
     public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
+        if(pTarget == null && getTarget() != null){
+            this.remove(RemovalReason.KILLED);
+        }
         super.setTarget(pTarget);
     }
+
     @Override
     public void updatePersistentAnger(@NotNull ServerLevel pServerLevel, boolean pUpdateAnger) {
         if (this.getTarget() == null || !this.hasLineOfSight(this.getTarget())) {
@@ -340,50 +344,66 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     @Override
     protected void customServerAiStep() {
         boolean targetDirectlyAboveThreeBlocks = this.getTarget() != null && this.getTarget().getY() - this.getY() >= 3.0D;
-        if (this.getTarget() != null && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks) {
+        if (this.getTarget() != null) {
             double playerDirectionOffset = (this.getTarget().getY() - this.getY());
             double offset = Double.compare(playerDirectionOffset, 0.0D);
             offset = offset < 0.0D ? -1.0D : offset == 0 ? 0.0D : 1.0D;
-            if(RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()){
-                this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0));
+            if(
+                    (RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get() ||
+                    RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get())
+            ){
+                // TODO the line of sight check can make it get stuck if it has the player in line of sight but not enough space to get to them
+                if(breakCooldown > 0){ breakCooldown--; }
+                this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0),
+                        RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()
+                        && (breakCooldown <= 0)
+                        && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks
+                );
+
             }
         }
 
         super.customServerAiStep();
     }
 
-    private boolean checkWalls(AABB pArea) {
+    private void checkWalls(AABB pArea, boolean breakSolid) {
         int i = Mth.floor(pArea.minX);
         int j = Mth.floor(pArea.minY);
         int k = Mth.floor(pArea.minZ);
         int l = Mth.floor(pArea.maxX);
         int i1 = Mth.floor(pArea.maxY);
         int j1 = Mth.floor(pArea.maxZ);
-        boolean flag = false;
-        boolean flag1 = false;
 
         for(int k1 = i; k1 <= l; ++k1) {
             for(int l1 = j; l1 <= i1; ++l1) {
+                if(getTarget() != null && l1 < getTarget().getY() && l1 <= this.getY()){
+                    continue;
+                }
                 for(int i2 = k; i2 <= j1; ++i2) {
                     BlockPos blockpos = new BlockPos(k1, l1, i2);
                     BlockState blockstate = this.level().getBlockState(blockpos);
                     if (!blockstate.isAir() && !blockstate.is(BlockTags.DRAGON_TRANSPARENT)) {
                         if (net.minecraftforge.common.ForgeHooks.canEntityDestroy(this.level(), blockpos, this)) {
-                            flag1 = this.level().destroyBlock(blockpos, true) || flag1;
-                        } else {
-                            flag = true;
+                            if (breakSolid && this.getY() <= level().getSeaLevel()) {
+                                if(this.getY() < 0 || blockstate.is(BlockTags.ANCIENT_CITY_REPLACEABLE)){
+                                    this.level().destroyBlock(blockpos, true, this);
+                                } else {
+                                    RevervoxMod.LOGGER.debug("tasking...");
+                                    RevervoxMod.TASKS.schedule(() -> {
+                                        if(this.isAlive() && !this.isRemoved()){
+                                            this.level().destroyBlock(blockpos, true, this);
+                                        }
+                                    }, 5);
+                                    breakCooldown = 6;
+                                }
+                            } else if(RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get() && !blockstate.isSolid()){
+                                this.level().destroyBlock(blockpos, true, this);
+                            }
                         }
                     }
                 }
             }
         }
-
-        if (flag1) {
-            BlockPos blockpos1 = new BlockPos(i + this.random.nextInt(l - i + 1), j + this.random.nextInt(i1 - j + 1), k + this.random.nextInt(j1 - k + 1));
-            this.level().levelEvent(2008, blockpos1, 0);
-        }
-
-        return flag;
     }
     @Override
     public boolean onClimbable() {
