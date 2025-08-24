@@ -3,6 +3,7 @@ package dev.omialien.revervoxmod.registries;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.items.AudioRepeatingItem;
 import dev.omialien.revervoxmod.items.RevervoxSword;
+import dev.omialien.revervoxmod.items.ThrowableAudioItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
@@ -24,6 +25,11 @@ public class ItemRegistry {
     public static final RegistryObject<AudioRepeatingItem> REVERVOX_VOICE_BOX = REGISTRY.register(
             "revervox_voice_box",
             () -> new AudioRepeatingItem(new Item.Properties().stacksTo(1))
+    );
+
+    public static final RegistryObject<ThrowableAudioItem> THROWABLE_AUDIO_ITEM = REGISTRY.register(
+            "throwable_audio_item",
+            () -> new ThrowableAudioItem(new Item.Properties().stacksTo(16))
     );
     public static final RegistryObject<Item> REVERVOX_EAR = REGISTRY.register(
             "revervox_ear",
