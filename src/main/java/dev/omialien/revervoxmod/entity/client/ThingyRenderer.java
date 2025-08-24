@@ -20,7 +20,7 @@ public class ThingyRenderer extends MobRenderer<ThingyEntity, ThingyModel<Thingy
     @Override
     @NotNull
     public ResourceLocation getTextureLocation(@NotNull ThingyEntity pEntity) {
-        return ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "textures/entity/thingy.png");
+        return new ResourceLocation(RevervoxMod.MOD_ID, "textures/entity/thingy.png");
     }
 
     @Override

@@ -126,7 +126,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
-
     }
 
     protected void addBehaviourGoals() {

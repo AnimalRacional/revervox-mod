@@ -20,7 +20,7 @@ public class SoundRegistry {
     public static final RegistryObject<SoundEvent> REVERVOX_BAT_ALERT = registerSound("revervox_bat_alert");
 
     private static RegistryObject<SoundEvent> registerSound(String name){
-        return REGISTRY.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, name)));
+        return REGISTRY.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(RevervoxMod.MOD_ID, name)));
     }
 
     public static void register(IEventBus bus){

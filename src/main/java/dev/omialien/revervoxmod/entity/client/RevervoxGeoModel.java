@@ -7,7 +7,7 @@ import software.bernie.geckolib.model.DefaultedEntityGeoModel;
 
 public class RevervoxGeoModel extends DefaultedEntityGeoModel<RevervoxGeoEntity> {
     public RevervoxGeoModel() {
-        super(ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox"));
+        super(new ResourceLocation(RevervoxMod.MOD_ID, "revervox"));
     }
 }
 

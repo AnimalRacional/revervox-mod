@@ -6,5 +6,5 @@ import net.minecraft.resources.ResourceLocation;
 
 public class ModModelLayers {
     public static final ModelLayerLocation THINGY_LAYER = new ModelLayerLocation(
-            ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "thingy_layer"), "main");
+            new ResourceLocation(RevervoxMod.MOD_ID, "thingy_layer"), "main");
 }

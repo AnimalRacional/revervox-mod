@@ -18,10 +18,11 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
@@ -32,26 +33,32 @@ public class RevervoxMod {
     public static final LevelResource AUDIO_DIRECTORY = new LevelResource("player_audios");
     final public static TaskScheduler TASKS = new TaskScheduler();
 
-    public RevervoxMod(FMLJavaModLoadingContext context) {
-        MinecraftForge.EVENT_BUS.addListener(this::setup);
-        MinecraftForge.EVENT_BUS.register(this);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new ClientForgeEventBus()));
-        MinecraftForge.EVENT_BUS.register(new CommonForgeEventBus());
-
-        EntityRegistry.register(context.getModEventBus());
-        SoundRegistry.register(context.getModEventBus());
-        ItemRegistry.register(context.getModEventBus());
-        CreativeTabRegistry.register(context.getModEventBus());
-        ParticleRegistry.register(context.getModEventBus());
-
-        RevervoxPacketHandler.registerPackets();
-
+    public RevervoxMod(){
+        LOGGER.warn("Old forge version!");
+        commonSetup(FMLJavaModLoadingContext.get().getModEventBus());
+        ModLoadingContext context = ModLoadingContext.get();
         context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox-client.toml");
         context.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC, "revervox-server.toml");
     }
 
-    private void setup(FMLCommonSetupEvent event) {
-        LOGGER.debug("Setting up Revervox Mod");
+    public RevervoxMod(FMLJavaModLoadingContext context) {
+        commonSetup(context.getModEventBus());
+        context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox-client.toml");
+        context.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC, "revervox-server.toml");
+    }
+
+    private void commonSetup(IEventBus bus){
+        MinecraftForge.EVENT_BUS.register(this);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> MinecraftForge.EVENT_BUS.register(new ClientForgeEventBus()));
+        MinecraftForge.EVENT_BUS.register(new CommonForgeEventBus());
+
+        EntityRegistry.register(bus);
+        SoundRegistry.register(bus);
+        ItemRegistry.register(bus);
+        CreativeTabRegistry.register(bus);
+        ParticleRegistry.register(bus);
+
+        RevervoxPacketHandler.registerPackets();
     }
 
     public static void summonBatWave(Player player){
