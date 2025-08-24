@@ -2,7 +2,6 @@ package dev.omialien.revervoxmod.networking;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
-import dev.omialien.revervoxmod.networking.packets.PrivacyModePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -20,13 +19,6 @@ public class RevervoxPacketHandler {
 
     public static void registerPackets(){
         int id = 0;
-        INSTANCE.registerMessage(
-                id++,
-                PrivacyModePacket.class,
-                PrivacyModePacket::encode,
-                PrivacyModePacket::decode,
-                PrivacyModePacket::handle
-        );
         INSTANCE.registerMessage(
                 id++,
                 AddSoundInstancePacket.class,

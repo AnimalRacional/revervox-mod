@@ -1,7 +1,6 @@
 package dev.omialien.revervoxmod;
 
 import com.mojang.logging.LogUtils;
-import dev.omialien.revervoxmod.config.RevervoxModClientConfigs;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.events.ClientForgeEventBus;
@@ -37,13 +36,11 @@ public class RevervoxMod {
         LOGGER.warn("Old forge version!");
         commonSetup(FMLJavaModLoadingContext.get().getModEventBus());
         ModLoadingContext context = ModLoadingContext.get();
-        context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox-client.toml");
         context.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC, "revervox-server.toml");
     }
 
     public RevervoxMod(FMLJavaModLoadingContext context) {
         commonSetup(context.getModEventBus());
-        context.registerConfig(ModConfig.Type.CLIENT, RevervoxModClientConfigs.SPEC, "revervox-client.toml");
         context.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC, "revervox-server.toml");
     }
 
