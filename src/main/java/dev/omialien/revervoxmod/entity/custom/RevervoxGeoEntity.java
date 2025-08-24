@@ -46,6 +46,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
@@ -383,13 +384,12 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 for(int i2 = k; i2 <= j1; ++i2) {
                     BlockPos blockpos = new BlockPos(k1, l1, i2);
                     BlockState blockstate = this.level().getBlockState(blockpos);
-                    if (!blockstate.isAir() && !blockstate.is(BlockTags.DRAGON_TRANSPARENT)) {
+                    if (!blockstate.isAir() && !blockstate.is(BlockTags.DRAGON_TRANSPARENT) && (!blockstate.is(BlockTags.DRAGON_IMMUNE) || blockstate.is(Blocks.IRON_BARS))) {
                         if (net.minecraftforge.common.ForgeHooks.canEntityDestroy(this.level(), blockpos, this)) {
                             if (breakSolid && this.getY() <= level().getSeaLevel()) {
                                 if(this.getY() < 0 || blockstate.is(BlockTags.ANCIENT_CITY_REPLACEABLE)){
                                     this.level().destroyBlock(blockpos, true, this);
                                 } else {
-                                    RevervoxMod.LOGGER.debug("tasking...");
                                     RevervoxMod.TASKS.schedule(() -> {
                                         if(this.isAlive() && !this.isRemoved()){
                                             this.level().destroyBlock(blockpos, true, this);
