@@ -25,7 +25,6 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
     }
 
     public boolean canUse() {
-        RevervoxMod.LOGGER.debug("canuse");
         int i = this.mob.getLastHurtByMobTimestamp();
         LivingEntity livingentity = this.mob.getLastHurtByMob();
         if (i != this.timestamp && livingentity != null) {
