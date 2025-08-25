@@ -1,5 +1,6 @@
 package dev.omialien.revervoxmod.entity.goals;
 
+import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
@@ -24,19 +25,25 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
     }
 
     public boolean canUse() {
+        RevervoxMod.LOGGER.debug("canuse");
         int i = this.mob.getLastHurtByMobTimestamp();
         LivingEntity livingentity = this.mob.getLastHurtByMob();
         if (i != this.timestamp && livingentity != null) {
+            RevervoxMod.LOGGER.debug("timestamp + entity;");
             if (livingentity.getType() == EntityType.PLAYER && this.mob.level().getGameRules().getBoolean(GameRules.RULE_UNIVERSAL_ANGER)) {
+                RevervoxMod.LOGGER.debug("universal anger");
                 return false;
             } else {
+                boolean found = false;
                 for(Class<?> oclass : this.toAllowDamage) {
-                    if (!oclass.isAssignableFrom(livingentity.getClass())) {
-                        return false;
+                    if (oclass.isAssignableFrom(livingentity.getClass())) {
+                        found = true;
+                        break;
                     }
                 }
-
-                return this.canAttack(livingentity, HURT_BY_TARGETING);
+                if(found){
+                    return this.canAttack(livingentity, HURT_BY_TARGETING);
+                }else { return false; }
             }
         } else {
             return false;
@@ -45,6 +52,7 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
 
     @Override
     public void start() {
+        RevervoxMod.LOGGER.debug("raah");
         if (!this.revervox.isAngry()){
             revervox.level().playSound(null, revervox.getX(), revervox.getY(), revervox.getZ(), SoundRegistry.REVERVOX_ALERT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
             RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this.mob),
