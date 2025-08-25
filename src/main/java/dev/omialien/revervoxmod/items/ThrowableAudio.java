@@ -75,6 +75,12 @@ public class ThrowableAudio extends ThrowableItemProjectile {
                 RevervoxMod.LOGGER.debug("No audio to play for throwable");
             }
         }
+        if (!(entity instanceof Player) && entity instanceof LivingEntity livingEntity && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api) {
+            short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
+            if(audio != null){
+                playAudio(livingEntity.position(), api, audio);
+            }
+        }
     }
 
     protected void onHit(@NotNull HitResult pResult) {
