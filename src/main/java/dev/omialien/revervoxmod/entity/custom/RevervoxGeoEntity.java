@@ -40,10 +40,12 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -74,6 +76,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
     private AudioPlayer currentAudioPlayer;
+    private Vec3 angerLocation;
     @Nullable
     private UUID persistentAngerTarget;
     private int breakCooldown;
@@ -119,20 +122,20 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     @Override
     protected void registerGoals() {
         RevervoxMod.LOGGER.debug("Revervox Spawned");
-        // So it doesn't sink in the water
-        this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 0.4D, Ingredient.of(Items.MUSIC_DISC_13), false));
-        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(0, new FloatGoal(this)); // So it doesn't sink in the water
+        this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
+        this.goalSelector.addGoal(4, new TemptGoal(this, 0.4D, Ingredient.of(Items.MUSIC_DISC_13), false));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5D));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
     }
 
     protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
+        this.goalSelector.addGoal(1, new FollowAngerLocationGoal(this));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
-        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, Player.class));
+        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, Player.class, IronGolem.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 
@@ -144,7 +147,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
                 .add(Attributes.ATTACK_DAMAGE, 14D)
                 .add(Attributes.ATTACK_SPEED, 0.3D)
-                .add(Attributes.MOVEMENT_SPEED, 0.5D);
+                .add(Attributes.MOVEMENT_SPEED, 0.5D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
     }
 
     @Override
@@ -266,6 +270,18 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         return false;
     }
 
+    public Vec3 getAngerLocation(){
+        return this.angerLocation;
+    }
+
+    public void setAngerLocation(Vec3 hitLocation) {
+        this.angerLocation = hitLocation;
+    }
+
+    public boolean hasAngerLocation(){
+        return this.angerLocation != null;
+    }
+
     public boolean teleportTowards(Entity pTarget) {
         Vec3 vec3 = new Vec3(this.getX() - pTarget.getX(), this.getY(0.5D) - pTarget.getEyeY(), this.getZ() - pTarget.getZ());
         vec3 = vec3.normalize();
@@ -353,13 +369,14 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             if(
                     (RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get() ||
                     RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get())
+                    && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
             ){
                 // TODO the line of sight check can make it get stuck if it has the player in line of sight but not enough space to get to them
                 if(breakCooldown > 0){ breakCooldown--; }
                 this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0),
                         RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()
                         && (breakCooldown <= 0)
-                        && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks
+                        && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks || this.getNavigation().isStuck()
                 );
 
             }
@@ -466,4 +483,36 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
         }
     }
+
+    static class FollowAngerLocationGoal extends Goal {
+        private final RevervoxGeoEntity revervox;
+        private Vec3 targetLocation;
+        public FollowAngerLocationGoal(RevervoxGeoEntity revervox) {
+            this.revervox = revervox;
+    }
+
+        @Override
+        public boolean canUse() {
+            if (this.revervox.hasAngerLocation()){
+                RevervoxMod.LOGGER.debug("Revervox has anger location, starting...");
+                this.targetLocation = this.revervox.getAngerLocation();
+                this.revervox.setAngerLocation(null);
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean canContinueToUse() {
+            return this.revervox.position().distanceToSqr(targetLocation) < 1.0D;
+        }
+
+        @Override
+        public void start() {
+            this.revervox.getNavigation().moveTo( this.revervox.getNavigation().createPath(targetLocation.x, targetLocation.y, targetLocation.z, 0), this.revervox.getAttribute(Attributes.MOVEMENT_SPEED).getValue());
+            RevervoxMod.LOGGER.debug("Setting anger location to {}", targetLocation);
+            super.start();
+        }
+    }
+
 }

@@ -13,6 +13,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Snowball;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -29,6 +31,7 @@ import java.util.UUID;
 
 public class ThrowableAudio extends ThrowableItemProjectile {
     private boolean hasPlayed = false;
+    private final int CHANNEL_DISTANCE = 50;
 
     public ThrowableAudio(EntityType<? extends Snowball> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -82,6 +85,12 @@ public class ThrowableAudio extends ThrowableItemProjectile {
                 short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
                 if(audio != null){
                     playAudio(hitLocation, api, audio);
+
+                    AABB aabb = new AABB(hitLocation.x - CHANNEL_DISTANCE, hitLocation.y - CHANNEL_DISTANCE, hitLocation.z - CHANNEL_DISTANCE, hitLocation.x + CHANNEL_DISTANCE, hitLocation.y + CHANNEL_DISTANCE, hitLocation.z + CHANNEL_DISTANCE);
+                    this.level().getNearbyEntities(RevervoxGeoEntity.class, TargetingConditions.DEFAULT, null, aabb).forEach(entity -> {
+                        entity.setAngerLocation(hitLocation);
+                    });
+
                 } else {
                     RevervoxMod.LOGGER.debug("No audio to play for throwable");
                 }
@@ -95,7 +104,7 @@ public class ThrowableAudio extends ThrowableItemProjectile {
             LocationalAudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(loc.x, loc.y, loc.z));
             if(channel != null) {
                 channel.setCategory(RevervoxMod.MOD_ID);
-                channel.setDistance(10);
+                channel.setDistance(CHANNEL_DISTANCE);
                 new AudioPlayer(audio, api, channel).start();
                 hasPlayed = true;
 
