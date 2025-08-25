@@ -48,11 +48,14 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fluids.IFluidBlock;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.constant.DefaultAnimations;
@@ -320,6 +323,21 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     @Override
     public float getStepHeight() {
         return 1;
+    }
+
+    private boolean isFluid(Block block){
+        return block instanceof LiquidBlock || block instanceof IFluidBlock;
+    }
+
+    @Override
+    protected boolean isAffectedByFluids() {
+        return isFluid(level().getBlockState(blockPosition().above()).getBlock())
+                || isFluid(level().getBlockState(blockPosition().above().above()).getBlock());
+    }
+
+    @Override
+    public boolean isPushedByFluid() {
+        return false;
     }
 
     public void tick() {
