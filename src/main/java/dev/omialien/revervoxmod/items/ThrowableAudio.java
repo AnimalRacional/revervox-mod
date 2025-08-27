@@ -65,22 +65,30 @@ public class ThrowableAudio extends ThrowableItemProjectile {
     protected void onHitEntity(@NotNull EntityHitResult pResult) {
         super.onHitEntity(pResult);
         Entity entity = pResult.getEntity();
+
         int i = entity instanceof RevervoxGeoEntity ? 3 : 0;
         entity.hurt(this.damageSources().thrown(this, this.getOwner()), (float)i);
-        if (entity instanceof Player player && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api) {
-            short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(player.getUUID(), false);
-            if(audio != null){
-                playAudio(player.position(), api, audio);
-            } else {
-                RevervoxMod.LOGGER.debug("No audio to play for throwable");
+
+        if (!this.level().isClientSide) {
+            if (RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api) {
+                if (!hasPlayed) {
+                    if (entity instanceof Player player) {
+                        short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(player.getUUID(), false);
+                        if(audio != null){
+                            playAudio(player.position(), api, audio);
+                        } else {
+                            RevervoxMod.LOGGER.debug("No audio to play for throwable");
+                        }
+                    } else if(entity instanceof LivingEntity livingEntity) {
+                        short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
+                        if(audio != null){
+                            playAudio(livingEntity.position(), api, audio);
+                        }
+                    }
+                }
             }
         }
-        if (!(entity instanceof Player) && entity instanceof LivingEntity livingEntity && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api) {
-            short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
-            if(audio != null){
-                playAudio(livingEntity.position(), api, audio);
-            }
-        }
+
     }
 
     protected void onHit(@NotNull HitResult pResult) {
