@@ -42,14 +42,12 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -142,7 +140,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.goalSelector.addGoal(1, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
         this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
-        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, Player.class, IronGolem.class));
+        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 
@@ -387,7 +385,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             if(
                     (RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get() ||
                     RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get())
-                    && this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)
             ){
                 // TODO the line of sight check can make it get stuck if it has the player in line of sight but not enough space to get to them
                 if(breakCooldown > 0){ breakCooldown--; }

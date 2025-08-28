@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class RandomRepeatGoal extends Goal {
     private final RevervoxGeoEntity mob;
-    public static final int CHANNEL_DISTANCE = 50;
+    private static final int CHANNEL_DISTANCE = 50;
     private EntityAudioChannel channel;
     private int audiosPlayed = 0;
     private boolean canSpeak = true;
