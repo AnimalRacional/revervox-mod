@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class RandomRepeatGoal extends Goal {
     private final RevervoxGeoEntity mob;
-    private static final int CHANNEL_DISTANCE = 50;
+    public static final int CHANNEL_DISTANCE = 50;
     private EntityAudioChannel channel;
     private int audiosPlayed = 0;
     private boolean canSpeak = true;
@@ -36,7 +36,7 @@ public class RandomRepeatGoal extends Goal {
     private AudioChannel getChannel(){
         if (channel == null && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
             UUID channelID = UUID.randomUUID();
-            channel = createChannel(api, channelID, RevervoxMod.MOD_ID, this.mob);
+            channel = createChannel(api, channelID, this.mob);
         }
         return channel;
     }
@@ -127,13 +127,13 @@ public class RandomRepeatGoal extends Goal {
         audiosPlayed++;
     }
 
-    private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, String category, Entity nearestEntity) {
+    private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, Entity nearestEntity) {
         EntityAudioChannel channel = api.createEntityAudioChannel(channelID, api.fromEntity(nearestEntity));
         if (channel == null) {
             RevervoxMod.LOGGER.error("Couldn't create channel");
             return null;
         }
-        channel.setCategory(category);
+        channel.setCategory(RevervoxMod.MOD_ID);
         channel.setDistance(RandomRepeatGoal.CHANNEL_DISTANCE);
         return channel;
     }

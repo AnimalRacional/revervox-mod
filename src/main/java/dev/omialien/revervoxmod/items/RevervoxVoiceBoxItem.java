@@ -18,10 +18,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class AudioRepeatingItem extends Item {
+public class RevervoxVoiceBoxItem extends Item {
     private int audioDuration;
 
-    public AudioRepeatingItem(Properties pProperties) {
+    public RevervoxVoiceBoxItem(Properties pProperties) {
         super(pProperties);
         audioDuration = 0;
     }

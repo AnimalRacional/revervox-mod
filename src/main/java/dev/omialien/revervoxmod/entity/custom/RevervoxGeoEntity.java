@@ -6,7 +6,7 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
 import dev.omialien.revervoxmod.entity.ai.RVClimbNavigation;
-import dev.omialien.revervoxmod.entity.goals.FollowAngerLocationGoal;
+import dev.omialien.revervoxmod.entity.goals.EatFoodGoal;
 import dev.omialien.revervoxmod.entity.goals.RandomRepeatGoal;
 import dev.omialien.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
@@ -27,6 +27,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -42,8 +43,10 @@ import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.GameRules;
@@ -136,7 +139,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(1, new FollowAngerLocationGoal(this));
+        this.goalSelector.addGoal(1, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
         this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, Player.class, IronGolem.class));
@@ -219,6 +222,14 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     @Override
+    public @NotNull ItemStack eat(Level pLevel, @NotNull ItemStack pFood) {
+        pLevel.playSound(null, this.getX(), this.getY(), this.getZ(), this.getEatingSound(pFood), SoundSource.NEUTRAL, 1.0F, 1.0F + (pLevel.random.nextFloat() - pLevel.random.nextFloat()) * 0.4F);
+
+        this.gameEvent(GameEvent.EAT);
+        return pFood;
+    }
+
+    @Override
     public void awardKillScore(@NotNull Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {
         if(pEntity instanceof Player player && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
             Vec3 loc = this.getEyePosition();
@@ -272,18 +283,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             } else return false;
         }
         return false;
-    }
-
-    public Vec3 getAngerLocation(){
-        return this.angerLocation;
-    }
-
-    public void setAngerLocation(Vec3 hitLocation) {
-        this.angerLocation = hitLocation;
-    }
-
-    public boolean hasAngerLocation(){
-        return this.angerLocation != null;
     }
 
     public boolean teleportTowards(Entity pTarget) {

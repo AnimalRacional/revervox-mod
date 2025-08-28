@@ -24,7 +24,7 @@ public class CreativeTabRegistry {
                 output.accept(ItemRegistry.REVERVOX_EAR.get());
                 output.accept(ItemRegistry.REVERVOX_SWORD.get());
                 output.accept(ItemRegistry.REVERVOX_BAT_TOOTH.get());
-                output.accept(ItemRegistry.THROWABLE_AUDIO_ITEM.get());
+                output.accept(ItemRegistry.REVERVOX_BAIT.get());
             }).build());
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);

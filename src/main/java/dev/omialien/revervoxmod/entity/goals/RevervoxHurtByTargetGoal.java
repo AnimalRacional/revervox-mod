@@ -28,9 +28,9 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
         int i = this.mob.getLastHurtByMobTimestamp();
         LivingEntity livingentity = this.mob.getLastHurtByMob();
         if (i != this.timestamp && livingentity != null) {
-            RevervoxMod.LOGGER.debug("timestamp + entity;");
+            //RevervoxMod.LOGGER.debug("timestamp + entity;");
             if (livingentity.getType() == EntityType.PLAYER && this.mob.level().getGameRules().getBoolean(GameRules.RULE_UNIVERSAL_ANGER)) {
-                RevervoxMod.LOGGER.debug("universal anger");
+                //RevervoxMod.LOGGER.debug("universal anger");
                 return false;
             } else {
                 boolean found = false;
