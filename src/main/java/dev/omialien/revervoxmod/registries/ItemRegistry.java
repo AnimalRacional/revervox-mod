@@ -1,7 +1,8 @@
 package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.items.AudioRepeatingItem;
+import dev.omialien.revervoxmod.items.RevervoxBaitItem;
+import dev.omialien.revervoxmod.items.RevervoxVoiceBoxItem;
 import dev.omialien.revervoxmod.items.RevervoxSword;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
@@ -20,13 +21,18 @@ public class ItemRegistry {
             .register("revervox_bat_spawn_egg",
                     () -> new DeferredSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
                             new Item.Properties()));
-    public static final DeferredItem<AudioRepeatingItem> REVERVOX_VOICE_BOX = REGISTRY.register(
+    public static final DeferredItem<RevervoxVoiceBoxItem> REVERVOX_VOICE_BOX = REGISTRY.register(
             "revervox_voice_box",
-            () -> new AudioRepeatingItem(new Item.Properties().stacksTo(1))
+            () -> new RevervoxVoiceBoxItem(new Item.Properties().stacksTo(1))
     );
     public static final DeferredItem<Item> REVERVOX_EAR = REGISTRY.register(
             "revervox_ear",
             () -> new Item(new Item.Properties())
+    );
+
+    public static final DeferredItem<RevervoxBaitItem> REVERVOX_BAIT = REGISTRY.register(
+            "revervox_bait",
+            () -> new RevervoxBaitItem(new Item.Properties().stacksTo(16))
     );
 
     public static final DeferredItem<SwordItem> REVERVOX_SWORD = REGISTRY.register(

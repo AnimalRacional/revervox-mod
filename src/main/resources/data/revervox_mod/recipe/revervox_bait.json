@@ -1,0 +1,16 @@
+{
+    "type": "minecraft:crafting_shapeless",
+    "category": "misc",
+    "ingredients": [
+        {
+            "item": "minecraft:fermented_spider_eye"
+        },
+        {
+            "item": "minecraft:egg"
+        }
+    ],
+    "result": {
+        "count": 1,
+        "id": "revervox_mod:revervox_bait"},
+    "show_notification": true
+}

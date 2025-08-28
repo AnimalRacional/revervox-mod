@@ -6,6 +6,7 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
 import dev.omialien.revervoxmod.entity.ai.RVClimbNavigation;
+import dev.omialien.revervoxmod.entity.goals.EatFoodGoal;
 import dev.omialien.revervoxmod.entity.goals.RandomRepeatGoal;
 import dev.omialien.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
@@ -26,6 +27,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -40,12 +42,18 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
@@ -123,19 +131,20 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         RevervoxMod.LOGGER.debug("Revervox Spawned");
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(3, new TemptGoal(this, 0.4D, Ingredient.of(Items.MUSIC_DISC_13), false));
-        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
+        this.goalSelector.addGoal(4, new TemptGoal(this, 0.4D, Ingredient.of(Items.MUSIC_DISC_13), false));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5D));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
 
     }
 
     protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 0.7D, false));
+        this.goalSelector.addGoal(1, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
-        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, Player.class));
+        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
     }
 
@@ -213,6 +222,15 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         }
         return super.hurt(pSource, amount);
     }
+
+    @Override
+    public @NotNull ItemStack eat(Level level, @NotNull ItemStack food, @NotNull FoodProperties foodProperties) {
+        level.playSound(null, this.getX(), this.getY(), this.getZ(), this.getEatingSound(food), SoundSource.NEUTRAL, 1.0F, 1.0F + (level.random.nextFloat() - level.random.nextFloat()) * 0.4F);
+
+        this.gameEvent(GameEvent.EAT);
+        return food;
+    }
+
 
     @Override
     public void awardKillScore(@NotNull Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {
@@ -302,6 +320,20 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             return false;
         }
     }
+    private boolean isFluid(Block block){
+        return block instanceof LiquidBlock; //TODO verificar se e prciso instance of IFluidBlock
+    }
+
+    @Override
+    protected boolean isAffectedByFluids() {
+        return isFluid(level().getBlockState(blockPosition().above()).getBlock())
+                || isFluid(level().getBlockState(blockPosition().above().above()).getBlock());
+    }
+
+    @Override
+    public boolean isPushedByFluid() {
+        return false;
+    }
 
     public void tick() {
         super.tick();
@@ -382,7 +414,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 for(int i2 = k; i2 <= j1; ++i2) {
                     BlockPos blockpos = new BlockPos(k1, l1, i2);
                     BlockState blockstate = this.level().getBlockState(blockpos);
-                    if (!blockstate.isAir() && !blockstate.is(BlockTags.DRAGON_TRANSPARENT)) {
+                    if (!blockstate.isAir() && !blockstate.is(BlockTags.DRAGON_TRANSPARENT) && (!blockstate.is(BlockTags.DRAGON_IMMUNE) || blockstate.is(Blocks.IRON_BARS))) {
                         if (CommonHooks.canEntityDestroy(this.level(), blockpos, this)) {
                             if (breakSolid && this.getY() <= level().getSeaLevel()) {
                                 if(this.getY() < 0 || blockstate.is(BlockTags.ANCIENT_CITY_REPLACEABLE)){

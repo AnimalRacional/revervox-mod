@@ -29,13 +29,16 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
             if (livingentity.getType() == EntityType.PLAYER && this.mob.level().getGameRules().getBoolean(GameRules.RULE_UNIVERSAL_ANGER)) {
                 return false;
             } else {
+                boolean found = false;
                 for(Class<?> oclass : this.toAllowDamage) {
-                    if (!oclass.isAssignableFrom(livingentity.getClass())) {
-                        return false;
+                    if (oclass.isAssignableFrom(livingentity.getClass())) {
+                        found = true;
+                        break;
                     }
                 }
-
-                return this.canAttack(livingentity, HURT_BY_TARGETING);
+                if(found){
+                    return this.canAttack(livingentity, HURT_BY_TARGETING);
+                }else { return false; }
             }
         } else {
             return false;

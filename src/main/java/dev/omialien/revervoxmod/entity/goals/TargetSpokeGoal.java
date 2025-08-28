@@ -2,7 +2,6 @@ package dev.omialien.revervoxmod.entity.goals;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.HearingEntity;
-import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -39,7 +38,7 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
             //ExampleMod.LOGGER.debug("isSpeakingAtMe: " + isSpeakingAtMe + ", isAngryAt: " + isAngryAt + ", hasIndirectPassenger: " + hasIndirectPassenger);
             return (isSpeakingAtMe || isAngryAt) && !hasIndirectPassenger;
         };
-        this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(this.isAngerInducing);
+        this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(this.isAngerInducing).ignoreLineOfSight();
     }
     public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay) {
         this(entity, pSelectionPredicate, soundToPlay, null);
