@@ -26,8 +26,6 @@ public class ItemRegistry {
             "revervox_voice_box",
             () -> new RevervoxVoiceBoxItem(new Item.Properties().stacksTo(1))
     );
-
-
     public static final RegistryObject<RevervoxBaitItem> REVERVOX_BAIT = REGISTRY.register(
             "revervox_bait",
             () -> new RevervoxBaitItem(new Item.Properties().stacksTo(16))
