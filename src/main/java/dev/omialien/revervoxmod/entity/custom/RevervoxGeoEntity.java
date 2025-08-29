@@ -39,11 +39,13 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
@@ -132,9 +134,10 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
         this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(4, new TemptGoal(this, 0.4D, Ingredient.of(Items.MUSIC_DISC_13), false));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(4, new TemptGoal(this, 0.4D, Ingredient.of(Items.SPIDER_EYE), false));
+        this.goalSelector.addGoal(5, new TemptGoal(this, 0.4D, Ingredient.of(Items.FERMENTED_SPIDER_EYE), false));
+        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.5D));
+        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
 
@@ -146,6 +149,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Spider.class, false));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
