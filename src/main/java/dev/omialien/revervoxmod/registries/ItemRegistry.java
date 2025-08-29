@@ -1,6 +1,7 @@
 package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.items.MegaphoneItem;
 import dev.omialien.revervoxmod.items.RevervoxBaitItem;
 import dev.omialien.revervoxmod.items.RevervoxVoiceBoxItem;
 import dev.omialien.revervoxmod.items.RevervoxSword;
@@ -28,6 +29,10 @@ public class ItemRegistry {
     public static final DeferredItem<Item> REVERVOX_EAR = REGISTRY.register(
             "revervox_ear",
             () -> new Item(new Item.Properties())
+    );
+    public static final DeferredItem<MegaphoneItem> MEGAPHONE = REGISTRY.register(
+            "megaphone",
+            () -> new MegaphoneItem(new Item.Properties())
     );
 
     public static final DeferredItem<RevervoxBaitItem> REVERVOX_BAIT = REGISTRY.register(
