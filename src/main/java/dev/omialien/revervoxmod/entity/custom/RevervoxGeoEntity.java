@@ -44,8 +44,7 @@ import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
@@ -81,7 +80,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);
-    private final RawAnimation REVERVO_CLIMB = RawAnimation.begin().thenLoop("move.climb");
+    private final RawAnimation REVERVOX_CLIMB = RawAnimation.begin().thenLoop("move.climb");
     private int remainingPersistentAngerTime;
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
@@ -109,7 +108,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
-                        return state.setAndContinue(REVERVO_CLIMB);
+                        return state.setAndContinue(REVERVOX_CLIMB);
                     }
 
                     state.resetCurrentAnimation();
@@ -149,7 +148,10 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Spider.class, false));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Spider.class, true));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, CaveSpider.class, true));
+        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, Silverfish.class, true));
+        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, Endermite.class, true));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -229,7 +231,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     public @NotNull ItemStack eat(Level level, @NotNull ItemStack food, @NotNull FoodProperties foodProperties) {
-        level.playSound(null, this.getX(), this.getY(), this.getZ(), this.getEatingSound(food), SoundSource.NEUTRAL, 1.0F, 1.0F + (level.random.nextFloat() - level.random.nextFloat()) * 0.4F);
+        level.playSound(null, this.getX(), this.getY(), this.getZ(), this.getEatingSound(food), SoundSource.HOSTILE, 1.0F, 1.0F + (level.random.nextFloat() - level.random.nextFloat()) * 0.4F);
 
         this.gameEvent(GameEvent.EAT);
         return food;
@@ -388,12 +390,11 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                     (RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get() ||
                             RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get())
             ){
-                // TODO the line of sight check can make it get stuck if it has the player in line of sight but not enough space to get to them
                 if(breakCooldown > 0){ breakCooldown--; }
                 this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0),
                         RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()
                                 && (breakCooldown <= 0)
-                                && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks
+                                && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks || this.getNavigation().isStuck()
                 );
 
             }
