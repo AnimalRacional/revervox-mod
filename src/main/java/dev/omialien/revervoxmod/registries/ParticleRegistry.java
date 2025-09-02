@@ -15,6 +15,8 @@ public class ParticleRegistry {
 
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> REVERVOX_PARTICLES =
             PARTICLE_TYPES.register("revervox", () -> new SimpleParticleType(true));
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> REVERVOX_SONIC_BOOM_PARTICLES =
+            PARTICLE_TYPES.register("revervox_sonic_boom", () -> new SimpleParticleType(true));
 
     public static void register(IEventBus eventBus) {
         PARTICLE_TYPES.register(eventBus);

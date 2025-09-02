@@ -1,11 +1,11 @@
 package dev.omialien.revervoxmod.items;
 
 import dev.omialien.revervoxmod.items.client.MegaphoneRenderer;
+import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
@@ -94,7 +94,7 @@ public class MegaphoneItem extends Item implements GeoItem {
         for(int j = 1; j < i; ++j) {
             Vec3 vec33 = vec3.add(vec32.scale(j));
             //level.explode(player, vec33.x, vec33.y, vec33.z, 2, Level.ExplosionInteraction.BLOCK );
-            ((ServerLevel) level).sendParticles(ParticleTypes.SONIC_BOOM, vec33.x, vec33.y, vec33.z, 1, 0.0, 0.0, 0.0, 0.0);
+            ((ServerLevel) level).sendParticles(ParticleRegistry.REVERVOX_SONIC_BOOM_PARTICLES.get(), vec33.x, vec33.y, vec33.z, 1, 0.0, 0.0, 0.0, 0.0);
             AABB currentParticleAABB = new AABB(new BlockPos((int) vec33.x, (int) vec33.y, (int) vec33.z)).inflate(2.0D, 2.0D, 2.0D);
             List<LivingEntity> nearbyEntities = level.getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, null, currentParticleAABB);
             entitiesToHit.addAll(nearbyEntities);

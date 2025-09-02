@@ -4,6 +4,7 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.client.*;
 import dev.omialien.revervoxmod.items.client.MegaphoneItemExtensions;
 import dev.omialien.revervoxmod.particle.custom.RevervoxParticles;
+import dev.omialien.revervoxmod.particle.custom.RevervoxSonicBoomParticle;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
@@ -51,5 +52,6 @@ public class ClientEventBus {
     public static void registerParticleFactories(final RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ParticleRegistry.REVERVOX_PARTICLES.get(),
                 RevervoxParticles.Provider::new);
+        event.registerSpriteSet(ParticleRegistry.REVERVOX_SONIC_BOOM_PARTICLES.get(), RevervoxSonicBoomParticle.Provider::new);
     }
 }
