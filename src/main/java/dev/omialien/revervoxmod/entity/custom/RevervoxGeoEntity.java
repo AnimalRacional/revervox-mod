@@ -148,16 +148,16 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Spider.class, true));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, CaveSpider.class, true));
-        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, Silverfish.class, true));
-        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, Endermite.class, true));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Spider.class, true, true));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, CaveSpider.class, true, true));
+        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, Silverfish.class, true, true));
+        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, Endermite.class, true, true));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createLivingAttributes()
                 .add(Attributes.MAX_HEALTH, 100.0D)
-                .add(Attributes.FOLLOW_RANGE, 50.0D)
+                .add(Attributes.FOLLOW_RANGE, 20.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
                 .add(Attributes.ATTACK_DAMAGE, 14D)
@@ -367,7 +367,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
-        if(pTarget == null && getTarget() != null){
+        if(pTarget == null && getTarget() != null && getTarget() instanceof Player){
             this.remove(RemovalReason.KILLED);
         }
         super.setTarget(pTarget);

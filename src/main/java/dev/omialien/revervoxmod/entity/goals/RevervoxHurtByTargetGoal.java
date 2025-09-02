@@ -8,6 +8,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -47,7 +48,7 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
 
     @Override
     public void start() {
-        if (!this.revervox.isAngry()){
+        if (!this.revervox.isAngry() && this.revervox.getTarget() instanceof Player) {
             revervox.level().playSound(null, revervox.getX(), revervox.getY(), revervox.getZ(), SoundRegistry.REVERVOX_ALERT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
             PacketDistributor.sendToPlayersTrackingEntity(this.mob, new SoundInstancePacket(
                     this.mob.getId(),
