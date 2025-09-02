@@ -100,7 +100,7 @@ public class MegaphoneItem extends Item implements GeoItem {
             entitiesToHit.addAll(nearbyEntities);
         }
         for (LivingEntity entity : entitiesToHit) {
-            if (entity.hurt(level.damageSources().sonicBoom(player), 10.0F)) {
+            if (entity != player && entity.hurt(level.damageSources().sonicBoom(player), 10.0F)) {
                 double d1 = 0.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
                 double d0 = 2.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
                 entity.push(vec32.x() * d0, vec32.y() * d1, vec32.z() * d0);
