@@ -26,7 +26,7 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
     private final TargetingConditions startAggroTargetConditions;
     private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
 
-    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, SoundEvent soundToLoop) {
+    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, SoundEvent soundToLoop, int range) {
         super(entity, Player.class, 10, false, false, pSelectionPredicate);
         this.entity = entity;
         this.soundToPlay = soundToPlay;
@@ -35,16 +35,15 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
             boolean isSpeakingAtMe = entity.isSpeakingAtMe((Player)player);
             boolean isAngryAt = entity.isAngryAt(player);
             boolean hasIndirectPassenger = entity.hasIndirectPassenger(player);
-            //ExampleMod.LOGGER.debug("isSpeakingAtMe: " + isSpeakingAtMe + ", isAngryAt: " + isAngryAt + ", hasIndirectPassenger: " + hasIndirectPassenger);
             return (isSpeakingAtMe || isAngryAt) && !hasIndirectPassenger;
         };
-        this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(this.isAngerInducing).ignoreLineOfSight();
+        this.startAggroTargetConditions = TargetingConditions.forCombat().range(range).selector(this.isAngerInducing).ignoreLineOfSight();
     }
-    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay) {
-        this(entity, pSelectionPredicate, soundToPlay, null);
+    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, int range) {
+        this(entity, pSelectionPredicate, soundToPlay, null, range);
     }
-    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate) {
-        this(entity, pSelectionPredicate, null, null);
+    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, int range) {
+        this(entity, pSelectionPredicate, null, range);
     }
     @Override
     public boolean canUse() {

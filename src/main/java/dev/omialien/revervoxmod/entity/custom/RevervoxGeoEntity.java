@@ -87,6 +87,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private AudioPlayer currentAudioPlayer;
     @Nullable
     private UUID persistentAngerTarget;
+    private int ticksToDisappear;
     private int breakCooldown;
 
     public RevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
@@ -94,6 +95,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         moveControl = new MMEntityMoveHelper(this, 90);
         firstSpeak = NOT_SPOKEN_YET;
         breakCooldown = 0;
+        ticksToDisappear = 0;
     }
 
     @Override
@@ -145,7 +147,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(1, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
         this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.7D, false));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Spider.class, true, true));
@@ -345,6 +347,17 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         super.tick();
         if (!this.level().isClientSide) {
 
+            if (this.getTarget() != null && this.getTarget() instanceof Player) {
+                if (!this.hasLineOfSight(this.getTarget())) {
+                    ticksToDisappear++;
+                }
+                if (ticksToDisappear > 500) {
+                    this.remove(Entity.RemovalReason.DISCARDED);
+                    //TODO som aqui para n ficar feio
+                    ticksToDisappear = 0;
+                }
+            }
+
 
             Vec3i offset = this.getDirection().getNormal();
             boolean isFacingSolid = !this.level().getBlockState(blockPosition().relative(getDirection())).isAir();
@@ -390,11 +403,13 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                     (RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get() ||
                             RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get())
             ){
+                //TODO fazer com que ja so parte non-solid blocos e adicionar um sonic boom do warden que talvez parta blocos com animacao e som
                 if(breakCooldown > 0){ breakCooldown--; }
+                RevervoxMod.LOGGER.debug("is Done: " + this.getNavigation().isDone());
                 this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0),
                         RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()
                                 && (breakCooldown <= 0)
-                                && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks || this.getNavigation().isStuck()
+                                && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks
                 );
 
             }
@@ -463,6 +478,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
         // TODO maybe see if a custom MobCategory is possible so revervox doesn't get affected by the normal mob cap
         // https://docs.neoforged.net/docs/entities/livingentity/#natural-spawning
+        // Check if there are other Revervox around
         if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
                 TargetingConditions.DEFAULT,
                 null,
@@ -475,7 +491,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         if (pLevel.getMaxLocalRawBrightness(pPos) < 4) {
             // Priority to spawn on alone player
             Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
-            if (player != null){
+            if (player != null) {
                 if (!RevervoxModServerConfigs.REVERVOX_ABOVE_GROUND.get() && player.position().y <= pLevel.getSeaLevel()){
                     if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100, 50, 100)).isEmpty()){
                         boolean flag = checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
@@ -490,7 +506,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         if (!RevervoxModServerConfigs.REVERVOX_ABOVE_GROUND.get() && pPos.getY() >= pLevel.getSeaLevel()) {
             return false;
         } else {
-            // Check if there are other Revervox around
+
             int i = pLevel.getMaxLocalRawBrightness(pPos);
             int j = 4;
             if (pRandom.nextBoolean()) {

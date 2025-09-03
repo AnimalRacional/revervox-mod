@@ -82,7 +82,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new RVBatSweepAttackGoal());
         this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 3.0F));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundEvents.BAT_LOOP));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundEvents.BAT_LOOP, 32));
         this.targetSelector.addGoal(2, new RVHurtByTargetGoal(this, Player.class));
         super.registerGoals();
     }
@@ -179,7 +179,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
         VoicechatServerApi api = (VoicechatServerApi) VoiceChatRecording.vcApi;
         short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
         if (audio != null) {
-            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
+            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.3f).makeReverb(0.5f, 160, 1));
         }
         super.remove(pReason);
     }
