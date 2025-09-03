@@ -66,10 +66,7 @@ import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -106,7 +103,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5),
+        controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5).triggerableAnim("Stun", RawAnimation.begin().then("misc.stun", Animation.LoopType.PLAY_ONCE)),
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
@@ -347,6 +344,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         super.tick();
         if (!this.level().isClientSide) {
 
+
             if (this.getTarget() != null && this.getTarget() instanceof Player) {
                 if (!this.hasLineOfSight(this.getTarget())) {
                     ticksToDisappear++;
@@ -405,7 +403,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             ){
                 //TODO fazer com que ja so parte non-solid blocos e adicionar um sonic boom do warden que talvez parta blocos com animacao e som
                 if(breakCooldown > 0){ breakCooldown--; }
-                RevervoxMod.LOGGER.debug("is Done: " + this.getNavigation().isDone());
                 this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0),
                         RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()
                                 && (breakCooldown <= 0)
@@ -466,6 +463,19 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
     public void setClimbing(boolean pClimbing) {
         this.entityData.set(CLIMBING_ACCESSOR, pClimbing);
+    }
+
+    public void stun(){
+        triggerAnim("Walk/Run/Idle", "Stun");
+        //TODO fix flutua no ar
+        this.setNoAi(true);
+        int STUN_ANIM_DURATION_TICKS = 55;
+        RevervoxMod.TASKS.schedule(this::resetStunned, STUN_ANIM_DURATION_TICKS);
+    }
+
+    private void resetStunned(){
+        RevervoxMod.LOGGER.debug("resetStunned");
+        this.setNoAi(false);
     }
 
 

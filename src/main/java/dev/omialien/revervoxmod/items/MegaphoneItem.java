@@ -1,5 +1,6 @@
 package dev.omialien.revervoxmod.items;
 
+import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.items.client.MegaphoneRenderer;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
@@ -104,6 +105,9 @@ public class MegaphoneItem extends Item implements GeoItem {
                 double d1 = 0.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
                 double d0 = 2.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
                 entity.push(vec32.x() * d0, vec32.y() * d1, vec32.z() * d0);
+                if (entity instanceof RevervoxGeoEntity revervox){
+                    revervox.stun();
+                }
             }
         }
         //TODO ver se da para fazer mais eficiente, versão com raycast aqui em baixo, apenas funciona se olhar diretamente para a entidade

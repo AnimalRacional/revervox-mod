@@ -77,7 +77,7 @@ public class CommonEventBus {
             List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
             if (!playerList.isEmpty()) {
                 int randomPlayer = new Random().nextInt(playerList.size());
-                if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel())) {
+                if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
                     RevervoxMod.LOGGER.debug("Player met requirements, starting bat event!");
                     RevervoxMod.summonBatWave(playerList.get(randomPlayer));
                 } else {
