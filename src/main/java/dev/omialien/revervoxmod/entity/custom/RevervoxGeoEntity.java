@@ -84,6 +84,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private AudioPlayer currentAudioPlayer;
     @Nullable
     private UUID persistentAngerTarget;
+    private int ticksToDisappear;
     private int breakCooldown;
 
     public RevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
@@ -91,6 +92,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         moveControl = new MMEntityMoveHelper(this, 90);
         firstSpeak = NOT_SPOKEN_YET;
         breakCooldown = 0;
+        ticksToDisappear = 0;
     }
 
     @Override
@@ -341,6 +343,20 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     public void tick() {
         super.tick();
         if (!this.level().isClientSide) {
+
+
+            if (this.getTarget() != null && this.getTarget() instanceof Player) {
+                if (!this.hasLineOfSight(this.getTarget())) {
+                    ticksToDisappear++;
+                }
+                if (ticksToDisappear > 500) {
+                    this.remove(Entity.RemovalReason.DISCARDED);
+                    //TODO som aqui para n ficar feio
+                    ticksToDisappear = 0;
+                }
+            }
+
+
             Vec3i offset = this.getDirection().getNormal();
             boolean isFacingSolid = !this.level().getBlockState(blockPosition().relative(getDirection())).isAir();
 
