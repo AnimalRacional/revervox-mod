@@ -7,7 +7,7 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
-import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
+import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -104,19 +104,13 @@ public class RandomRepeatGoal extends Goal {
                     }
                 }
                 RevervoxMod.LOGGER.debug("Playing audio from random player that is not near...");
-                Set<UUID> recordedPlayers = VoiceChatRecordingPlugin.getRecordedPlayers().keySet();
                 Set<UUID> nearbyPlayerUUIDs = nearbyPlayers.stream().map(Player::getUUID).collect(Collectors.toSet());
-                Set<UUID> otherPlayers = new HashSet<>(recordedPlayers);
-                otherPlayers.removeAll(nearbyPlayerUUIDs);
-
-                if (!otherPlayers.isEmpty()) {
-                    playRandomAudioFromSet(api, otherPlayers);
-                } else {
-                    RevervoxMod.LOGGER.debug("No other players to play sounds from");
-                    short[] audio = VoiceChatRecordingPlugin.getRandomAudio(true);
-                    if (audio == null) return;
-                    this.mob.playAudio(audio, api, getChannel(), new AudioEffect());
+                RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio((u) -> !nearbyPlayerUUIDs.contains(u), false);
+                if(audio == null){
+                    audio = RevervoxMod.AUDIOS.getRandomAudio(false);
                 }
+                if(audio == null){ return; }
+                this.mob.playAudio(audio.getAudio(), api, getChannel(), new AudioEffect());
             }
         }
     }

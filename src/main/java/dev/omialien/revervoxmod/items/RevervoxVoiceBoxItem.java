@@ -2,8 +2,9 @@ package dev.omialien.revervoxmod.items;
 
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
+import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
-import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -40,9 +41,10 @@ public class RevervoxVoiceBoxItem extends Item {
         ItemStack item = pPlayer.getItemInHand(pUsedHand);
         boolean audioPlayed = false;
         if (!pLevel.isClientSide() && VoiceChatRecording.vcApi instanceof VoicechatServerApi api) {
-            short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
+            //short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
+            short[] audio = RevervoxMod.AUDIOS.getRandomAudio(false).getAudio();
             if(audio != null){
-                this.audioDuration =  audio.length / VoiceChatRecordingPlugin.SAMPLE_RATE;
+                this.audioDuration =  audio.length / AudioStorage.SAMPLE_RATE;
                 playAudio(pPlayer, api, audio);
                 audioPlayed = true;
                 pPlayer.startUsingItem(pUsedHand);

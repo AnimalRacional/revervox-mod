@@ -42,6 +42,9 @@ repositories {
     maven {
         url 'https://maven.blamejared.com/'
     }
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 base {
@@ -161,7 +164,7 @@ dependencies {
     localRuntime ("maven.modrinth:jade:15.10.3+neoforge")
     implementation ("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
     implementation("com.eliotlash.mclib:mclib:20")
-    implementation ("maven.modrinth:voice-chat-recording:${voicechatrecording_version}")
+    implementation ("blank:voice-chat-recording:1.21.1-${voicechatrecording_version}")
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:19.22.1.316"
 }
 

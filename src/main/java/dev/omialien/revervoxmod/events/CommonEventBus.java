@@ -11,8 +11,11 @@ import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
+import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechat_recording.voicechat.events.AudioEvent;
+import dev.omialien.voicechat_recording.voicechat.events.MicPacketReceivedEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -132,7 +135,7 @@ public class CommonEventBus {
             if(source.getEntity() instanceof Player attacker && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
                 RevervoxMod.LOGGER.debug("is player && serverapi");
                 if(attacker.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IRevervoxWeapon){
-                    short[] audio = VoiceChatRecordingPlugin.getRandomAudio(victim.getUUID(), false);
+                    short[] audio = RevervoxMod.AUDIOS.getRandomAudio(victim.getUUID(), false).getAudio();
                     if(audio == null) { return; }
                     AudioChannel channel = api.createLocationalAudioChannel(
                             UUID.randomUUID(),
@@ -170,5 +173,19 @@ public class CommonEventBus {
                 SoundInstancePacket.STREAM_CODEC,
                 FMLEnvironment.dist == Dist.CLIENT ? RevervoxClientPacketHandler::handleSoundInstancePacket : null
         );
+    }
+
+    @SubscribeEvent
+    private static void onAudioEvent(AudioEvent event){
+        // TODO max audios
+        if(event.getAudio().getFilterResult() == RecordedAudio.FilterResult.PASSED){
+            RevervoxMod.LOGGER.debug("Audio recorded and stored!");
+            RevervoxMod.AUDIOS.addAudio(event.getAudio());
+        }
+    }
+
+    @SubscribeEvent
+    public static void onMicrophonePacket(MicPacketReceivedEvent event){
+        // TODO isScreaming, alert or something
     }
 }

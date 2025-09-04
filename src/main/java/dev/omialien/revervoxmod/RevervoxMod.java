@@ -3,6 +3,7 @@ package dev.omialien.revervoxmod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.registries.*;
+import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.voicechat_recording.taskscheduler.TaskScheduler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -27,6 +28,7 @@ public class RevervoxMod {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final TaskScheduler TASKS = new TaskScheduler();
+    public static final AudioStorage AUDIOS = new AudioStorage();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.

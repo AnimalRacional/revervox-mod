@@ -15,7 +15,7 @@ import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
-import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
+import dev.omialien.voicechat_recording.voicechat.IRecordedPlayer;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
@@ -280,7 +280,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(hasSpoken() && time >= getGracePeriodEnd()){
-            RecordedPlayer rec = VoiceChatRecordingPlugin.getRecordedPlayer(player.getUUID());
+            IRecordedPlayer rec = VoiceChatRecordingPlugin.getRecordedPlayer(player.getUUID());
             if (rec != null){
                 return rec.isSpeaking() &&
                         rec.getLastSpoke() >= getGracePeriodEnd();
@@ -470,8 +470,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
 
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
-        // TODO maybe see if a custom MobCategory is possible so revervox doesn't get affected by the normal mob cap
-        // https://docs.neoforged.net/docs/entities/livingentity/#natural-spawning
         // Check if there are other Revervox around
         if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
                 TargetingConditions.DEFAULT,
