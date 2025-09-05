@@ -114,6 +114,7 @@ public class MegaphoneItem extends Item implements GeoItem {
             }
         }
 
+        //TODO fazer knockback depender do RMS e dano tbm
         if (player instanceof ServerPlayer sp) {
             Vec3 look = player.getLookAngle();
 

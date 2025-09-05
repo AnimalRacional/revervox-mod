@@ -6,10 +6,7 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
 import dev.omialien.revervoxmod.entity.ai.RVClimbNavigation;
-import dev.omialien.revervoxmod.entity.goals.EatFoodGoal;
-import dev.omialien.revervoxmod.entity.goals.RandomRepeatGoal;
-import dev.omialien.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
-import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
+import dev.omialien.revervoxmod.entity.goals.*;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
@@ -71,6 +68,8 @@ import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
@@ -82,6 +81,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private long firstSpeak;
     private static final long NOT_SPOKEN_YET = -1;
     private AudioPlayer currentAudioPlayer;
+    private long noLineOfSightTicks;
     @Nullable
     private UUID persistentAngerTarget;
     private int breakCooldown;
@@ -101,7 +101,9 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5).triggerableAnim("Stun", RawAnimation.begin().then("misc.stun", Animation.LoopType.PLAY_ONCE)),
+        controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5)
+                        .triggerableAnim("Stun", RawAnimation.begin().then("misc.stun", Animation.LoopType.PLAY_ONCE))
+                .triggerableAnim("SonicBoom", DefaultAnimations.ATTACK_CAST),
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
@@ -129,19 +131,20 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         RevervoxMod.LOGGER.debug("Revervox Spawned");
         // So it doesn't sink in the water
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(4, new TemptGoal(this, 0.4D, Ingredient.of(Items.SPIDER_EYE), false));
-        this.goalSelector.addGoal(5, new TemptGoal(this, 0.4D, Ingredient.of(Items.FERMENTED_SPIDER_EYE), false));
-        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(4, new RandomRepeatGoal(this));
+        this.goalSelector.addGoal(5, new TemptGoal(this, 0.4D, Ingredient.of(Items.SPIDER_EYE), false));
+        this.goalSelector.addGoal(6, new TemptGoal(this, 0.4D, Ingredient.of(Items.FERMENTED_SPIDER_EYE), false));
+        this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.5D));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
 
     }
 
     protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(1, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.7D, false));
+        this.goalSelector.addGoal(1, new SonicBoomGoal(this));
+        this.goalSelector.addGoal(2, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
@@ -348,6 +351,12 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 offset = offset.offset(0, 1, 0);
             }
 
+            if (this.getTarget() != null) {
+                this.noLineOfSightTicks++;
+            } else {
+                this.noLineOfSightTicks = 0;
+            }
+
             boolean isFacingBelowSolid = !this.level().getBlockState(blockPosition().relative(getDirection()).below()).isAir();
             boolean isOffsetFacingTwoAboveSolid = !this.level().getBlockState(blockPosition().offset(offset).above(2)).isAir();
 
@@ -358,6 +367,10 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             this.setClimbing((this.horizontalCollision && this.getTarget() != null) && (isOffsetFacingTwoAboveSolid || !isFacingBelowSolid) && (breakCooldown <= 0) && (this.getTarget().getY() > this.getY()));
             this.setSprinting(this.getTarget() != null);
         }
+    }
+
+    public boolean lostLineOfSightFor(long pTicks) {
+        return this.noLineOfSightTicks >= pTicks;
     }
 
     @Override
@@ -455,12 +468,53 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.setNoAi(true);
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.REVERVOX_STUN.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
         int STUN_ANIM_DURATION_TICKS = 55;
-        RevervoxMod.TASKS.schedule(this::resetStunned, STUN_ANIM_DURATION_TICKS);
+        RevervoxMod.TASKS.schedule(this::resetAI, STUN_ANIM_DURATION_TICKS);
     }
 
-    private void resetStunned(){
-        RevervoxMod.LOGGER.debug("resetStunned");
+    private void resetAI(){
+        RevervoxMod.LOGGER.debug("resetAI");
         this.setNoAi(false);
+    }
+
+    public void startSonicBoom(){
+        triggerAnim("Walk/Run/Idle", "SonicBoom");
+        //TODO fix flutua no ar
+        //TODO face player
+        this.setNoAi(true);
+        int SONIC_BOOM_ANIM_DURATION_TICKS = 45;
+        RevervoxMod.TASKS.schedule(this::resetAI, SONIC_BOOM_ANIM_DURATION_TICKS);
+        RevervoxMod.TASKS.schedule(this::doSonicBoom, 13);
+
+    }
+
+    private void doSonicBoom(){
+        Vec3 vec3 = this.position().add(this.getAttachments().get(EntityAttachment.WARDEN_CHEST, 0, this.getYRot()));
+        Vec3 revervoxFowardsPosition = this.getEyePosition().add(this.getLookAngle().scale(10));
+        Vec3 vec31 = revervoxFowardsPosition.subtract(vec3);
+        Vec3 vec32 = vec31.normalize();
+        int i = Mth.floor(vec31.length()) + 7;
+
+        List<LivingEntity> entitiesToHit = new ArrayList<>();
+
+        for(int j = 1; j < i; ++j) {
+            Vec3 vec33 = vec3.add(vec32.scale(j));
+            this.level().explode(this, vec33.x, vec33.y, vec33.z, 2, Level.ExplosionInteraction.BLOCK );
+            ((ServerLevel) this.level()).sendParticles(ParticleRegistry.REVERVOX_SONIC_BOOM_PARTICLES.get(), vec33.x, vec33.y, vec33.z, 1, 0.0, 0.0, 0.0, 0.0);
+            AABB currentParticleAABB = new AABB(new BlockPos((int) vec33.x, (int) vec33.y, (int) vec33.z)).inflate(2.0D, 2.0D, 2.0D);
+            List<LivingEntity> nearbyEntities = this.level().getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, null, currentParticleAABB);
+            entitiesToHit.addAll(nearbyEntities);
+        }
+        for (LivingEntity entity : entitiesToHit) {
+            if (entity != this && entity.hurt(this.level().damageSources().sonicBoom(this), 10.0F)) {
+                double d1 = 0.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
+                double d0 = 2.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
+                entity.push(vec32.x() * d0, vec32.y() * d1, vec32.z() * d0);
+                if (entity instanceof RevervoxGeoEntity revervox){
+                    revervox.stun();
+                }
+            }
+        }
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.MEGAPHONE_USE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
 
