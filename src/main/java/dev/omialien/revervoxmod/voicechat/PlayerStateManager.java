@@ -13,6 +13,7 @@ import java.util.*;
 public class PlayerStateManager {
     private static final Set<UUID> screamingPlayers = new HashSet<>();
     private static final Map<UUID, Pair<OpusDecoder, OpusEncoder>> playerCoders = new HashMap<>();
+    private static final Set<UUID> playersUsingMegaphone = new HashSet<>();
 
     public static boolean isScreaming(UUID uuid) {
         return screamingPlayers.contains(uuid);
@@ -26,6 +27,20 @@ public class PlayerStateManager {
     public static void removeScreamingPlayer(UUID uuid) {
         if (!screamingPlayers.contains(uuid)) return;
         screamingPlayers.remove(uuid);
+    }
+
+    public static boolean isUsingMegaphone(UUID uuid) {
+        return playersUsingMegaphone.contains(uuid);
+    }
+
+    public static void addUsingMegaphone(UUID uuid) {
+        if (playersUsingMegaphone.contains(uuid)) return;
+        playersUsingMegaphone.add(uuid);
+    }
+
+    public static void removeUsingMegaphone(UUID uuid) {
+        if (!playersUsingMegaphone.contains(uuid)) return;
+        playersUsingMegaphone.remove(uuid);
     }
 
     public static OpusDecoder getPlayerDecoder(UUID uuid) {

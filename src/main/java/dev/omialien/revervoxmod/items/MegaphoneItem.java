@@ -57,6 +57,7 @@ public class MegaphoneItem extends Item implements GeoItem {
         ItemStack itemstack = player.getItemInHand(usedHand);
         player.startUsingItem(usedHand);
         player.awardStat(Stats.ITEM_USED.get(this));
+        PlayerStateManager.addUsingMegaphone(player.getUUID());
         return InteractionResultHolder.consume(itemstack);
     }
 
@@ -76,6 +77,9 @@ public class MegaphoneItem extends Item implements GeoItem {
     @Override
     public void onStopUsing(@NotNull ItemStack stack, @NotNull LivingEntity entity, int count) {
         usedItem = false;
+        if (entity instanceof Player player) {
+            PlayerStateManager.removeUsingMegaphone(player.getUUID());
+        }
         super.onStopUsing(stack, entity, count);
     }
 

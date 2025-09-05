@@ -10,9 +10,9 @@ import dev.omialien.revervoxmod.items.IRevervoxWeapon;
 import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
+import dev.omialien.revervoxmod.voicechat.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
-import dev.omialien.voicechat_recording.configs.RecordingCommonConfig;
 import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.events.AudioEvent;
@@ -181,97 +181,19 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void onMicrophonePacket(MicPacketReceivedEvent event){
         if (event.getPlayer() == null) return;
-        short[] packet = PlayerStateManager.getPlayerDecoder(event.getPlayer().getUUID()).decode(event.getPacket().getOpusEncodedData());
-        double packetRMS = calculateRMS(packet);
-        RevervoxMod.LOGGER.debug("Packet RMS: " + packetRMS);
-        if (packetRMS > 3000.0D){
-            PlayerStateManager.addScreamingPlayer(event.getPlayer().getUUID());
-        } else {
-            PlayerStateManager.removeScreamingPlayer(event.getPlayer().getUUID());
-        }
-        // TODO isUsingMegaphone por voz radio
-        /*
-        event.getPacket().setOpusEncodedData(
-                PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(applyRadioEffect(packet, RevervoxModServerConfigs.VOICE_GAIN.get())));
-         */
-    }
-
-    public static short[] applyRadioEffect(short[] pcmBE, double gain) {
-        // Convert to float [-1, 1]
-        float[] samples = new float[pcmBE.length];
-        for (int i = 0; i < pcmBE.length; i++) {
-            samples[i] = pcmBE[i] / 32768.0f;
-        }
-
-        // Simple band-pass FIR filter (300–3500 Hz @ 48kHz)
-        float[] filtered = bandPassFilter(samples, 300.0, 3500.0, 48000);
-
-        // Apply gain (loudness boost)
-        short[] out = new short[filtered.length];
-        for (int i = 0; i < filtered.length; i++) {
-            float v = (float) (filtered[i] * gain);
-            v = Math.max(-1.0f, Math.min(1.0f, v)); // prevent clipping
-            out[i] = (short) (v * 32767);
-        }
-
-        return out;
-    }
-
-    // Very simple band-pass filter (FIR via naive convolution)
-    private static float[] bandPassFilter(float[] input, double lowCut, double highCut, int sampleRate) {
-        int filterSize = 101; // longer = sharper filter
-        float[] filter = new float[filterSize];
-
-        double nyquist = sampleRate / 2.0;
-        double low = lowCut / nyquist;
-        double high = highCut / nyquist;
-
-        // Design a band-pass filter using windowed sinc
-        for (int i = 0; i < filterSize; i++) {
-            int m = i - filterSize / 2;
-            if (m == 0) {
-                filter[i] = (float) (2 * (high - low));
+        if (PlayerStateManager.isUsingMegaphone(event.getPlayer().getUUID())) {
+            short[] packet = PlayerStateManager.getPlayerDecoder(event.getPlayer().getUUID()).decode(event.getPacket().getOpusEncodedData());
+            double packetRMS = AudioUtil.calculateRMS(packet);
+            RevervoxMod.LOGGER.debug("Packet RMS: " + packetRMS);
+            if (packetRMS > 4000.0D){
+                PlayerStateManager.addScreamingPlayer(event.getPlayer().getUUID());
             } else {
-                filter[i] = (float) ((Math.sin(2 * Math.PI * high * m) - Math.sin(2 * Math.PI * low * m)) / (Math.PI * m));
+                PlayerStateManager.removeScreamingPlayer(event.getPlayer().getUUID());
             }
-            // Apply Hamming window
-            filter[i] *= 0.54 - 0.46 * Math.cos(2 * Math.PI * i / (filterSize - 1));
+            event.getPacket().setOpusEncodedData(
+                    PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(AudioUtil.applyRadioEffect(packet, RevervoxModServerConfigs.VOICE_GAIN.get())));
         }
-
-        // Convolution
-        float[] output = new float[input.length];
-        for (int i = 0; i < input.length; i++) {
-            double acc = 0;
-            for (int j = 0; j < filterSize; j++) {
-                int idx = i - j;
-                if (idx >= 0) acc += input[idx] * filter[j];
-            }
-            output[i] = (float) acc;
-        }
-
-        return output;
     }
-
-    public static double calculateRMS(short[] audio){
-        int start;
-        for(start = 0; start < audio.length && Math.abs(audio[start]) < (Integer) RecordingCommonConfig.SILENCE_THRESHOLD.get(); ++start) {
-        }
-
-        int end;
-        for(end = audio.length - 1; end > start && Math.abs(audio[end]) < (Integer)RecordingCommonConfig.SILENCE_THRESHOLD.get(); --end) {
-        }
-
-        int activeSamples = end - start + 1;
-        long sumSquares = 0L;
-
-        for(int i = start; i <= end; ++i) {
-            int sample = audio[i];
-            sumSquares += (long)(sample * sample);
-        }
-
-        return Math.sqrt((double)sumSquares / (double)activeSamples);
-    }
-
     @SubscribeEvent
     public static void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event){
         PlayerStateManager.removePlayerCoders(event.getEntity().getUUID());
