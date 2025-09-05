@@ -52,5 +52,7 @@
   "sounds.revervox_mod.revervox.alert": "Revervox alerted",
   "sounds.revervox_mod.revervox_bat.idle": "Bat shrieks",
   "sounds.revervox_mod.revervox_bat.hurt": "Revervox Bat hurts",
-  "sounds.revervox_mod.revervox_bat.alert": "Revervox Bat alerted"
+  "sounds.revervox_mod.revervox_bat.alert": "Revervox Bat alerted",
+  "sounds.revervox_mod.megaphone.use": "Megaphone used",
+  "sounds.revervox_mod.revervox.stun": "Revervox stunned"
 }

@@ -453,6 +453,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         triggerAnim("Walk/Run/Idle", "Stun");
         //TODO fix flutua no ar
         this.setNoAi(true);
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.REVERVOX_STUN.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
         int STUN_ANIM_DURATION_TICKS = 55;
         RevervoxMod.TASKS.schedule(this::resetStunned, STUN_ANIM_DURATION_TICKS);
     }
