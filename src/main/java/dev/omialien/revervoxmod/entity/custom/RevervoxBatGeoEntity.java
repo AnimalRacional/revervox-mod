@@ -11,6 +11,7 @@ import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
 import dev.omialien.voicechat_recording.voicechat.IRecordedPlayer;
+import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
@@ -178,9 +179,9 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     public void remove(@NotNull RemovalReason pReason) {
         VoicechatServerApi api = (VoicechatServerApi) VoiceChatRecording.vcApi;
         //short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
-        short[] audio = RevervoxMod.AUDIOS.getRandomAudio(false).getAudio();
+        RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
         if (audio != null) {
-            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.3f).makeReverb(0.5f, 160, 1));
+            playAudio(audio.getAudio(), api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.3f).makeReverb(0.5f, 160, 1));
         }
         super.remove(pReason);
     }

@@ -15,5 +15,6 @@ public class RevervoxModServerConfigs {
     public static final ModConfigSpec.BooleanValue REVERVOX_BREAKS_BLOCKS = BUILDER.define("revervoxBreaksBlocks", true);
     public static final ModConfigSpec.BooleanValue REVERVOX_ABOVE_GROUND = BUILDER.define("revervoxAboveGround", false);
     public static final ModConfigSpec.BooleanValue REVERVOX_BREAKS_NONSOLID = BUILDER.define("revervoxBreakNonSolid", true);
+    public static final ModConfigSpec.IntValue VOICE_GAIN = BUILDER.defineInRange("voiceGain", 3, 1, 100);
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

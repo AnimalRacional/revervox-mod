@@ -3,6 +3,7 @@ package dev.omialien.revervoxmod.entity.custom;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -38,15 +39,15 @@ public interface SpeakingEntity {
     }
 
     default void playPlayerAudio(Player player, VoicechatServerApi api, Supplier<AudioChannel> channelSupp, AudioEffect effect){
-        short[] audio = RevervoxMod.AUDIOS.getRandomAudio(player.getUUID(), true).getAudio();
+        RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(player.getUUID(), true);
         if(audio == null){
             RevervoxMod.LOGGER.error("No audio found for {}, choosing random player", player.getName());
-            audio = RevervoxMod.AUDIOS.getRandomAudio(true).getAudio();
+            audio = RevervoxMod.AUDIOS.getRandomAudio(true);
             if (audio == null) return;
         }
         AudioChannel channel = channelSupp.get();
         if(channel == null){ return; }
         RevervoxMod.LOGGER.debug("Playing audio from player: " + player.getName());
-        playAudio(audio, api, channel, effect);
+        playAudio(audio.getAudio(), api, channel, effect);
     }
 }

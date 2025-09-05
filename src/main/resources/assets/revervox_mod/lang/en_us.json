@@ -28,6 +28,10 @@
   "revervox_mod.configuration.revervoxAboveGround.tooltip": "Whether Revervox spawns above ground",
   "revervox_mod.configuration.revervoxBreakNonSolid": "Revervox breaks non-solid",
   "revervox_mod.configuration.revervoxBreakNonSolid.tooltip": "Whether revervox breaks non-solid blocks such as torches and leaves",
+  "revervox_mod.configuration.maxSavedRecordings": "Maximum Saved Recordings",
+  "revervox_mod.configuration.maxSavedRecordings.tooltip": "The maximum amount of player recordings that can be saved",
+  "revervox_mod.configuration.minimumAudioCount": "Minimum Audio Count",
+  "revervox_mod.configuration.minimumAudioCount.tooltip": "The minimum amount of audios before they start being deleted",
 
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",

@@ -111,14 +111,9 @@ public class RandomRepeatGoal extends Goal {
                 }
                 if(audio == null){ return; }
                 this.mob.playAudio(audio.getAudio(), api, getChannel(), new AudioEffect());
+                audiosPlayed++;
             }
         }
-    }
-
-    private void playRandomAudioFromSet(VoicechatServerApi api, Set<UUID> nearbyPlayerUUIDs) {
-        UUID randomUUID = new ArrayList<>(nearbyPlayerUUIDs).get(new Random().nextInt(nearbyPlayerUUIDs.size()));
-        this.mob.playPlayerAudio(Objects.requireNonNull(this.mob.level().getPlayerByUUID(randomUUID)), api, this::getChannel);
-        audiosPlayed++;
     }
 
     private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, String category, Entity nearestEntity) {

@@ -1,6 +1,8 @@
 package dev.omialien.revervoxmod.voicechat;
 
+import dev.omialien.revervoxmod.config.RevervoxModCommonConfigs;
 import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
+import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,8 +10,8 @@ import java.util.function.Predicate;
 
 public class AudioStorage {
     public static final int SAMPLE_RATE = 48000;
-    private Random rnd;
-    private Map<UUID, List<RecordedAudio>> storedAudios;
+    private final Random rnd;
+    private final Map<UUID, List<RecordedAudio>> storedAudios;
 
     public AudioStorage(){
         rnd = new Random();
@@ -27,13 +29,13 @@ public class AudioStorage {
         storedAudios.get(audio.getPlayerUUID()).add(audio);
     }
 
-    // TODO parametro remove
     public RecordedAudio getRandomAudio(UUID player, boolean remove){
         List<RecordedAudio> recs = storedAudios.get(player);
         if(recs == null || recs.isEmpty()) { return null; }
         int idx = rnd.nextInt(recs.size());
-        // TODO mover as configs da api para aqui
-        //if(remove && getTotalAudioCount() > RevervoxModServerConfigs.)
+        if(remove && getTotalAudioCount() > RevervoxModCommonConfigs.MINIMUM_AUDIO_COUNT.get()){
+            return recs.remove(idx);
+        }
         return recs.get(idx);
     }
 
@@ -43,12 +45,40 @@ public class AudioStorage {
             total.addAll(storedAudios.get(uuid));
         });
         if(total.isEmpty()){ return null; }
-        return total.get(rnd.nextInt(total.size()));
+        int randomIndex = rnd.nextInt(total.size());
+        RecordedAudio randomAudio = total.get(randomIndex);
+        if(remove && getTotalAudioCount() > RevervoxModCommonConfigs.MINIMUM_AUDIO_COUNT.get()){
+            return storedAudios.get(randomAudio.getPlayerUUID()).remove(randomIndex);
+        }
+        return randomAudio;
     }
 
     public RecordedAudio getRandomAudio(boolean remove){
         List<RecordedAudio> total = storedAudios.values().stream().flatMap(Collection::stream).toList();
         if(total.isEmpty()){ return null; }
-        return total.get(rnd.nextInt(total.size()));
+        int randomIndex = rnd.nextInt(total.size());
+        RecordedAudio randomAudio = total.get(randomIndex);
+        if(remove && getTotalAudioCount() > RevervoxModCommonConfigs.MINIMUM_AUDIO_COUNT.get()){
+            return storedAudios.get(randomAudio.getPlayerUUID()).remove(randomIndex);
+        }
+        return randomAudio;
+    }
+
+    public void removeRandomAudio(){
+        List<RecordedAudio> total = storedAudios.values().stream().flatMap(Collection::stream).toList();
+        if(total.isEmpty()){ return; }
+        RecordedAudio toRemove = total.get(rnd.nextInt(total.size()));
+        storedAudios.get(toRemove.getPlayerUUID()).remove(toRemove);
+    }
+
+    public void savePlayerAudios(UUID uuid) {
+        List<RecordedAudio> recs = storedAudios.get(uuid);
+        if(recs != null && !recs.isEmpty()){
+            recs.forEach(RecordedAudio::saveAudio);
+        }
+    }
+
+    public void loadPlayerAudios(UUID uuid) {
+        VoiceChatRecordingPlugin.loadPlayerAudios(uuid);
     }
 }

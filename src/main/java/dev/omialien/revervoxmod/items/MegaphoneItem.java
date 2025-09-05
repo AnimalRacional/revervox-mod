@@ -3,8 +3,7 @@ package dev.omialien.revervoxmod.items;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.items.client.MegaphoneRenderer;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
-import dev.omialien.voicechat_recording.voicechat.IRecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
+import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -66,13 +65,10 @@ public class MegaphoneItem extends Item implements GeoItem {
         if (!(livingEntity instanceof Player player)) return;
 
         if (!level.isClientSide && !usedItem) {
-            IRecordedPlayer rec = VoiceChatRecordingPlugin.getRecordedPlayer(player.getUUID());
-            if (rec != null) {
-                if (rec.isSpeaking()) { //TODO precisa de um metodo is screaming e outro para aplicar efeito de som na voz que ele vai falar
-                    doSonicBoom(level, player);
-                    usedItem = true;
-                    player.getCooldowns().addCooldown(this, cooldownDur);
-                }
+            if (PlayerStateManager.isScreaming(player.getUUID())) { //TODO metodo para aplicar efeito de som na voz que ele vai falar
+                doSonicBoom(level, player);
+                usedItem = true;
+                player.getCooldowns().addCooldown(this, cooldownDur);
             }
         }
     }

@@ -1,21 +1,23 @@
 package dev.omialien.revervoxmod.events;
 
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
+import dev.omialien.revervoxmod.config.RevervoxModCommonConfigs;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.*;
 import dev.omialien.revervoxmod.items.IRevervoxWeapon;
 import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
+import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
+import dev.omialien.voicechat_recording.configs.RecordingCommonConfig;
 import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
 import dev.omialien.voicechat_recording.voicechat.events.AudioEvent;
 import dev.omialien.voicechat_recording.voicechat.events.MicPacketReceivedEvent;
+import dev.omialien.voicechat_recording.voicechat.util.AudioPlayingUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -36,6 +38,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -44,7 +47,6 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
-import java.util.UUID;
 
 @EventBusSubscriber(modid = RevervoxMod.MOD_ID)
 public class CommonEventBus {
@@ -124,27 +126,17 @@ public class CommonEventBus {
         if(!event.getEntity().level().isClientSide() && event.getEntity() instanceof Player victim){
             DamageSource source = event.getSource();
             RevervoxMod.LOGGER.debug("damage source: {}", source);
-            if(source == null){
-                return;
-            }
             RevervoxMod.LOGGER.debug("attacker entity: {}", source.getEntity());
             if(source.getEntity() == null){
                 RevervoxMod.LOGGER.debug("no entity source");
                 return;
             }
-            if(source.getEntity() instanceof Player attacker && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
+            if(source.getEntity() instanceof Player attacker){
                 RevervoxMod.LOGGER.debug("is player && serverapi");
                 if(attacker.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IRevervoxWeapon){
-                    short[] audio = RevervoxMod.AUDIOS.getRandomAudio(victim.getUUID(), false).getAudio();
+                    RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(victim.getUUID(), false);
                     if(audio == null) { return; }
-                    AudioChannel channel = api.createLocationalAudioChannel(
-                            UUID.randomUUID(),
-                            api.fromServerLevel(victim.level()),
-                            api.createPosition(victim.getX(), victim.getY(), victim.getZ()));
-                    if(channel != null){
-                        channel.setCategory(RevervoxMod.MOD_ID);
-                        new AudioPlayer(audio, api, channel).start();
-                    }
+                    AudioPlayingUtil.playLocationalAudio(audio, victim.position(), (ServerLevel) victim.level(), RevervoxMod.MOD_ID);
                 }
             }
         }
@@ -177,8 +169,10 @@ public class CommonEventBus {
 
     @SubscribeEvent
     private static void onAudioEvent(AudioEvent event){
-        // TODO max audios
         if(event.getAudio().getFilterResult() == RecordedAudio.FilterResult.PASSED){
+            if (RevervoxMod.AUDIOS.getTotalAudioCount() >= RevervoxModCommonConfigs.RECORDING_LIMIT.get()){
+                RevervoxMod.AUDIOS.removeRandomAudio();
+            }
             RevervoxMod.LOGGER.debug("Audio recorded and stored!");
             RevervoxMod.AUDIOS.addAudio(event.getAudio());
         }
@@ -186,6 +180,107 @@ public class CommonEventBus {
 
     @SubscribeEvent
     public static void onMicrophonePacket(MicPacketReceivedEvent event){
-        // TODO isScreaming, alert or something
+        if (event.getPlayer() == null) return;
+        short[] packet = PlayerStateManager.getPlayerDecoder(event.getPlayer().getUUID()).decode(event.getPacket().getOpusEncodedData());
+        double packetRMS = calculateRMS(packet);
+        RevervoxMod.LOGGER.debug("Packet RMS: " + packetRMS);
+        if (packetRMS > 3000.0D){
+            PlayerStateManager.addScreamingPlayer(event.getPlayer().getUUID());
+        } else {
+            PlayerStateManager.removeScreamingPlayer(event.getPlayer().getUUID());
+        }
+        // TODO isUsingMegaphone por voz radio
+        /*
+        event.getPacket().setOpusEncodedData(
+                PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(applyRadioEffect(packet, RevervoxModServerConfigs.VOICE_GAIN.get())));
+         */
+    }
+
+    public static short[] applyRadioEffect(short[] pcmBE, double gain) {
+        // Convert to float [-1, 1]
+        float[] samples = new float[pcmBE.length];
+        for (int i = 0; i < pcmBE.length; i++) {
+            samples[i] = pcmBE[i] / 32768.0f;
+        }
+
+        // Simple band-pass FIR filter (300–3500 Hz @ 48kHz)
+        float[] filtered = bandPassFilter(samples, 300.0, 3500.0, 48000);
+
+        // Apply gain (loudness boost)
+        short[] out = new short[filtered.length];
+        for (int i = 0; i < filtered.length; i++) {
+            float v = (float) (filtered[i] * gain);
+            v = Math.max(-1.0f, Math.min(1.0f, v)); // prevent clipping
+            out[i] = (short) (v * 32767);
+        }
+
+        return out;
+    }
+
+    // Very simple band-pass filter (FIR via naive convolution)
+    private static float[] bandPassFilter(float[] input, double lowCut, double highCut, int sampleRate) {
+        int filterSize = 101; // longer = sharper filter
+        float[] filter = new float[filterSize];
+
+        double nyquist = sampleRate / 2.0;
+        double low = lowCut / nyquist;
+        double high = highCut / nyquist;
+
+        // Design a band-pass filter using windowed sinc
+        for (int i = 0; i < filterSize; i++) {
+            int m = i - filterSize / 2;
+            if (m == 0) {
+                filter[i] = (float) (2 * (high - low));
+            } else {
+                filter[i] = (float) ((Math.sin(2 * Math.PI * high * m) - Math.sin(2 * Math.PI * low * m)) / (Math.PI * m));
+            }
+            // Apply Hamming window
+            filter[i] *= 0.54 - 0.46 * Math.cos(2 * Math.PI * i / (filterSize - 1));
+        }
+
+        // Convolution
+        float[] output = new float[input.length];
+        for (int i = 0; i < input.length; i++) {
+            double acc = 0;
+            for (int j = 0; j < filterSize; j++) {
+                int idx = i - j;
+                if (idx >= 0) acc += input[idx] * filter[j];
+            }
+            output[i] = (float) acc;
+        }
+
+        return output;
+    }
+
+    public static double calculateRMS(short[] audio){
+        int start;
+        for(start = 0; start < audio.length && Math.abs(audio[start]) < (Integer) RecordingCommonConfig.SILENCE_THRESHOLD.get(); ++start) {
+        }
+
+        int end;
+        for(end = audio.length - 1; end > start && Math.abs(audio[end]) < (Integer)RecordingCommonConfig.SILENCE_THRESHOLD.get(); --end) {
+        }
+
+        int activeSamples = end - start + 1;
+        long sumSquares = 0L;
+
+        for(int i = start; i <= end; ++i) {
+            int sample = audio[i];
+            sumSquares += (long)(sample * sample);
+        }
+
+        return Math.sqrt((double)sumSquares / (double)activeSamples);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event){
+        PlayerStateManager.removePlayerCoders(event.getEntity().getUUID());
+        RevervoxMod.AUDIOS.savePlayerAudios(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerConnect(PlayerEvent.PlayerLoggedInEvent event){
+        PlayerStateManager.addPlayerCoders(event.getEntity().getUUID());
+        RevervoxMod.AUDIOS.loadPlayerAudios(event.getEntity().getUUID());
     }
 }

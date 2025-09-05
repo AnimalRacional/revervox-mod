@@ -1,5 +1,6 @@
 package dev.omialien.revervoxmod;
 
+import dev.omialien.revervoxmod.config.RevervoxModCommonConfigs;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.registries.*;
@@ -41,6 +42,7 @@ public class RevervoxMod {
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC);
+        modContainer.registerConfig(ModConfig.Type.COMMON, RevervoxModCommonConfigs.SPEC);
     }
 
     public static void summonBatWave(Player player){
