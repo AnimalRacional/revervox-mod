@@ -1,6 +1,5 @@
 package dev.omialien.revervoxmod.events;
 
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
 import dev.omialien.revervoxmod.config.RevervoxModCommonConfigs;
@@ -12,7 +11,6 @@ import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.voicechat.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
-import dev.omialien.voicechat_recording.VoiceChatRecording;
 import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.events.AudioEvent;
@@ -104,7 +102,7 @@ public class CommonEventBus {
 
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
-        VoiceChatRecordingPlugin.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null, (VoicechatServerApi) VoiceChatRecording.vcApi);
+        VoiceChatRecordingPlugin.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null);
     }
 
     // TODO neoforge might have a better way of doing this

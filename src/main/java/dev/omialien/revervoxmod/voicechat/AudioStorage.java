@@ -71,7 +71,6 @@ public class AudioStorage {
         storedAudios.get(toRemove.getPlayerUUID()).remove(toRemove);
     }
 
-    //TODO thread pool na api
     public void savePlayerAudios(UUID uuid) {
         List<RecordedAudio> recs = storedAudios.get(uuid);
         if(recs != null && !recs.isEmpty()){

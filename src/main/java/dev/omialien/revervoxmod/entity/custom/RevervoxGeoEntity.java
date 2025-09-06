@@ -373,6 +373,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         return this.noLineOfSightTicks >= pTicks;
     }
 
+    //TODO bater nele e depois falar faz ele desaparecer
     @Override
     public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
         if(pTarget == null && getTarget() != null && getTarget() instanceof Player){
@@ -498,8 +499,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
         for(int j = 1; j < i; ++j) {
             Vec3 vec33 = vec3.add(vec32.scale(j));
-            this.level().explode(this, vec33.x, vec33.y, vec33.z, 2, Level.ExplosionInteraction.BLOCK );
             ((ServerLevel) this.level()).sendParticles(ParticleRegistry.REVERVOX_SONIC_BOOM_PARTICLES.get(), vec33.x, vec33.y, vec33.z, 1, 0.0, 0.0, 0.0, 0.0);
+            //TODO fazer partir blocos
             AABB currentParticleAABB = new AABB(new BlockPos((int) vec33.x, (int) vec33.y, (int) vec33.z)).inflate(2.0D, 2.0D, 2.0D);
             List<LivingEntity> nearbyEntities = this.level().getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, null, currentParticleAABB);
             entitiesToHit.addAll(nearbyEntities);
