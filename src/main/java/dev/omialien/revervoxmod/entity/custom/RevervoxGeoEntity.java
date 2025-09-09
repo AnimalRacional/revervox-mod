@@ -147,7 +147,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.goalSelector.addGoal(2, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
-        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
+        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Spider.class, true, true));
         this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, CaveSpider.class, true, true));
