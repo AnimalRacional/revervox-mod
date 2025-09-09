@@ -21,7 +21,6 @@ import org.joml.Vector3f;
 public class MegaphoneItemExtensions implements IClientItemExtensions {
     @Override
     public boolean applyForgeHandTransform(@NotNull PoseStack poseStack, @NotNull LocalPlayer player, @NotNull HumanoidArm arm, ItemStack itemInHand, float partialTick, float equipProcess, float swingProcess) {
-
         if (itemInHand.getItem() instanceof MegaphoneItem) {
             if (player.isUsingItem()) {
                 if (arm.equals(HumanoidArm.RIGHT)) {
@@ -39,11 +38,10 @@ public class MegaphoneItemExtensions implements IClientItemExtensions {
     @Override
     public HumanoidModel.@Nullable ArmPose getArmPose(@NotNull LivingEntity entityLiving, @NotNull InteractionHand hand, ItemStack itemStack) {
         if (itemStack.getItem() instanceof MegaphoneItem && FMLLoader.getDist() == Dist.CLIENT) {
-            if (Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON) {
+            if (Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON && Minecraft.getInstance().cameraEntity != null && entityLiving.is(Minecraft.getInstance().cameraEntity)) {
                 return null;
             }
         }
-        //TODO n funciona no servidor, os outros n conseguem ver esta anim
         if (entityLiving.isUsingItem()) {
             return HumanoidModel.ArmPose.TOOT_HORN;
         }
