@@ -74,7 +74,10 @@ public class AudioStorage {
     public void savePlayerAudios(UUID uuid) {
         List<RecordedAudio> recs = storedAudios.get(uuid);
         if(recs != null && !recs.isEmpty()){
-            recs.forEach(RecordedAudio::saveAudio);
+            recs.forEach(audio -> {
+                if (audio.wasSaved()) return;
+                audio.saveAudio();
+            });
         }
     }
 

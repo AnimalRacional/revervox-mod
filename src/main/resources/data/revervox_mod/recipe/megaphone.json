@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "Ri ",
+    " iI"
+  ],
+  "key": {
+    "#": {
+      "item": "revervox_mod:revervox_voice_box"
+    },
+    "R": {
+      "item": "minecraft:redstone_torch"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "I": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "revervox_mod:megaphone"},
+  "show_notification": true
+}

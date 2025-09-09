@@ -37,7 +37,7 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
             boolean hasIndirectPassenger = entity.hasIndirectPassenger(player);
             return (isSpeakingAtMe || isAngryAt) && !hasIndirectPassenger;
         };
-        this.startAggroTargetConditions = TargetingConditions.forCombat().range(range).selector(this.isAngerInducing).ignoreLineOfSight();
+        this.startAggroTargetConditions = TargetingConditions.forCombat().range(range).selector(this.isAngerInducing);
     }
     public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, int range) {
         this(entity, pSelectionPredicate, soundToPlay, null, range);
