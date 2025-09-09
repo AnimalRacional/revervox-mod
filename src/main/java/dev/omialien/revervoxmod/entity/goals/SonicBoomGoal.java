@@ -1,6 +1,5 @@
 package dev.omialien.revervoxmod.entity.goals;
 
-import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -21,13 +20,7 @@ public class SonicBoomGoal extends Goal {
 
     @Override
     public void start() {
-        RevervoxMod.LOGGER.debug("Starting SonicBoomGoal");
         this.mob.startSonicBoom();
     }
 
-    @Override
-    public void stop() {
-        RevervoxMod.LOGGER.debug("Stopping SonicBoomGoal");
-        this.mob.resetLineOfSight();
-    }
 }

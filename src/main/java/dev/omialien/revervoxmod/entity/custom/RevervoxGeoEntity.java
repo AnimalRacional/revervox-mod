@@ -378,8 +378,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     //TODO bater nele e depois falar faz ele desaparecer (por alguma razão da set a um target null)
-    //TODO o hurtByTargetGoal spama isto enquanto que o targetSpokeGoal não pois o hurtByTargetGoal tem a cena do persistentAnger,
-    // e quando essa anger acaba, por falta de visão, o gajo desaparece devido a logica de baixo, mas se dermos aggro a partir de falar e nao de bater,
+    //TODO o hurtByTargetGoal spama isto enquanto que o targetSpokeGoal não pois o hurtByTargetGoal, depois de um tempo, tenta por o target a null
+    // e quando isso acontece, o gajo desaparece devido a logica de baixo, mas se dermos aggro a partir de falar e nao de bater,
     // ele nunca desaparece porque nunca perde o target
     @Override
     public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
@@ -481,7 +481,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     private void resetNavigation(){
-        RevervoxMod.LOGGER.debug("resetNavigation");
         if (this.getTarget() == null) return;
         this.getNavigation().moveTo(this.getTarget(), this.getAttributeValue(Attributes.MOVEMENT_SPEED));
     }
@@ -525,6 +524,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             }
         }
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.MEGAPHONE_USE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        resetLineOfSight();
     }
 
 
