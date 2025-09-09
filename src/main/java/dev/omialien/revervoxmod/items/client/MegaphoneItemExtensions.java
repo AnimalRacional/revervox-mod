@@ -43,6 +43,7 @@ public class MegaphoneItemExtensions implements IClientItemExtensions {
                 return null;
             }
         }
+        //TODO n funciona no servidor, os outros n conseguem ver esta anim
         if (entityLiving.isUsingItem()) {
             return HumanoidModel.ArmPose.TOOT_HORN;
         }

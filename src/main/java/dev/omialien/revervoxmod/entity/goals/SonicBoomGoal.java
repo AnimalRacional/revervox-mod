@@ -1,6 +1,7 @@
 package dev.omialien.revervoxmod.entity.goals;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +16,7 @@ public class SonicBoomGoal extends Goal {
     @Override
     public boolean canUse() {
         Player player = this.mob.getTarget() instanceof Player ? (Player) this.mob.getTarget() : null;
-        return player != null && !this.mob.hasLineOfSight(player) && this.mob.lostLineOfSightFor(200);
+        return RevervoxModServerConfigs.REVERVOX_SONIC_BOOM.get() && player != null && !this.mob.hasLineOfSight(player) && this.mob.lostLineOfSightFor(200);
     }
 
     @Override

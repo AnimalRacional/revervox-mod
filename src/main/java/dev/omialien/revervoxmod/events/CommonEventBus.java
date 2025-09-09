@@ -2,7 +2,6 @@ package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
-import dev.omialien.revervoxmod.config.RevervoxModCommonConfigs;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.*;
 import dev.omialien.revervoxmod.items.IRevervoxWeapon;
@@ -13,7 +12,8 @@ import dev.omialien.revervoxmod.voicechat.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
-import dev.omialien.voicechat_recording.voicechat.events.AudioEvent;
+import dev.omialien.voicechat_recording.voicechat.events.AudioLoadedEvent;
+import dev.omialien.voicechat_recording.voicechat.events.AudioRecordedEvent;
 import dev.omialien.voicechat_recording.voicechat.events.MicPacketReceivedEvent;
 import dev.omialien.voicechat_recording.voicechat.util.AudioPlayingUtil;
 import net.minecraft.server.level.ServerLevel;
@@ -166,14 +166,20 @@ public class CommonEventBus {
     }
 
     @SubscribeEvent
-    private static void onAudioEvent(AudioEvent event){
+    private static void onAudioRecordedEvent(AudioRecordedEvent event){
         if(event.getAudio().getFilterResult() == RecordedAudio.FilterResult.PASSED){
-            if (RevervoxMod.AUDIOS.getTotalAudioCount() >= RevervoxModCommonConfigs.RECORDING_LIMIT.get()){
+            if (RevervoxMod.AUDIOS.getTotalAudioCount() >= RevervoxModServerConfigs.RECORDING_LIMIT.get()){
                 RevervoxMod.AUDIOS.removeRandomAudio();
             }
             RevervoxMod.LOGGER.debug("Audio recorded and stored!");
             RevervoxMod.AUDIOS.addAudio(event.getAudio());
         }
+    }
+
+    @SubscribeEvent
+    private static void onAudioLoadedEvent(AudioLoadedEvent event){
+        RevervoxMod.LOGGER.debug("Audio stored!");
+        RevervoxMod.AUDIOS.addAudio(event.getAudio());
     }
 
     @SubscribeEvent
@@ -189,7 +195,7 @@ public class CommonEventBus {
                 PlayerStateManager.removeScreamingPlayer(event.getPlayer().getUUID());
             }
             event.getPacket().setOpusEncodedData(
-                    PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(AudioUtil.applyRadioEffect(packet, RevervoxModServerConfigs.VOICE_GAIN.get())));
+                    PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(AudioUtil.applyRadioEffect(packet, 50)));
         }
     }
     @SubscribeEvent
