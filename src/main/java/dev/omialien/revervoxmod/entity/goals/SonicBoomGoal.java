@@ -4,9 +4,10 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
-import dev.omialien.revervoxmod.registries.SoundRegistry;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityAttachment;
@@ -26,7 +27,7 @@ public class SonicBoomGoal extends Goal {
     @Override
     public boolean canUse() {
         Player player = this.mob.getTarget() instanceof Player ? (Player) this.mob.getTarget() : null;
-        return RevervoxModServerConfigs.REVERVOX_SONIC_BOOM.get() && player != null && !this.mob.hasLineOfSight(player) && this.mob.lostLineOfSightFor(200);
+        return RevervoxModServerConfigs.REVERVOX_SONIC_BOOM.get() && player != null && !this.mob.hasLineOfSight(player) && this.mob.lostLineOfSightFor(100);
     }
 
     @Override
@@ -40,8 +41,9 @@ public class SonicBoomGoal extends Goal {
         this.mob.lookAt(EntityAnchorArgument.Anchor.FEET, this.mob.getTarget().getEyePosition());
         this.mob.getNavigation().stop();
         int SONIC_BOOM_ANIM_DURATION_TICKS = 45;
+        this.mob.level().playSound(null, BlockPos.containing(this.mob.position()), SoundEvents.WARDEN_SONIC_CHARGE, SoundSource.HOSTILE, 1.0F, 1.0F);
         RevervoxMod.TASKS.schedule(mob::resetNavigation, SONIC_BOOM_ANIM_DURATION_TICKS);
-        RevervoxMod.TASKS.schedule(this::doSonicBoom, 13);
+        RevervoxMod.TASKS.schedule(this::doSonicBoom, 20);
 
     }
 
@@ -66,8 +68,9 @@ public class SonicBoomGoal extends Goal {
             target.push(vec32.x() * d0, vec32.y() * d1, vec32.z() * d0);
 
         }
-        this.mob.level().playSound(null, this.mob.getX(), this.mob.getY(), this.mob.getZ(), SoundRegistry.MEGAPHONE_USE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        //this.mob.level().playSound(null, this.mob.getX(), this.mob.getY(), this.mob.getZ(), SoundRegistry.MEGAPHONE_USE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         this.mob.resetLineOfSight();
+        this.mob.level().playSound(null, BlockPos.containing(this.mob.position()), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 1.0F, 1.0F);
     }
 
 }

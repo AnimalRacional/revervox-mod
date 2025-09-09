@@ -3,12 +3,12 @@ package dev.omialien.revervoxmod.items;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.items.client.MegaphoneRenderer;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
-import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
@@ -124,7 +124,7 @@ public class MegaphoneItem extends Item implements GeoItem {
             sp.hurtMarked = true;
         }
 
-        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegistry.MEGAPHONE_USE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 1.0F, 1.0F);
         //TODO ver se da para fazer mais eficiente, versão com raycast aqui em baixo, apenas funciona se olhar diretamente para a entidade
         /*
         Vec3 viewVector = player.getViewVector(0.0F).normalize();
