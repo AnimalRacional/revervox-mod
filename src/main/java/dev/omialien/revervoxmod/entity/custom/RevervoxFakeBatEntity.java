@@ -203,9 +203,6 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
 
     }
 
-    // TODO n funfa
-
-
     @Override
     public boolean isInvisible() {
         if(level().isClientSide){

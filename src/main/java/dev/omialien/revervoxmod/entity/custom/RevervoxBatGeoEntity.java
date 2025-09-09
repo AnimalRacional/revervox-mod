@@ -461,7 +461,6 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
                     double attackSpeed = RevervoxBatGeoEntity.this.getAttributeValue(Attributes.ATTACK_SPEED);
                     attackCooldown = (int)(getCurrentSwingDuration() / attackSpeed);
 
-                    //TODO som de ataque
                     if (!RevervoxBatGeoEntity.this.isSilent()) {
                         RevervoxBatGeoEntity.this.level().levelEvent(1039, RevervoxBatGeoEntity.this.blockPosition(), 0);
                     }

@@ -408,7 +408,6 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                     (RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get() ||
                             RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get())
             ){
-                //TODO fazer com que ja so parte non-solid blocos e adicionar um sonic boom do warden que talvez parta blocos com animacao e som
                 if(breakCooldown > 0){ breakCooldown--; }
                 this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0),
                         RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()

@@ -14,7 +14,7 @@ public class EntityFollowingSoundInstance extends AbstractTickableSoundInstance 
         this.entity = entity;
         this.looping = looping;
         this.delay = 0;
-        this.volume = 0.8F;
+        this.volume = 0.7F;
         this.x = ((float)entity.getX());
         this.y = ((float)entity.getY());
         this.z = ((float)entity.getZ());

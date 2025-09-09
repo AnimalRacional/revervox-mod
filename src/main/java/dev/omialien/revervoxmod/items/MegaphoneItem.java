@@ -69,7 +69,7 @@ public class MegaphoneItem extends Item implements GeoItem {
         if (!(livingEntity instanceof Player player)) return;
 
         if (!level.isClientSide && !usedItem) {
-            if (PlayerStateManager.isScreaming(player.getUUID())) { //TODO metodo para aplicar efeito de som na voz que ele vai falar
+            if (PlayerStateManager.isScreaming(player.getUUID())) {
                 doSonicBoom(level, player);
                 usedItem = true;
                 player.getCooldowns().addCooldown(this, cooldownDur);
@@ -114,14 +114,14 @@ public class MegaphoneItem extends Item implements GeoItem {
             }
         }
 
-        //TODO fazer knockback depender do RMS e dano tbm
+        //TODO fazer knockback depender do RMS
         if (player instanceof ServerPlayer sp) {
             Vec3 look = player.getLookAngle();
 
-            Vec3 recoil = look.reverse().normalize().scale(1.0); // adjust scale
+            Vec3 recoil = look.reverse().normalize().scale(1.0);
 
             sp.push(recoil.x, recoil.y, recoil.z);
-            sp.hurtMarked = true; // sync to client
+            sp.hurtMarked = true;
         }
 
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundRegistry.MEGAPHONE_USE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
