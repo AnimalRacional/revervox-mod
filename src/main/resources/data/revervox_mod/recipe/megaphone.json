@@ -3,7 +3,7 @@
   "pattern": [
     " # ",
     "Ri ",
-    " iI"
+    " jI"
   ],
   "key": {
     "#": {
@@ -17,6 +17,9 @@
     },
     "I": {
       "item": "minecraft:iron_nugget"
+    },
+    "j": {
+      "item": "minecraft:echo_shard"
     }
   },
   "result": {

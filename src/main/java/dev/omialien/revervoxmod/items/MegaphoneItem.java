@@ -109,7 +109,7 @@ public class MegaphoneItem extends Item implements GeoItem {
                 double d0 = 2.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
                 entity.push(vec32.x() * d0, vec32.y() * d1, vec32.z() * d0);
                 if (entity instanceof RevervoxGeoEntity revervox){
-                    revervox.stun();
+                    revervox.setStunned(true);
                 }
             }
         }

@@ -72,7 +72,7 @@ neoForge {
         client {
             client()
             programArgument '--username'
-            programArgument 'Dev' + (new Random(System.currentTimeMillis()).nextInt(1001)).toString()
+            programArgument 'Dev'
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }

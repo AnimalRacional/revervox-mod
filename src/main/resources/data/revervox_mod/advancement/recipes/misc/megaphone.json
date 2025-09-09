@@ -11,9 +11,25 @@
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_the_recipe": {
+    "has_echo_shard": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:echo_shard"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_voice_box": {
       "conditions": {
         "recipe": "revervox_mod:revervox_voice_box"
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "revervox_mod:megaphone"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,7 +37,9 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_revervox_ear"
+      "has_voice_box",
+      "has_revervox_ear",
+      "has_echo_shard"
     ]
   ],
   "rewards": {

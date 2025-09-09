@@ -16,7 +16,6 @@ import dev.omialien.voicechat_recording.voicechat.IRecordedPlayer;
 import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
 import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
-import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -38,7 +37,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -69,8 +67,6 @@ import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
@@ -80,9 +76,11 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     private final RawAnimation REVERVOX_CLIMB = RawAnimation.begin().thenLoop("move.climb");
     private int remainingPersistentAngerTime;
     private long firstSpeak;
+    private boolean shouldDisappear;
     private static final long NOT_SPOKEN_YET = -1;
     private AudioPlayer currentAudioPlayer;
     private long noLineOfSightTicks;
+    private boolean stunned;
     @Nullable
     private UUID persistentAngerTarget;
     private int breakCooldown;
@@ -131,7 +129,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     protected void registerGoals() {
         RevervoxMod.LOGGER.debug("Revervox Spawned");
         // So it doesn't sink in the water
-        this.goalSelector.addGoal(0, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(4, new RandomRepeatGoal(this));
         this.goalSelector.addGoal(5, new TemptGoal(this, 0.4D, Ingredient.of(Items.SPIDER_EYE), false));
         this.goalSelector.addGoal(6, new TemptGoal(this, 0.4D, Ingredient.of(Items.FERMENTED_SPIDER_EYE), false));
@@ -143,16 +141,16 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     protected void addBehaviourGoals() {
+        this.goalSelector.addGoal(0, new RevervoxStunGoal(this));
         this.goalSelector.addGoal(1, new SonicBoomGoal(this));
         this.goalSelector.addGoal(2, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
-        this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Spider.class, true, true));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, CaveSpider.class, true, true));
-        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, Silverfish.class, true, true));
-        this.targetSelector.addGoal(7, new NearestAttackableTargetGoal<>(this, Endermite.class, true, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Spider.class, true, true));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, CaveSpider.class, true, true));
+        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Silverfish.class, true, true));
+        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, Endermite.class, true, true));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -164,7 +162,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 .add(Attributes.ATTACK_DAMAGE, 14D)
                 .add(Attributes.ATTACK_SPEED, 0.3D)
                 .add(Attributes.MOVEMENT_SPEED, 0.5D)
-                .add(Attributes.STEP_HEIGHT, 1);
+                .add(Attributes.STEP_HEIGHT, 1)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
     }
 
     @Override
@@ -293,6 +292,14 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         return false;
     }
 
+    @Override
+    public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity target) {
+        if (target instanceof Player){
+            this.setShouldDisappear(true);
+        }
+        super.setTarget(target);
+    }
+
     public boolean teleportTowards(Entity pTarget) {
         Vec3 vec3 = new Vec3(this.getX() - pTarget.getX(), this.getY(0.5D) - pTarget.getEyeY(), this.getZ() - pTarget.getZ());
         vec3 = vec3.normalize();
@@ -353,9 +360,11 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             }
 
             if (this.getTarget() != null) {
-                this.noLineOfSightTicks++;
-            } else {
-                this.noLineOfSightTicks = 0;
+                if (!this.hasLineOfSight(this.getTarget())) {
+                    this.noLineOfSightTicks++;
+                } else {
+                    resetLineOfSight();
+                }
             }
 
             boolean isFacingBelowSolid = !this.level().getBlockState(blockPosition().relative(getDirection()).below()).isAir();
@@ -377,19 +386,11 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.noLineOfSightTicks = 0;
     }
 
-    //TODO bater nele e depois falar faz ele desaparecer (por alguma razão da set a um target null)
-    //TODO o hurtByTargetGoal spama isto enquanto que o targetSpokeGoal não pois o hurtByTargetGoal, depois de um tempo, tenta por o target a null
-    // e quando isso acontece, o gajo desaparece devido a logica de baixo, mas se dermos aggro a partir de falar e nao de bater,
-    // ele nunca desaparece porque nunca perde o target
-    @Override
-    public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
-        RevervoxMod.LOGGER.debug("Setting Target: {}", pTarget);
-        if (this.getTarget() != null) RevervoxMod.LOGGER.debug("Current Target: {}", this.getTarget());
-        if(pTarget == null && getTarget() != null && getTarget() instanceof Player){
-            this.remove(RemovalReason.KILLED);
-        }
-        super.setTarget(pTarget);
+    public void resetNavigation(){
+        if (this.getTarget() == null) return;
+        this.getNavigation().moveTo(this.getTarget(), this.getAttributeValue(Attributes.MOVEMENT_SPEED));
     }
+
     @Override
     public void updatePersistentAnger(@NotNull ServerLevel pServerLevel, boolean pUpdateAnger) {
         if (this.getTarget() == null || !this.hasLineOfSight(this.getTarget())) {
@@ -415,6 +416,10 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                                 && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks
                 );
 
+            }
+        } else {
+            if (shouldDisappear()) {
+                this.remove(RemovalReason.DISCARDED);
             }
         }
 
@@ -471,62 +476,13 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.entityData.set(CLIMBING_ACCESSOR, pClimbing);
     }
 
-    public void stun(){
-        triggerAnim("Walk/Run/Idle", "Stun");
-        //TODO fix flutua no ar, n é um goal ent n sei fazer a prioridade
-        this.setNoAi(true);
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.REVERVOX_STUN.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
-        int STUN_ANIM_DURATION_TICKS = 55;
-        RevervoxMod.TASKS.schedule(() -> this.setNoAi(false), STUN_ANIM_DURATION_TICKS);
+    public boolean isStunned(){
+        return this.stunned;
     }
 
-    private void resetNavigation(){
-        if (this.getTarget() == null) return;
-        this.getNavigation().moveTo(this.getTarget(), this.getAttributeValue(Attributes.MOVEMENT_SPEED));
+    public void setStunned(boolean pStunned){
+        this.stunned = pStunned;
     }
-
-    public void startSonicBoom(){
-        triggerAnim("Walk/Run/Idle", "SonicBoom");
-        if (this.getTarget() == null) return;
-        this.lookAt(EntityAnchorArgument.Anchor.FEET, this.getTarget().getEyePosition());
-        this.getNavigation().stop();
-        int SONIC_BOOM_ANIM_DURATION_TICKS = 45;
-        RevervoxMod.TASKS.schedule(this::resetNavigation, SONIC_BOOM_ANIM_DURATION_TICKS);
-        RevervoxMod.TASKS.schedule(this::doSonicBoom, 13);
-
-    }
-
-    private void doSonicBoom(){
-        Vec3 vec3 = this.position().add(this.getAttachments().get(EntityAttachment.WARDEN_CHEST, 0, this.getYRot()));
-        if (this.getTarget() == null) return;
-        Vec3 targetPosition = this.getTarget().getEyePosition();
-        Vec3 vec31 = targetPosition.subtract(vec3);
-        Vec3 vec32 = vec31.normalize();
-        int i = Mth.floor(vec31.length()) + 7;
-
-        List<LivingEntity> entitiesToHit = new ArrayList<>();
-
-        for(int j = 1; j < i; ++j) {
-            Vec3 vec33 = vec3.add(vec32.scale(j));
-            ((ServerLevel) this.level()).sendParticles(ParticleRegistry.REVERVOX_SONIC_BOOM_PARTICLES.get(), vec33.x, vec33.y, vec33.z, 1, 0.0, 0.0, 0.0, 0.0);
-            AABB currentParticleAABB = new AABB(new BlockPos((int) vec33.x, (int) vec33.y, (int) vec33.z)).inflate(2.0D, 2.0D, 2.0D);
-            List<LivingEntity> nearbyEntities = this.level().getNearbyEntities(LivingEntity.class, TargetingConditions.DEFAULT, null, currentParticleAABB);
-            entitiesToHit.addAll(nearbyEntities);
-        }
-        for (LivingEntity entity : entitiesToHit) {
-            if (entity != this && entity.hurt(this.level().damageSources().sonicBoom(this), 10.0F)) {
-                double d1 = 0.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
-                double d0 = 2.5 * (1.0 - (entity).getAttributeValue(Attributes.KNOCKBACK_RESISTANCE));
-                entity.push(vec32.x() * d0, vec32.y() * d1, vec32.z() * d0);
-                if (entity instanceof RevervoxGeoEntity revervox){
-                    revervox.stun();
-                }
-            }
-        }
-        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.MEGAPHONE_USE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-        resetLineOfSight();
-    }
-
 
     public long getGracePeriodEnd(){
         long grace = (long)(RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000);
@@ -576,5 +532,13 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             return flag1;
 
         }
+    }
+
+    public boolean shouldDisappear() {
+        return shouldDisappear;
+    }
+
+    private void setShouldDisappear(boolean shouldDisappear) {
+        this.shouldDisappear = shouldDisappear;
     }
 }

@@ -18,7 +18,7 @@ public class SoundRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> REVERVOX_BAT_IDLE = registerSound("revervox_bat_idle");
     public static final DeferredHolder<SoundEvent, SoundEvent> REVERVOX_BAT_HURT = registerSound("revervox_bat_hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> REVERVOX_BAT_ALERT = registerSound("revervox_bat_alert");
-    public static final DeferredHolder<SoundEvent, SoundEvent> MEGAPHONE_USE = registerSound("megaphone");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MEGAPHONE_USE = registerSound("megaphone"); //TODO change this audio
     public static final DeferredHolder<SoundEvent, SoundEvent> REVERVOX_STUN = registerSound("revervox_stun");
 
     private static DeferredHolder<SoundEvent, SoundEvent> registerSound(String name){
