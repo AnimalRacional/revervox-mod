@@ -33,10 +33,11 @@ public class AudioStorage {
         List<RecordedAudio> recs = storedAudios.get(player);
         if(recs == null || recs.isEmpty()) { return null; }
         int idx = rnd.nextInt(recs.size());
+        RecordedAudio audio = recs.get(idx);
         if(remove && getTotalAudioCount() > RevervoxModServerConfigs.MINIMUM_AUDIO_COUNT.get()){
-            recs.remove(recs.get(idx));
+            recs.remove(audio);
         }
-        return recs.get(idx);
+        return audio;
     }
 
     public RecordedAudio getRandomAudio(Predicate<UUID> includePlayer, boolean remove){
