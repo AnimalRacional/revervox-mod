@@ -1,0 +1,32 @@
+{
+  "parent": "revervox_mod:revervox/craft_voice_box",
+  "criteria": {
+    "craft_sword": {
+      "conditions": {
+        "recipe_id": "revervox_mod:revervox_sword"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.revervox_mod.craft_sword.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "revervox_mod:revervox_sword"
+    },
+    "title": {
+      "translate": "advancements.revervox_mod.craft_sword.title"
+    }
+  },
+  "requirements": [
+    [
+      "craft_sword"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  }
+}

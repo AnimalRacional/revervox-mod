@@ -1,5 +1,5 @@
 {
-  "parent": "revervox_mod:revervox/revervox_hears",
+  "parent": "revervox_mod:revervox/get_ear",
   "criteria": {
     "craft_voicebox": {
       "conditions": {

@@ -288,6 +288,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.currentAudioPlayer = player;
     }
 
+    //TODO fazer depender da distancia que o player ta dele
     @Override
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();

@@ -34,7 +34,7 @@ public class AudioStorage {
         if(recs == null || recs.isEmpty()) { return null; }
         int idx = rnd.nextInt(recs.size());
         if(remove && getTotalAudioCount() > RevervoxModServerConfigs.MINIMUM_AUDIO_COUNT.get()){
-            return recs.remove(idx);
+            recs.remove(recs.get(idx));
         }
         return recs.get(idx);
     }
@@ -48,7 +48,7 @@ public class AudioStorage {
         int randomIndex = rnd.nextInt(total.size());
         RecordedAudio randomAudio = total.get(randomIndex);
         if(remove && getTotalAudioCount() > RevervoxModServerConfigs.MINIMUM_AUDIO_COUNT.get()){
-            return storedAudios.get(randomAudio.getPlayerUUID()).remove(randomIndex);
+            storedAudios.get(randomAudio.getPlayerUUID()).remove(randomAudio);
         }
         return randomAudio;
     }
@@ -58,8 +58,8 @@ public class AudioStorage {
         if(total.isEmpty()){ return null; }
         int randomIndex = rnd.nextInt(total.size());
         RecordedAudio randomAudio = total.get(randomIndex);
-        if(remove && getTotalAudioCount() > RevervoxModServerConfigs.MINIMUM_AUDIO_COUNT.get()){
-            return storedAudios.get(randomAudio.getPlayerUUID()).remove(randomIndex);
+        if (remove && getTotalAudioCount() > RevervoxModServerConfigs.MINIMUM_AUDIO_COUNT.get()) {
+            storedAudios.get(randomAudio.getPlayerUUID()).remove(randomAudio);
         }
         return randomAudio;
     }
