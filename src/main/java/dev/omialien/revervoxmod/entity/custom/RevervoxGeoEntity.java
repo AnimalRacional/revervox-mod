@@ -122,6 +122,14 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     }
 
     @Override
+    public void die(@NotNull DamageSource damageSource) {
+        super.die(damageSource);
+        if(this.dead){
+            this.remove(RemovalReason.KILLED);
+        }
+    }
+
+    @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.geoCache;
     }
@@ -137,8 +145,9 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
-
     }
+
+
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(0, new RevervoxStunGoal(this));

@@ -1,0 +1,44 @@
+{
+  "criteria": {
+    "layer": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "position": {
+                  "y": {
+                    "max": 0.0
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:location"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "revervox_mod:textures/block/tapebox_side.png",
+    "description": {
+      "translate": "advancements.revervox_mod.root.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "revervox_mod:revervox_voice_box"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.revervox_mod.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "layer"
+    ]
+  ]
+}

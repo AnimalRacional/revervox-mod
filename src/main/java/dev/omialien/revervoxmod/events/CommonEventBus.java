@@ -3,8 +3,11 @@ package dev.omialien.revervoxmod.events;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
-import dev.omialien.revervoxmod.entity.custom.*;
-import dev.omialien.revervoxmod.items.IRevervoxWeapon;
+import dev.omialien.revervoxmod.datagen.AdvancementProvider;
+import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
+import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
+import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
+import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
 import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
@@ -15,27 +18,22 @@ import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.events.AudioLoadedEvent;
 import dev.omialien.voicechat_recording.voicechat.events.AudioRecordedEvent;
 import dev.omialien.voicechat_recording.voicechat.events.MicPacketReceivedEvent;
-import dev.omialien.voicechat_recording.voicechat.util.AudioPlayingUtil;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.ambient.Bat;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -43,7 +41,6 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 @EventBusSubscriber(modid = RevervoxMod.MOD_ID)
@@ -103,41 +100,6 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
         VoiceChatRecordingPlugin.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null);
-    }
-
-    // TODO neoforge might have a better way of doing this
-    @SubscribeEvent
-    public static void onSpeakingEntityDeath(LivingDeathEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (entity instanceof SpeakingEntity) {
-            if(!entity.level().isClientSide()){
-                entity.dropAllDeathLoot((ServerLevel) entity.level(), Objects.requireNonNull(event.getSource()));
-            }
-            event.setCanceled(true); // Prevent default death behavior
-            entity.remove(Entity.RemovalReason.KILLED); // Disappear instantly
-        }
-    }
-
-    // TODO neoforge might have a better way to do this
-    @SubscribeEvent
-    public static void onPlayerDeath(LivingDeathEvent event){
-        if(!event.getEntity().level().isClientSide() && event.getEntity() instanceof Player victim){
-            DamageSource source = event.getSource();
-            RevervoxMod.LOGGER.debug("damage source: {}", source);
-            RevervoxMod.LOGGER.debug("attacker entity: {}", source.getEntity());
-            if(source.getEntity() == null){
-                RevervoxMod.LOGGER.debug("no entity source");
-                return;
-            }
-            if(source.getEntity() instanceof Player attacker){
-                RevervoxMod.LOGGER.debug("is player && serverapi");
-                if(attacker.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof IRevervoxWeapon){
-                    RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(victim.getUUID(), false);
-                    if(audio == null) { return; }
-                    AudioPlayingUtil.playLocationalAudio(audio, victim.position(), (ServerLevel) victim.level(), RevervoxMod.MOD_ID);
-                }
-            }
-        }
     }
 
     @SubscribeEvent
@@ -208,5 +170,11 @@ public class CommonEventBus {
     public static void onPlayerConnect(PlayerEvent.PlayerLoggedInEvent event){
         PlayerStateManager.addPlayerCoders(event.getEntity().getUUID());
         RevervoxMod.AUDIOS.loadPlayerAudios(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
+    public static void GatherDataEvent(GatherDataEvent event){
+        DataGenerator gen = event.getGenerator();
+        gen.addProvider(event.includeServer(), new AdvancementProvider(gen.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper()));
     }
 }

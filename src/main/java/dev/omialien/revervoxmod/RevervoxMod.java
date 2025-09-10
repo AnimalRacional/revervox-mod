@@ -38,6 +38,7 @@ public class RevervoxMod {
         ItemRegistry.register(modEventBus);
         CreativeTabRegistry.register(modEventBus);
         ParticleRegistry.register(modEventBus);
+        TriggerRegistry.register(modEventBus);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.SERVER, RevervoxModServerConfigs.SPEC);

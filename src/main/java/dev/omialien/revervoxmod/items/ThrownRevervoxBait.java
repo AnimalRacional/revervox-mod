@@ -32,8 +32,6 @@ public class ThrownRevervoxBait extends ThrowableItemProjectile {
     @Override
     public void handleEntityEvent(byte pId) {
         if (pId == 3) {
-            double d0 = 0.08D;
-
             for(int i = 0; i < 8; ++i) {
                 this.level().addParticle(new ItemParticleOption(ParticleTypes.ITEM, this.getItem()), this.getX(), this.getY(), this.getZ(), ((double)this.random.nextFloat() - 0.5D) * 0.08D, ((double)this.random.nextFloat() - 0.5D) * 0.08D, ((double)this.random.nextFloat() - 0.5D) * 0.08D);
             }
@@ -52,7 +50,11 @@ public class ThrownRevervoxBait extends ThrowableItemProjectile {
         Vec3 hitLocation = pResult.getLocation();
         if (!this.level().isClientSide) {
             if (!hasDropped) {
-                this.level().addFreshEntity(new ItemEntity(this.level(), hitLocation.x, hitLocation.y, hitLocation.z, new ItemStack(Items.FERMENTED_SPIDER_EYE)));
+                ItemEntity drop = new ItemEntity(this.level(), hitLocation.x, hitLocation.y, hitLocation.z, new ItemStack(Items.FERMENTED_SPIDER_EYE));
+                if(this.getOwner() != null){
+                    drop.setThrower(this.getOwner());
+                }
+                this.level().addFreshEntity(drop);
                 hasDropped = true;
             }
         }

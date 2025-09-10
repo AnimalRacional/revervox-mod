@@ -3,6 +3,8 @@ package dev.omialien.revervoxmod.entity.goals;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.HearingEntity;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
+import dev.omialien.revervoxmod.registries.TriggerRegistry;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -94,13 +96,11 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
                     return true;
                 }
             }
-
             return super.canContinueToUse();
         }
     }
 
     public void tick() {
-
         if (this.entity.getTarget() == null) {
             super.setTarget(null);
         }
@@ -111,6 +111,9 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
                 RevervoxMod.LOGGER.debug("Target: " + this.target.getName());
                 this.pendingTarget = null;
                 super.start();
+                if(target instanceof ServerPlayer spTarget){
+                    TriggerRegistry.HEARD_REVERVOX_TRIGGER.get().trigger(spTarget);
+                }
             }
         } else {
             super.tick();
