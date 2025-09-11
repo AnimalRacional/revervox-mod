@@ -28,7 +28,7 @@ public class RevervoxMod {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final TaskScheduler TASKS = new TaskScheduler();
-    public static final AudioStorage AUDIOS = new AudioStorage();
+    public static AudioStorage AUDIOS = new AudioStorage();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.

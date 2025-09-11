@@ -11,6 +11,7 @@ import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
 import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
+import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
@@ -100,6 +101,7 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void onServerStarting(ServerStartingEvent event) {
         VoiceChatRecordingPlugin.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null);
+        RevervoxMod.AUDIOS = new AudioStorage();
     }
 
     @SubscribeEvent
