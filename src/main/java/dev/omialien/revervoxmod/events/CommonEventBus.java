@@ -70,6 +70,9 @@ public class CommonEventBus {
                 event.getServer().getLevel(Level.OVERWORLD)),
                 new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
                         (int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get())));
+        //TODO RANDOM EVENT: se 2 players tiverem juntos, os dois param de ver um ao outro e
+        // ouvem a voz do outro amigo atras deles, quando virarem se, levam com um jumpscare do
+        // revervox e volta tudo ao normal. arranjar maneira de dar counter ao evento
     }
 
     private static Runnable fakeBatEventSpawnRequest(ServerLevel level){

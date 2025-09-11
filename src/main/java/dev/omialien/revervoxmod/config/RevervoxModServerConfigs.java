@@ -18,5 +18,8 @@ public class RevervoxModServerConfigs {
     public static final ModConfigSpec.BooleanValue REVERVOX_ABOVE_GROUND = BUILDER.define("revervoxAboveGround", false);
     public static final ModConfigSpec.BooleanValue REVERVOX_BREAKS_NONSOLID = BUILDER.define("revervoxBreakNonSolid", true);
     public static final ModConfigSpec.BooleanValue REVERVOX_SONIC_BOOM = BUILDER.define("revervoxSonicBoom", true);
+    public static final ModConfigSpec.IntValue REVERVOX_SONIC_BOOM_COOLDOWN = BUILDER.defineInRange("revervoxSonicBoomCooldown", 5, 1, 100);
+    public static final ModConfigSpec.IntValue REVERVOX_SONIC_BOOM_RANGE = BUILDER.defineInRange("revervoxSonicBoomRange", 30, 10, 100);
+    public static final ModConfigSpec.IntValue MEGAPHONE_COOLDOWN = BUILDER.defineInRange("megaphoneCooldown", 4, 0, 100);
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

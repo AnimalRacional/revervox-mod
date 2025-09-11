@@ -1,5 +1,6 @@
 package dev.omialien.revervoxmod.items;
 
+import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.items.client.MegaphoneRenderer;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
@@ -39,7 +40,6 @@ import java.util.function.Consumer;
 
 public class MegaphoneItem extends Item implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private static final int cooldownDur = 80;
     private boolean usedItem = false;
     public MegaphoneItem(Properties properties) {
         super(properties);
@@ -72,7 +72,7 @@ public class MegaphoneItem extends Item implements GeoItem {
             if (PlayerStateManager.isScreaming(player.getUUID())) {
                 doSonicBoom(level, player);
                 usedItem = true;
-                player.getCooldowns().addCooldown(this, cooldownDur);
+                player.getCooldowns().addCooldown(this, RevervoxModServerConfigs.MEGAPHONE_COOLDOWN.get() * 20);
             }
         }
     }
@@ -153,7 +153,7 @@ public class MegaphoneItem extends Item implements GeoItem {
     }
 
     public int getUseDuration(@NotNull ItemStack stack, @NotNull LivingEntity entity) {
-        return cooldownDur;
+        return RevervoxModServerConfigs.MEGAPHONE_COOLDOWN.get() * 20;
     }
 
     public @NotNull UseAnim getUseAnimation(@NotNull ItemStack stack) {

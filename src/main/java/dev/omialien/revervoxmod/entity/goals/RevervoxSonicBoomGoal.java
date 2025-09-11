@@ -17,9 +17,9 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
-public class SonicBoomGoal extends Goal {
+public class RevervoxSonicBoomGoal extends Goal {
     private final RevervoxGeoEntity mob;
-    public SonicBoomGoal(RevervoxGeoEntity mob){
+    public RevervoxSonicBoomGoal(RevervoxGeoEntity mob){
         this.getFlags().add(Flag.MOVE);
         this.mob = mob;
     }
@@ -27,7 +27,15 @@ public class SonicBoomGoal extends Goal {
     @Override
     public boolean canUse() {
         Player player = this.mob.getTarget() instanceof Player ? (Player) this.mob.getTarget() : null;
-        return RevervoxModServerConfigs.REVERVOX_SONIC_BOOM.get() && player != null && !this.mob.hasLineOfSight(player) && this.mob.lostLineOfSightFor(100);
+        boolean isTargetAboveGroundAndMobBelow = this.mob.position().y() < this.mob.level().getSeaLevel()
+                && (player != null
+                && player.position().y() > this.mob.level().getSeaLevel());
+        return RevervoxModServerConfigs.REVERVOX_SONIC_BOOM.get()
+                && player != null
+                && this.mob.distanceTo(player) <= RevervoxModServerConfigs.REVERVOX_SONIC_BOOM_RANGE.get()
+                && !this.mob.hasLineOfSight(player)
+                && this.mob.lostLineOfSightFor(RevervoxModServerConfigs.REVERVOX_SONIC_BOOM_COOLDOWN.get() * 20)
+                && !isTargetAboveGroundAndMobBelow;
     }
 
     @Override
