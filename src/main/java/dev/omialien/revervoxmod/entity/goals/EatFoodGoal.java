@@ -1,6 +1,8 @@
 package dev.omialien.revervoxmod.entity.goals;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.registries.TriggerRegistry;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -89,6 +91,9 @@ public class EatFoodGoal extends Goal {
         if (this.entity.position().distanceTo(currentItemToFollow.position()) < 2.5D) {
             RevervoxMod.LOGGER.debug("Eating");
             this.entity.eat(this.entity.level(), currentItemToFollow.getItem());
+            if(currentItemToFollow.getOwner() instanceof ServerPlayer spTarget){
+                TriggerRegistry.REVERVOX_ATE_FOOD_TRIGGER.get().trigger(spTarget);
+            }
             currentItemToFollow.discard();
             this.nearbyItems.remove(currentItemToFollow);
 

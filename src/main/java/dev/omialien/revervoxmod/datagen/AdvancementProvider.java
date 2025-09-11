@@ -1,6 +1,7 @@
 package dev.omialien.revervoxmod.datagen;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.advancements.RevervoxEatFoodTrigger;
 import dev.omialien.revervoxmod.advancements.RevervoxHearTrigger;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
@@ -117,6 +118,22 @@ public class AdvancementProvider extends net.neoforged.neoforge.common.data.Adva
                     .rewards(AdvancementRewards.Builder.experience(50))
                     .addCriterion("craft_sword", RecipeCraftedTrigger.TriggerInstance.craftedItem(ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox_sword")))
                     .save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/craft_sword"), existingFileHelper);
+            AdvancementHolder revervoxEatFood = new Advancement.Builder()
+                    .parent(root)
+                    .display(
+                            ItemRegistry.REVERVOX_BAIT.get(),
+                            Component.translatable("advancements.revervox_mod.revervox_ate_food.title"),
+                            Component.translatable("advancements.revervox_mod.revervox_ate_food.description"),
+                            null,
+                            AdvancementType.TASK,
+                            true,
+                            true,
+                            false
+                    )
+                    .rewards(AdvancementRewards.Builder.experience(50))
+                    .addCriterion("revervox_eat_food", TriggerRegistry.REVERVOX_ATE_FOOD_TRIGGER.get().createCriterion(new RevervoxEatFoodTrigger.TriggerInstance(Optional.empty())))
+                    .requirements(AdvancementRequirements.allOf(List.of("revervox_eat_food")))
+                    .save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/revervox_eat_food"), existingFileHelper);
         }
     }
 }
