@@ -53,12 +53,14 @@ public class AudioUtil {
     }
 
     public static double calculateRMS(short[] audio){
-        int start;
-        for(start = 0; start < audio.length && Math.abs(audio[start]) < (Integer) RecordingCommonConfig.SILENCE_THRESHOLD.get(); ++start) {
+        int start = 0;
+        while (start < audio.length && Math.abs(audio[start]) < RecordingCommonConfig.SILENCE_THRESHOLD.get()) {
+            ++start;
         }
 
-        int end;
-        for(end = audio.length - 1; end > start && Math.abs(audio[end]) < (Integer)RecordingCommonConfig.SILENCE_THRESHOLD.get(); --end) {
+        int end = audio.length - 1;
+        while (end > start && Math.abs(audio[end]) < RecordingCommonConfig.SILENCE_THRESHOLD.get()) {
+            --end;
         }
 
         int activeSamples = end - start + 1;

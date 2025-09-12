@@ -155,25 +155,27 @@ public class CommonEventBus {
         if (PlayerStateManager.isUsingMegaphone(event.getPlayer().getUUID())) {
             short[] packet = PlayerStateManager.getPlayerDecoder(event.getPlayer().getUUID()).decode(event.getPacket().getOpusEncodedData());
             double packetRMS = AudioUtil.calculateRMS(packet);
-            RevervoxMod.LOGGER.debug("Packet RMS: " + packetRMS);
+            if(!Double.isNaN(packetRMS)){
+                RevervoxMod.LOGGER.debug("Packet RMS: " + packetRMS);
+                event.getPacket().setOpusEncodedData(
+                        PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(AudioUtil.applyRadioEffect(packet, 50)));
+            }
             if (packetRMS > 4000.0D){
                 PlayerStateManager.addScreamingPlayer(event.getPlayer().getUUID());
             } else {
                 PlayerStateManager.removeScreamingPlayer(event.getPlayer().getUUID());
             }
-            event.getPacket().setOpusEncodedData(
-                    PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(AudioUtil.applyRadioEffect(packet, 50)));
         }
     }
     @SubscribeEvent
     public static void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event){
-        PlayerStateManager.removePlayerCoders(event.getEntity().getUUID());
+        PlayerStateManager.removeState(event.getEntity().getUUID());
         RevervoxMod.AUDIOS.savePlayerAudios(event.getEntity().getUUID());
     }
 
     @SubscribeEvent
     public static void onPlayerConnect(PlayerEvent.PlayerLoggedInEvent event){
-        PlayerStateManager.addPlayerCoders(event.getEntity().getUUID());
+        PlayerStateManager.createState(event.getEntity().getUUID());
         RevervoxMod.AUDIOS.loadPlayerAudios(event.getEntity().getUUID());
     }
 

@@ -1,64 +1,64 @@
 package dev.omialien.revervoxmod.voicechat;
 
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.opus.OpusEncoder;
-import dev.omialien.voicechat_recording.VoiceChatRecording;
-import oshi.util.tuples.Pair;
+import dev.omialien.revervoxmod.RevervoxMod;
 
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 //TODO fazer isto generico: o PlayerStateManager tem diferentes PlayerStates e depois quando quiser saber o estado do player,
 // basta chamar o PlayerStateManager.getPlayerState(player.getUUID(), PlayerStateType.SCREAMING);
 public class PlayerStateManager {
-    private static final Set<UUID> screamingPlayers = new HashSet<>();
-    private static final Map<UUID, Pair<OpusDecoder, OpusEncoder>> playerCoders = new HashMap<>();
-    private static final Set<UUID> playersUsingMegaphone = new HashSet<>();
+    private static final Map<UUID, PlayerState> PLAYER_STATES = new ConcurrentHashMap<>();
+
+    public static void createState(UUID uuid) {
+        if(PLAYER_STATES.containsKey(uuid)){
+            RevervoxMod.LOGGER.error("Tried to add already-existing state! {}", uuid);
+            return;
+        }
+        PLAYER_STATES.put(uuid, new PlayerState(uuid));
+    }
+
+    public static void removeState(UUID uuid){
+        if(!PLAYER_STATES.containsKey(uuid)) {
+            RevervoxMod.LOGGER.error("Tried to remove non-existing state! {}", uuid);
+            return;
+        }
+        PLAYER_STATES.remove(uuid);
+    }
+
+    public static PlayerState getState(UUID uuid) { return PLAYER_STATES.get(uuid); }
 
     public static boolean isScreaming(UUID uuid) {
-        return screamingPlayers.contains(uuid);
+        return getState(uuid).isScreaming();
     }
 
     public static void addScreamingPlayer(UUID uuid) {
-        if (screamingPlayers.contains(uuid)) return;
-        screamingPlayers.add(uuid);
+        getState(uuid).setScreaming(true);
     }
 
     public static void removeScreamingPlayer(UUID uuid) {
-        if (!screamingPlayers.contains(uuid)) return;
-        screamingPlayers.remove(uuid);
+        getState(uuid).setScreaming(false);
     }
 
     public static boolean isUsingMegaphone(UUID uuid) {
-        return playersUsingMegaphone.contains(uuid);
+        return getState(uuid).isUsingMegaphone();
     }
 
     public static void addUsingMegaphone(UUID uuid) {
-        if (playersUsingMegaphone.contains(uuid)) return;
-        playersUsingMegaphone.add(uuid);
+        getState(uuid).setMegaphone(true);
     }
 
     public static void removeUsingMegaphone(UUID uuid) {
-        if (!playersUsingMegaphone.contains(uuid)) return;
-        playersUsingMegaphone.remove(uuid);
+        getState(uuid).setMegaphone(false);
     }
 
     public static OpusDecoder getPlayerDecoder(UUID uuid) {
-        return playerCoders.get(uuid).getA();
+        return getState(uuid).getDecoder();
     }
     public static OpusEncoder getPlayerEncoder(UUID uuid) {
-        return playerCoders.get(uuid).getB();
-    }
-
-    public static void addPlayerCoders(UUID uuid) {
-        if (VoiceChatRecording.vcApi instanceof VoicechatServerApi api) {
-            OpusDecoder decoder = api.createDecoder();
-            OpusEncoder encoder = api.createEncoder();
-            playerCoders.put(uuid, new Pair<>(decoder, encoder));
-        }
-    }
-
-    public static void removePlayerCoders(UUID uuid) {
-        playerCoders.remove(uuid);
+        return getState(uuid).getEncoder();
     }
 }
