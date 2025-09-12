@@ -43,18 +43,6 @@ public class PlayerStateManager {
         getState(uuid).setScreaming(false);
     }
 
-    public static boolean isUsingMegaphone(UUID uuid) {
-        return getState(uuid).isUsingMegaphone();
-    }
-
-    public static void addUsingMegaphone(UUID uuid) {
-        getState(uuid).setMegaphone(true);
-    }
-
-    public static void removeUsingMegaphone(UUID uuid) {
-        getState(uuid).setMegaphone(false);
-    }
-
     public static OpusDecoder getPlayerDecoder(UUID uuid) {
         return getState(uuid).getDecoder();
     }

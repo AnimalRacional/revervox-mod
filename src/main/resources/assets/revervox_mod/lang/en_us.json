@@ -40,6 +40,9 @@
   "revervox_mod.configuration.revervoxSonicBoomRange.tooltip": "Range (in blocks) of Revervox's Sonic Boom",
   "revervox_mod.configuration.megaphoneCooldown": "Megaphone Cooldown",
   "revervox_mod.configuration.megaphoneCooldown.tooltip": "Cooldown (in seconds) between Megaphone uses",
+  "revervox_mod.configuration.crouchStopsMegaphone": "Crouch stops megaphone boom",
+  "revervox_mod.configuration.crouchStopsMegaphone.tooltip": "Whether crouching will stop your megaphone from doing a sonic boom",
+
 
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",

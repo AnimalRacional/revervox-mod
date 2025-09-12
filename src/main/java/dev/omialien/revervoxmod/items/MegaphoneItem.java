@@ -60,7 +60,6 @@ public class MegaphoneItem extends Item implements GeoItem {
         ItemStack itemstack = player.getItemInHand(usedHand);
         player.startUsingItem(usedHand);
         player.awardStat(Stats.ITEM_USED.get(this));
-        PlayerStateManager.addUsingMegaphone(player.getUUID());
         return InteractionResultHolder.consume(itemstack);
     }
 
@@ -69,7 +68,7 @@ public class MegaphoneItem extends Item implements GeoItem {
         if (!(livingEntity instanceof Player player)) return;
 
         if (!level.isClientSide && !usedItem) {
-            if (PlayerStateManager.isScreaming(player.getUUID())) {
+            if ((!player.isCrouching() || !RevervoxModServerConfigs.CROUCH_PREVENTS_MEGAPHONE_BOOM.get()) && PlayerStateManager.isScreaming(player.getUUID())) {
                 doSonicBoom(level, player);
                 usedItem = true;
                 player.getCooldowns().addCooldown(this, RevervoxModServerConfigs.MEGAPHONE_COOLDOWN.get() * 20);
@@ -80,9 +79,6 @@ public class MegaphoneItem extends Item implements GeoItem {
     @Override
     public void onStopUsing(@NotNull ItemStack stack, @NotNull LivingEntity entity, int count) {
         usedItem = false;
-        if (entity instanceof Player player) {
-            PlayerStateManager.removeUsingMegaphone(player.getUUID());
-        }
         super.onStopUsing(stack, entity, count);
     }
 

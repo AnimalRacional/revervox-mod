@@ -11,6 +11,7 @@ import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
 import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
+import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
@@ -152,7 +153,7 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void onMicrophonePacket(MicPacketReceivedEvent event){
         if (event.getPlayer() == null) return;
-        if (PlayerStateManager.isUsingMegaphone(event.getPlayer().getUUID())) {
+        if (event.getPlayer().isUsingItem() && event.getPlayer().getUseItem().is(ItemRegistry.MEGAPHONE)) {
             short[] packet = PlayerStateManager.getPlayerDecoder(event.getPlayer().getUUID()).decode(event.getPacket().getOpusEncodedData());
             double packetRMS = AudioUtil.calculateRMS(packet);
             if(!Double.isNaN(packetRMS)){
