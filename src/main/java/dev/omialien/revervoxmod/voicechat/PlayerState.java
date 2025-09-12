@@ -10,13 +10,12 @@ import dev.omialien.voicechat_recording.VoiceChatRecording;
 import java.util.UUID;
 
 public class PlayerState {
-    private boolean isUsingMegaphone;
     private boolean isScreaming;
+    private long lastScream;
     private final UUID uuid;
     private Pair<OpusDecoder, OpusEncoder> coders;
     public PlayerState(UUID uuid){
         this.uuid = uuid;
-        this.isUsingMegaphone = false;
         this.isScreaming = false;
         if(VoiceChatRecording.vcApi instanceof VoicechatServerApi api) {
             coders = new Pair<>(api.createDecoder(), api.createEncoder());
@@ -25,10 +24,13 @@ public class PlayerState {
         }
     }
     public UUID getUuid() {return this.uuid; }
-    public void setScreaming(boolean screaming){ this.isScreaming = screaming; }
-    public void setMegaphone(boolean megaphone) { this.isUsingMegaphone = megaphone; }
-    public boolean isScreaming() { return this.isScreaming; }
-    public boolean isUsingMegaphone() { return this.isUsingMegaphone; }
+    public void setScreaming(boolean screaming){
+        if(screaming){
+            this.lastScream = System.currentTimeMillis();
+        }
+        this.isScreaming = screaming;
+    }
+    public boolean isScreaming() { return this.isScreaming && System.currentTimeMillis() - this.lastScream <= 500; }
     public OpusDecoder getDecoder() { return this.coders.getFirst(); }
     public OpusEncoder getEncoder() { return this.coders.getSecond(); }
 }
