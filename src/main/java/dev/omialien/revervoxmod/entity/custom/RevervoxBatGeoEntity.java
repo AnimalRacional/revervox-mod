@@ -57,7 +57,7 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.UUID;
 
-public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
     public static final int TICKS_PER_FLAP = Mth.ceil(2.4166098F);

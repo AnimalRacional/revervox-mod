@@ -38,7 +38,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.Optional;
 import java.util.UUID;
 
-public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IRevervoxEntity, SpeakingEntity {
+public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache;
     private final int TICKS_TO_UPDATE_ROTATION = 200;
     private int ticksLeft = 3;

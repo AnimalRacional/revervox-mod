@@ -69,7 +69,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);

@@ -12,6 +12,7 @@ import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
+import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
@@ -20,6 +21,7 @@ import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
 import dev.omialien.voicechat_recording.voicechat.events.AudioLoadedEvent;
 import dev.omialien.voicechat_recording.voicechat.events.AudioRecordedEvent;
 import dev.omialien.voicechat_recording.voicechat.events.MicPacketReceivedEvent;
+import dev.omialien.voicechat_recording.voicechat.util.AudioPlayingUtil;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,6 +38,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -178,6 +181,20 @@ public class CommonEventBus {
     public static void onPlayerConnect(PlayerEvent.PlayerLoggedInEvent event){
         PlayerStateManager.createState(event.getEntity().getUUID());
         RevervoxMod.AUDIOS.loadPlayerAudios(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
+    public static void repeatOnKill(LivingDeathEvent e){
+        if(e.getEntity() instanceof ServerPlayer plr){
+            if(e.getEntity().level() instanceof ServerLevel level){
+                if(e.getSource().getWeaponItem() != null && e.getSource().getWeaponItem().is(RevervoxTags.Items.AUDIO_ON_KILL)) {
+                    RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(plr.getUUID(), false);
+                    if(audio != null){
+                        AudioPlayingUtil.playLocationalAudio(audio, e.getEntity().position(), level, RevervoxMod.MOD_ID);
+                    }
+                }
+            }
+        }
     }
 
     @SubscribeEvent
