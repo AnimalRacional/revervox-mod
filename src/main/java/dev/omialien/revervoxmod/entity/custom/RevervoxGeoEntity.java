@@ -10,6 +10,7 @@ import dev.omialien.revervoxmod.entity.goals.*;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
+import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechat_recording.VoiceChatRecording;
 import dev.omialien.voicechat_recording.voicechat.IRecordedPlayer;
@@ -39,7 +40,6 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
@@ -152,7 +152,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(0, new RevervoxStunGoal(this));
         this.goalSelector.addGoal(1, new RevervoxSonicBoomGoal(this));
-        this.goalSelector.addGoal(2, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
+        this.goalSelector.addGoal(2, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));

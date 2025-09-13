@@ -3,46 +3,51 @@ package dev.omialien.revervoxmod.entity.goals;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.registries.TriggerRegistry;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class EatFoodGoal extends Goal {
     private final Mob entity;
-    private final ItemEntity itemTypeToFollow;
+    private final TagKey<Item> itemTypesToFollow;
     private List<? extends ItemEntity> nearbyItems;
     private ItemEntity currentItemToFollow;
-    private final List<ItemEntity> ignoreItems;
+    private final Set<ItemEntity> ignoreItems;
 
-    public EatFoodGoal(Mob entity, ItemEntity item) {
+    public EatFoodGoal(Mob entity, TagKey<Item> item) {
         this.entity = entity;
-        this.itemTypeToFollow = item;
-        this.ignoreItems = new ArrayList<>();
+        this.itemTypesToFollow = item;
+        this.ignoreItems = new HashSet<>();
         this.getFlags().add(Flag.MOVE);
     }
     @Override
     public boolean canUse() {
         AABB entityAABB = this.entity.getBoundingBox().inflate(20, 5, 20);
-
-        if (this.itemTypeToFollow != null) {
+        // TODO este null check é necessário?
+        if (this.itemTypesToFollow != null) {
             // Remove items from the ignored items list that have been removed
             if (!this.ignoreItems.isEmpty()) this.ignoreItems.removeIf(Entity::isRemoved);
-
             // Check if there are any items in the area that are of the same type and not in the ignored items list
             nearbyItems = this.entity.level().getEntitiesOfClass(ItemEntity.class, entityAABB,
                     itemEntity -> {
-                    boolean flag = itemEntity.getItem().is(itemTypeToFollow.getItem().getItem());
-                    boolean flag1 = !this.ignoreItems.contains(itemEntity);
-                    return flag && flag1;
+                        boolean isValidItem = itemEntity.getItem().is(itemTypesToFollow);
+                        boolean isIgnored = this.ignoreItems.contains(itemEntity);
+                        return isValidItem && !isIgnored;
                     });
             if (!nearbyItems.isEmpty()) {
+                // TODO em vez de dar sort ao array, não se pode só fazer um loop e encontrar o mais pequeno?
                 // Sort the items by distance
                 nearbyItems.sort((a, b) -> Double.compare(
                         this.entity.distanceToSqr(a),
@@ -59,13 +64,13 @@ public class EatFoodGoal extends Goal {
         return false;
     }
 
-
     @Override
     public boolean canContinueToUse() {
-        if (entity.getNavigation().isDone() && nearbyItems.contains(currentItemToFollow) && currentItemToFollow.isAlive() && currentItemToFollow != null){
+        if(this.currentItemToFollow == null) { return false; }
+        if (entity.getNavigation().isDone() && nearbyItems.contains(currentItemToFollow) && currentItemToFollow.isAlive()){
             this.ignoreItems.add(currentItemToFollow);
         }
-        return nearbyItems.contains(currentItemToFollow) && currentItemToFollow.isAlive() && currentItemToFollow != null && !entity.getNavigation().isDone();
+        return nearbyItems.contains(currentItemToFollow) && currentItemToFollow.isAlive() && !entity.getNavigation().isDone();
     }
 
     @Override
@@ -90,13 +95,16 @@ public class EatFoodGoal extends Goal {
 
         if (this.entity.position().distanceTo(currentItemToFollow.position()) < 2.5D) {
             RevervoxMod.LOGGER.debug("Eating");
-            this.entity.eat(this.entity.level(), currentItemToFollow.getItem());
+            if(currentItemToFollow.getItem().getFoodProperties(this.entity) != null){
+                this.entity.eat(this.entity.level(), currentItemToFollow.getItem());
+            } else {
+                this.entity.level().playSound(null, this.entity.blockPosition(), SoundEvents.GENERIC_EAT, SoundSource.HOSTILE);
+            }
             if(currentItemToFollow.getOwner() instanceof ServerPlayer spTarget){
                 TriggerRegistry.REVERVOX_ATE_FOOD_TRIGGER.get().trigger(spTarget);
             }
             currentItemToFollow.discard();
             this.nearbyItems.remove(currentItemToFollow);
-
         }
     }
 
