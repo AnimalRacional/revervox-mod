@@ -73,7 +73,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, Speak
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    protected void defineSynchedData(SynchedEntityData.@NotNull Builder builder) {
         super.defineSynchedData(builder);
         builder.define(TARGET_ACCESSOR, Optional.empty());
     }
