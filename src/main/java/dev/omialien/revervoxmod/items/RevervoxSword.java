@@ -6,13 +6,14 @@ import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tier;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.neoforge.common.SimpleTier;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +27,8 @@ public class RevervoxSword extends SwordItem {
         return RevervoxModServerConfigs.REVERVOX_SWORD_BONUS_DAMAGE.get();
     }
 
-    public RevervoxSword(Tier pTier, int pAttackDamageModifier, float pAttackSpeedModifier, Properties pProperties) {
-        super(pTier, pProperties.attributes(SwordItem.createAttributes(REVERVOX_TIER, pAttackDamageModifier, pAttackSpeedModifier)));
+    public RevervoxSword(int pAttackDamageModifier, float pAttackSpeedModifier, Properties pProperties) {
+        super(REVERVOX_TIER, pProperties.attributes(SwordItem.createAttributes(REVERVOX_TIER, pAttackDamageModifier, pAttackSpeedModifier)));
     }
 
     @Override
@@ -43,15 +44,5 @@ public class RevervoxSword extends SwordItem {
             pTarget.hurt(pTarget.level().damageSources().source(DamageTypeRegistry.REVERVOX_BONUS), getBonusDamage());
         }
         return super.hurtEnemy(pStack, pTarget, pAttacker);
-    }
-
-    @Override
-    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is(ItemRegistry.REVERVOX_BAT_TOOTH.get());
-    }
-
-    @Override
-    public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
-        return stack.is(Items.ENCHANTED_BOOK) || (enchantment.value()).isSupportedItem(Items.DIAMOND_SWORD.getDefaultInstance());
     }
 }

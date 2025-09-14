@@ -7,7 +7,6 @@ import dev.omialien.revervoxmod.items.RevervoxVoiceBoxItem;
 import dev.omialien.revervoxmod.items.RevervoxSword;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tiers;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -42,7 +41,7 @@ public class ItemRegistry {
 
     public static final DeferredItem<SwordItem> REVERVOX_SWORD = REGISTRY.register(
             "revervox_sword",
-            () -> new RevervoxSword(Tiers.DIAMOND, 3, -2.4F, new Item.Properties())
+            () -> new RevervoxSword(3, -2.4F, new Item.Properties())
     );
     public static final DeferredItem<Item> REVERVOX_BAT_TOOTH = REGISTRY.register(
             "revervox_bat_tooth",
