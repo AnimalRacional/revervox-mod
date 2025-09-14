@@ -35,31 +35,35 @@ public class EatFoodGoal extends Goal {
     @Override
     public boolean canUse() {
         AABB entityAABB = this.entity.getBoundingBox().inflate(20, 5, 20);
-        // TODO este null check é necessário?
-        if (this.itemTypesToFollow != null) {
-            // Remove items from the ignored items list that have been removed
-            if (!this.ignoreItems.isEmpty()) this.ignoreItems.removeIf(Entity::isRemoved);
-            // Check if there are any items in the area that are of the same type and not in the ignored items list
-            nearbyItems = this.entity.level().getEntitiesOfClass(ItemEntity.class, entityAABB,
-                    itemEntity -> {
-                        boolean isValidItem = itemEntity.getItem().is(itemTypesToFollow);
-                        boolean isIgnored = this.ignoreItems.contains(itemEntity);
-                        return isValidItem && !isIgnored;
-                    });
-            if (!nearbyItems.isEmpty()) {
-                // TODO em vez de dar sort ao array, não se pode só fazer um loop e encontrar o mais pequeno?
-                // Sort the items by distance
-                nearbyItems.sort((a, b) -> Double.compare(
-                        this.entity.distanceToSqr(a),
-                        this.entity.distanceToSqr(b)
-                ));
-                // Check if the closest item is within 20 blocks
-                if (this.entity.position().distanceTo(nearbyItems.get(0).position()) > 20.0D) return false;
-                RevervoxMod.LOGGER.debug("Nearby Items: " + nearbyItems.size());
-                // Get the closest item and set it as the current item to follow
-                this.currentItemToFollow = nearbyItems.get(0);
-                return true;
+        // Remove items from the ignored items list that have been removed
+        if (!this.ignoreItems.isEmpty()) this.ignoreItems.removeIf(Entity::isRemoved);
+        // Check if there are any items in the area that are of the same type and not in the ignored items list
+        nearbyItems = this.entity.level().getEntitiesOfClass(ItemEntity.class, entityAABB,
+                itemEntity -> {
+                boolean isValidItem = itemEntity.getItem().is(itemTypesToFollow);
+                boolean isIgnored = this.ignoreItems.contains(itemEntity);
+                return isValidItem && !isIgnored;
+        });
+        if (!nearbyItems.isEmpty()) {
+            // Get the closest item
+            ItemEntity closestItem = null;
+
+            for (ItemEntity item : nearbyItems) {
+                if (closestItem == null) {
+                    closestItem = item;
+                } else {
+                    if (this.entity.distanceToSqr(item) < this.entity.distanceToSqr(closestItem)) {
+                        closestItem = item;
+                    }
+                }
             }
+
+            // Check if the closest item is within 20 blocks
+            if (this.entity.position().distanceTo(closestItem.position()) > 20.0D) return false;
+            RevervoxMod.LOGGER.debug("Nearby Items: " + nearbyItems.size());
+            // Get the closest item and set it as the current item to follow
+            this.currentItemToFollow = closestItem;
+            return true;
         }
         return false;
     }
