@@ -1,24 +1,23 @@
 package dev.omialien.revervoxmod;
 
+import com.mojang.logging.LogUtils;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.registries.*;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
-import dev.omialien.voicechat_recording.taskscheduler.TaskScheduler;
+import dev.omialien.voicechatrecording.taskscheduler.TaskScheduler;
+import dev.omialien.voicechatrecording_api.VoiceChatRecordingApi;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.slf4j.Logger;
-
-import com.mojang.logging.LogUtils;
-
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.ModContainer;
+import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(RevervoxMod.MOD_ID)
@@ -29,6 +28,7 @@ public class RevervoxMod {
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final TaskScheduler TASKS = new TaskScheduler();
     public static AudioStorage AUDIOS = new AudioStorage();
+    public static VoiceChatRecordingApi RECORDING_API = null;
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.

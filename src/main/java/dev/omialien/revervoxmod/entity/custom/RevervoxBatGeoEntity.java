@@ -9,18 +9,19 @@ import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
-import dev.omialien.voicechat_recording.VoiceChatRecording;
-import dev.omialien.voicechat_recording.voicechat.IRecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
-import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.VoiceChatRecording;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.voicechat.util.AudioPlayingUtil;
+import dev.omialien.voicechatrecording_api.AudioEffect;
+import dev.omialien.voicechatrecording_api.IRecordedAudio;
+import dev.omialien.voicechatrecording_api.IRecordedPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -177,11 +178,12 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
-        VoicechatServerApi api = (VoicechatServerApi) VoiceChatRecording.vcApi;
-        //short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
-        RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
-        if (audio != null) {
-            playAudio(audio.getAudio(), api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.3f).makeReverb(0.5f, 160, 1));
+        if(!this.level().isClientSide()) {
+            IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
+
+            if (audio != null) {
+                AudioPlayingUtil.playLocationalAudio(audio, this.getEyePosition(), (ServerLevel) this.level(), new AudioEffect().changePitch(1.3f).makeReverb(0.5f, 160, 1), RevervoxMod.MOD_ID, 32f);
+            }
         }
         super.remove(pReason);
     }
@@ -209,10 +211,18 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
     }
 
     @Override
+    public void die(@NotNull DamageSource damageSource) {
+        super.die(damageSource);
+        if(this.dead){
+            this.remove(RemovalReason.KILLED);
+        }
+    }
+
+    @Override
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(time >= getGracePeriodEnd()){
-            IRecordedPlayer rec = VoiceChatRecordingPlugin.getRecordedPlayer(player.getUUID());
+            IRecordedPlayer rec = RevervoxMod.RECORDING_API.getRecordedPlayer(player.getUUID());
             if (rec != null){
                 return rec.isSpeaking() &&
                         rec.getLastSpoke() >= getGracePeriodEnd();

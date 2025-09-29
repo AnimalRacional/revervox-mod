@@ -5,7 +5,7 @@ import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 import de.maxhenkel.voicechat.api.opus.OpusEncoder;
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.voicechat_recording.VoiceChatRecording;
+import dev.omialien.voicechatrecording.VoiceChatRecording;
 
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package dev.omialien.revervoxmod.voicechat;
 
-import dev.omialien.voicechat_recording.configs.RecordingCommonConfig;
+import dev.omialien.voicechatrecording.configs.RecordingCommonConfig;
 
 public class AudioUtil {
     public static short[] applyRadioEffect(short[] pcmBE, double gain) {

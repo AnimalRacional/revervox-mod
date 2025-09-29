@@ -7,10 +7,10 @@ import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
-import dev.omialien.voicechat_recording.VoiceChatRecording;
-import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.VoiceChatRecording;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording_api.AudioEffect;
+import dev.omialien.voicechatrecording_api.IRecordedAudio;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -149,7 +149,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, Speak
             Player target = getPlayerTarget();
             if(target != null){
 //                short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
-                RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
+                IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
                 if(audio != null){
                     AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(this.getX(), this.getY(), this.getZ()));
                     if(channel != null) {

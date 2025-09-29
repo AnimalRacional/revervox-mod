@@ -3,9 +3,9 @@ package dev.omialien.revervoxmod.entity.custom;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording_api.AudioEffect;
+import dev.omialien.voicechatrecording_api.IRecordedAudio;
 import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
@@ -27,10 +27,11 @@ public interface SpeakingEntity {
     void onSpeak(long audioDuration);
 
     default void playAudio(short @NotNull [] audio, VoicechatServerApi api, AudioChannel channel, AudioEffect effect){
+        final int SAMPLE_RATE = 48000;
         short[] audioWithAppliedEffects = effect.applyEffects(audio);
+        RevervoxMod.LOGGER.debug("Playing audio with {}s", audio.length / SAMPLE_RATE);
         setCurrentAudioPlayer(new AudioPlayer(audioWithAppliedEffects, api, channel));
         getCurrentAudioPlayer().start();
-        final int SAMPLE_RATE = 48000;
         onSpeak((audio.length / SAMPLE_RATE) * 1000);
     }
 
@@ -39,7 +40,7 @@ public interface SpeakingEntity {
     }
 
     default void playPlayerAudio(Player player, VoicechatServerApi api, Supplier<AudioChannel> channelSupp, AudioEffect effect){
-        RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(player.getUUID(), true);
+        IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(player.getUUID(), true);
         if(audio == null){
             RevervoxMod.LOGGER.error("No audio found for {}, choosing random player", player.getName());
             audio = RevervoxMod.AUDIOS.getRandomAudio(true);

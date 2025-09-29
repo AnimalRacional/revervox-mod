@@ -172,7 +172,7 @@ dependencies {
     localRuntime ("maven.modrinth:jade:15.10.3+neoforge")
     implementation ("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
     implementation("com.eliotlash.mclib:mclib:20")
-    implementation ("blank:voice-chat-recording:1.21.1-${voicechatrecording_version}")
+    implementation ("blank:voicechatrecording:1.21.1-${voicechatrecording_version}")
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:19.22.1.316"
 }
 

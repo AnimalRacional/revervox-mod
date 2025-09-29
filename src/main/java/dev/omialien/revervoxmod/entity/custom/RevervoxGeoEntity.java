@@ -12,11 +12,11 @@ import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
-import dev.omialien.voicechat_recording.VoiceChatRecording;
-import dev.omialien.voicechat_recording.voicechat.IRecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.VoiceChatRecording;
+import dev.omialien.voicechatrecording_api.IRecordedPlayer;
+import dev.omialien.voicechatrecording_api.VoiceChatRecordingApi;
+import dev.omialien.voicechatrecording_api.AudioEffect;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -293,7 +293,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(hasSpoken() && time >= getGracePeriodEnd()){
-            IRecordedPlayer rec = VoiceChatRecordingPlugin.getRecordedPlayer(player.getUUID());
+            IRecordedPlayer rec = RevervoxMod.RECORDING_API.getRecordedPlayer(player.getUUID());
             if (rec != null){
                 return rec.isSpeaking() &&
                         rec.getLastSpoke() >= getGracePeriodEnd();

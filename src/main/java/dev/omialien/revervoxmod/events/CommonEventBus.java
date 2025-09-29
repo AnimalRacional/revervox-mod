@@ -16,12 +16,13 @@ import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
-import dev.omialien.voicechat_recording.voicechat.RecordedAudio;
-import dev.omialien.voicechat_recording.voicechat.VoiceChatRecordingPlugin;
-import dev.omialien.voicechat_recording.voicechat.events.AudioLoadedEvent;
-import dev.omialien.voicechat_recording.voicechat.events.AudioRecordedEvent;
-import dev.omialien.voicechat_recording.voicechat.events.MicPacketReceivedEvent;
-import dev.omialien.voicechat_recording.voicechat.util.AudioPlayingUtil;
+import dev.omialien.voicechatrecording.voicechat.VoiceChatRecordingPlugin;
+import dev.omialien.voicechatrecording.voicechat.util.AudioPlayingUtil;
+import dev.omialien.voicechatrecording_api.IRecordedAudio;
+import dev.omialien.voicechatrecording_api.events.AudioLoadedEvent;
+import dev.omialien.voicechatrecording_api.events.AudioRecordedEvent;
+import dev.omialien.voicechatrecording_api.events.MicPacketReceivedEvent;
+import dev.omialien.voicechatrecording_api.events.RecordingSetupEvent;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -106,8 +107,9 @@ public class CommonEventBus {
     }
 
     @SubscribeEvent
-    public static void onServerStarting(ServerStartingEvent event) {
-        VoiceChatRecordingPlugin.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null);
+    public static void onRecordingApiInitialized(RecordingSetupEvent event) {
+        RevervoxMod.RECORDING_API = event.getApi();
+        event.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null);
         RevervoxMod.AUDIOS = new AudioStorage();
     }
 
@@ -138,7 +140,8 @@ public class CommonEventBus {
 
     @SubscribeEvent
     private static void onAudioRecordedEvent(AudioRecordedEvent event){
-        if(event.getAudio().getFilterResult() == RecordedAudio.FilterResult.PASSED){
+        if(event.getAudio().getFilterResult() == IRecordedAudio.FilterResult.PASSED){
+            // TODO passar esta verificação para AudioStorage no addAudio
             if (RevervoxMod.AUDIOS.getTotalAudioCount() >= RevervoxModServerConfigs.RECORDING_LIMIT.get()){
                 RevervoxMod.AUDIOS.removeRandomAudio();
             }
@@ -149,8 +152,12 @@ public class CommonEventBus {
 
     @SubscribeEvent
     private static void onAudioLoadedEvent(AudioLoadedEvent event){
-        RevervoxMod.LOGGER.debug("Audio stored!");
-        RevervoxMod.AUDIOS.addAudio(event.getAudio());
+        if(RevervoxMod.AUDIOS.getTotalAudioCount() < RevervoxModServerConfigs.RECORDING_LIMIT.get() &&
+                event.getLoadReason() == VoiceChatRecordingPlugin.LoadType.NAMESPACE &&
+                event.getNamespace().equals(RevervoxMod.MOD_ID)) {
+            RevervoxMod.LOGGER.debug("Storing namespace-loaded audio");
+            RevervoxMod.AUDIOS.addAudio(event.getAudio());
+        }
     }
 
     @SubscribeEvent
@@ -188,7 +195,7 @@ public class CommonEventBus {
         if(e.getEntity() instanceof ServerPlayer plr){
             if(e.getEntity().level() instanceof ServerLevel level){
                 if(e.getSource().getWeaponItem() != null && e.getSource().getWeaponItem().is(RevervoxTags.Items.AUDIO_ON_KILL)) {
-                    RecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(plr.getUUID(), false);
+                    IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(plr.getUUID(), false);
                     if(audio != null){
                         AudioPlayingUtil.playLocationalAudio(audio, e.getEntity().position(), level, RevervoxMod.MOD_ID);
                     }
