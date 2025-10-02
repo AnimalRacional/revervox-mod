@@ -71,10 +71,11 @@ public class CommonEventBus {
 
     @SubscribeEvent
     public static void onRegisterEvents(ServerStartingEvent event) {
+        int nextEvent = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
+                (int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()));
+        RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", nextEvent);
         RevervoxMod.TASKS.schedule(fakeBatEventSpawnRequest(
-                event.getServer().getLevel(Level.OVERWORLD)),
-                new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
-                        (int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get())));
+                event.getServer().getLevel(Level.OVERWORLD)), nextEvent);
         //TODO RANDOM EVENT: se 2 players tiverem juntos, os dois param de ver um ao outro e
         // ouvem a voz do outro amigo atras deles, quando virarem se, levam com um jumpscare do
         // revervox e volta tudo ao normal. arranjar maneira de dar counter ao evento
@@ -83,20 +84,22 @@ public class CommonEventBus {
     private static Runnable fakeBatEventSpawnRequest(ServerLevel level){
         return () -> {
             RevervoxMod.LOGGER.debug("Starting fake bat event!");
-            List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
-            if (!playerList.isEmpty()) {
-                int randomPlayer = new Random().nextInt(playerList.size());
-                if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
-                    RevervoxMod.LOGGER.debug("Player met requirements, starting bat event!");
-                    RevervoxMod.summonBatWave(playerList.get(randomPlayer));
+            if(RevervoxModServerConfigs.ENABLE_FAKE_BAT_EVENT.get()) {
+                List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
+                if (!playerList.isEmpty()) {
+                    int randomPlayer = new Random().nextInt(playerList.size());
+                    if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
+                        RevervoxMod.LOGGER.debug("Player met requirements, starting bat event!");
+                        RevervoxMod.summonBatWave(playerList.get(randomPlayer));
+                    } else {
+                        RevervoxMod.LOGGER.debug("Player didn't meet requirements, skipping bat event!");
+                    }
                 } else {
-                    RevervoxMod.LOGGER.debug("Player didn't meet requirements, skipping bat event!");
+                    RevervoxMod.LOGGER.debug("(Fake Bat Event) playerList is empty");
                 }
-            } else {
-                RevervoxMod.LOGGER.debug("(Fake Bat Event) playerList is empty");
             }
             int nextRandomTick = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),(int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get())); //20 minutos max
-            RevervoxMod.LOGGER.debug("next bat event scheduled for " + (nextRandomTick/20)/60 + " minutes");
+            RevervoxMod.LOGGER.debug("next bat event scheduled for {} ticks", nextRandomTick);
             RevervoxMod.TASKS.schedule(fakeBatEventSpawnRequest(level), nextRandomTick);
         };
     }
