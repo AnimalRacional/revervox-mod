@@ -25,6 +25,7 @@ public class RevervoxTags {
     }
     public static class Entities {
         public static final TagKey<EntityType<?>> REVERVOX_BONUS_DAMAGE = createTag("revervox_bonus_damage");
+        public static final TagKey<EntityType<?>> INSECTS = createTag("insects");
         private static TagKey<EntityType<?>> createTag(String name){
             return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, name));
         }

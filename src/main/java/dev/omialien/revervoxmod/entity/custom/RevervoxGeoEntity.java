@@ -13,10 +13,9 @@ import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechatrecording.VoiceChatRecording;
-import dev.omialien.voicechatrecording_api.IRecordedPlayer;
-import dev.omialien.voicechatrecording_api.VoiceChatRecordingApi;
-import dev.omialien.voicechatrecording_api.AudioEffect;
 import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording_api.AudioEffect;
+import dev.omialien.voicechatrecording_api.IRecordedPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -40,7 +39,7 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
@@ -156,10 +155,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Spider.class, true, true));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, CaveSpider.class, true, true));
-        this.targetSelector.addGoal(5, new NearestAttackableTargetGoal<>(this, Silverfish.class, true, true));
-        this.targetSelector.addGoal(6, new NearestAttackableTargetGoal<>(this, Endermite.class, true, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true, (entity) -> entity.getType().is(RevervoxTags.Entities.INSECTS)));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
