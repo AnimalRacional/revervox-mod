@@ -11,7 +11,7 @@ import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechatrecording.VoiceChatRecording;
 import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
-import dev.omialien.voicechatrecording.voicechat.util.AudioPlayingUtil;
+import dev.omialien.voicechatrecording_api.util.AudioPlayingUtil;
 import dev.omialien.voicechatrecording_api.AudioEffect;
 import dev.omialien.voicechatrecording_api.IRecordedAudio;
 import dev.omialien.voicechatrecording_api.IRecordedPlayer;

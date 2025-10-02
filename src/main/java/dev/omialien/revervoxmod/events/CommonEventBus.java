@@ -16,13 +16,12 @@ import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
-import dev.omialien.voicechatrecording.voicechat.VoiceChatRecordingPlugin;
-import dev.omialien.voicechatrecording.voicechat.util.AudioPlayingUtil;
 import dev.omialien.voicechatrecording_api.IRecordedAudio;
 import dev.omialien.voicechatrecording_api.events.AudioLoadedEvent;
 import dev.omialien.voicechatrecording_api.events.AudioRecordedEvent;
 import dev.omialien.voicechatrecording_api.events.MicPacketReceivedEvent;
 import dev.omialien.voicechatrecording_api.events.RecordingSetupEvent;
+import dev.omialien.voicechatrecording_api.util.AudioPlayingUtil;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -156,7 +155,7 @@ public class CommonEventBus {
     @SubscribeEvent
     private static void onAudioLoadedEvent(AudioLoadedEvent event){
         if(RevervoxMod.AUDIOS.getTotalAudioCount() < RevervoxModServerConfigs.RECORDING_LIMIT.get() &&
-                event.getLoadReason() == VoiceChatRecordingPlugin.LoadType.NAMESPACE &&
+                event.getLoadReason() == AudioLoadedEvent.LoadType.NAMESPACE &&
                 event.getNamespace().equals(RevervoxMod.MOD_ID)) {
             RevervoxMod.LOGGER.debug("Storing namespace-loaded audio");
             RevervoxMod.AUDIOS.addAudio(event.getAudio());
