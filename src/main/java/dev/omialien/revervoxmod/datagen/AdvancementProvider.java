@@ -3,6 +3,7 @@ package dev.omialien.revervoxmod.datagen;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.advancements.RevervoxEatFoodTrigger;
 import dev.omialien.revervoxmod.advancements.RevervoxHearTrigger;
+import dev.omialien.revervoxmod.advancements.RevervoxStunnedTrigger;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.TriggerRegistry;
@@ -134,6 +135,22 @@ public class AdvancementProvider extends net.neoforged.neoforge.common.data.Adva
                     .addCriterion("revervox_eat_food", TriggerRegistry.REVERVOX_ATE_FOOD_TRIGGER.get().createCriterion(new RevervoxEatFoodTrigger.TriggerInstance(Optional.empty())))
                     .requirements(AdvancementRequirements.allOf(List.of("revervox_eat_food")))
                     .save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/revervox_eat_food"), existingFileHelper);
+            AdvancementHolder stunRevervox = new Advancement.Builder()
+                    .parent(craftVoicebox)
+                    .display(
+                            ItemRegistry.MEGAPHONE.get(),
+                            Component.translatable("advancements.revervox_mod.revervox_stunned.title"),
+                            Component.translatable("advancements.revervox_mod.revervox_stunned.description"),
+                            null,
+                            AdvancementType.CHALLENGE,
+                            true,
+                            true,
+                            false
+                    )
+                    .rewards(AdvancementRewards.Builder.experience(100))
+                    .addCriterion("stun_revervox", TriggerRegistry.REVERVOX_STUNNED_TRIGGER.get().createCriterion(new RevervoxStunnedTrigger.TriggerInstance(Optional.empty())))
+                    .requirements(AdvancementRequirements.allOf(List.of("stun_revervox")))
+                    .save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/revervox_stunned"), existingFileHelper);
         }
     }
 }

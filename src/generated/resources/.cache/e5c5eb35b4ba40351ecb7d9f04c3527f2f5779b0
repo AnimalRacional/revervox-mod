@@ -1,7 +1,8 @@
-// 1.21.1	2025-09-11T10:32:44.266083	Advancements
+// 1.21.1	2025-10-02T21:16:41.0764478	Advancements
 7a663ee75df64c3e75190637247284b304429042 data/revervox_mod/advancement/revervox/craft_sword.json
 4a1eed1fdf606727e9c982af3a23658686ff0703 data/revervox_mod/advancement/revervox/craft_voice_box.json
 c3aea34c7d9759b739aba26fa9b44424c270c447 data/revervox_mod/advancement/revervox/get_ear.json
 f4173c37a20b4ac5a24007d4dcfb2312457092fa data/revervox_mod/advancement/revervox/revervox_eat_food.json
 78f0341317eec1ed0ff9b9124e03f9c998ec0298 data/revervox_mod/advancement/revervox/revervox_hears.json
+525be0510495cdca786c533cedf6bc088575c053 data/revervox_mod/advancement/revervox/revervox_stunned.json
 d789525f5d654f8de09b7083beac9092f36f75ce data/revervox_mod/advancement/revervox/root.json

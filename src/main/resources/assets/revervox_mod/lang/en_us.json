@@ -79,5 +79,7 @@
   "advancements.revervox_mod.craft_sword.title": "Repeat this!",
   "advancements.revervox_mod.craft_sword.description": "Craft the Revervox Sword",
   "advancements.revervox_mod.revervox_ate_food.title": "Good boy!",
-  "advancements.revervox_mod.revervox_ate_food.description": "Have Revervox eat your bait"
+  "advancements.revervox_mod.revervox_ate_food.description": "Have Revervox eat your bait",
+  "advancements.revervox_mod.revervox_stunned.title": "Red light!",
+  "advancements.revervox_mod.revervox_stunned.description": "Stun Revervox using a megaphone"
 }

@@ -4,6 +4,7 @@ import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.items.client.MegaphoneRenderer;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
+import dev.omialien.revervoxmod.registries.TriggerRegistry;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
@@ -106,6 +107,9 @@ public class MegaphoneItem extends Item implements GeoItem {
                 entity.push(vec32.x() * d0, vec32.y() * d1, vec32.z() * d0);
                 if (entity instanceof RevervoxGeoEntity revervox){
                     revervox.setStunned(true);
+                    if(player instanceof ServerPlayer sp) {
+                        TriggerRegistry.REVERVOX_STUNNED_TRIGGER.get().trigger(sp);
+                    }
                 }
             }
         }

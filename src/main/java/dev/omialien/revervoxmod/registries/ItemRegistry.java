@@ -31,7 +31,7 @@ public class ItemRegistry {
     );
     public static final DeferredItem<MegaphoneItem> MEGAPHONE = REGISTRY.register(
             "megaphone",
-            () -> new MegaphoneItem(new Item.Properties())
+            () -> new MegaphoneItem(new Item.Properties().stacksTo(1))
     );
 
     public static final DeferredItem<RevervoxBaitItem> REVERVOX_BAIT = REGISTRY.register(
