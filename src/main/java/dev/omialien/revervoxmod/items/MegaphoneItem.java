@@ -81,13 +81,8 @@ public class MegaphoneItem extends Item implements GeoItem {
         super.onStopUsing(stack, entity, count);
     }
 
-    public Vec3 getChestAttachmentPos(Player player) {
-        // Approximate based on eye position
-        return player.position().add(0.0D, player.getBbHeight() * 0.7D, 0.0D);
-    }
-
     private void doSonicBoom(Level level, Player player) {
-        Vec3 vec3 = player.position().add(getChestAttachmentPos(player));
+        Vec3 vec3 = player.position().add(0, player.getBbHeight() * 0.7D, 0);
         Vec3 playerFowardsPosition = player.getEyePosition().add(player.getLookAngle().scale(10));
         Vec3 vec31 = playerFowardsPosition.subtract(vec3);
         Vec3 vec32 = vec31.normalize();
@@ -156,7 +151,7 @@ public class MegaphoneItem extends Item implements GeoItem {
     }
 
     @Override
-    public int getUseDuration(ItemStack pStack) {
+    public int getUseDuration(@NotNull ItemStack pStack) {
         return RevervoxModServerConfigs.MEGAPHONE_COOLDOWN.get() * 20;
     }
 
