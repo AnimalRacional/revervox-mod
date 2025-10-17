@@ -27,9 +27,10 @@
     "description": {
       "translate": "advancements.revervox_mod.root.description"
     },
+    "frame": "task",
+    "hidden": false,
     "icon": {
-      "count": 1,
-      "id": "revervox_mod:revervox_voice_box"
+      "item": "revervox_mod:revervox_voice_box"
     },
     "show_toast": false,
     "title": {
@@ -40,5 +41,6 @@
     [
       "layer"
     ]
-  ]
+  ],
+  "sends_telemetry_event": true
 }

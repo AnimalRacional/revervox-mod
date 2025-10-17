@@ -9,14 +9,17 @@
     }
   },
   "display": {
+    "announce_to_chat": true,
     "description": {
       "translate": "advancements.revervox_mod.craft_sword.description"
     },
     "frame": "challenge",
+    "hidden": false,
     "icon": {
-      "count": 1,
-      "id": "revervox_mod:revervox_sword"
+      "item": "revervox_mod:revervox_sword",
+      "nbt": "{Damage:0}"
     },
+    "show_toast": true,
     "title": {
       "translate": "advancements.revervox_mod.craft_sword.title"
     }
@@ -28,5 +31,6 @@
   ],
   "rewards": {
     "experience": 50
-  }
+  },
+  "sends_telemetry_event": true
 }

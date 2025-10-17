@@ -12,8 +12,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class RevervoxEatFoodTrigger extends SimpleCriterionTrigger<RevervoxEatFoodTrigger.TriggerInstance> {
     private static final ResourceLocation ID = new ResourceLocation(RevervoxMod.MOD_ID, "revervox_ate_food");
-    public void trigger(ServerPlayer player){
-        this.trigger(player, (p) -> true);
+    @Override
+    public @NotNull ResourceLocation getId() {
+        return ID;
     }
 
     @Override
@@ -21,15 +22,17 @@ public class RevervoxEatFoodTrigger extends SimpleCriterionTrigger<RevervoxEatFo
         return new TriggerInstance(pPredicate);
     }
 
-    @Override
-    public @NotNull ResourceLocation getId() {
-        return ID;
+    public void trigger(ServerPlayer player){
+        this.trigger(player, (p) -> true);
     }
 
     public static class TriggerInstance extends AbstractCriterionTriggerInstance {
-
         public TriggerInstance(ContextAwarePredicate pPlayer) {
             super(ID, pPlayer);
+        }
+
+        public static TriggerInstance getInstance() {
+            return new TriggerInstance(ContextAwarePredicate.ANY);
         }
     }
 

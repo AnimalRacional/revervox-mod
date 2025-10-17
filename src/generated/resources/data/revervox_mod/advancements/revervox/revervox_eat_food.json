@@ -2,17 +2,21 @@
   "parent": "revervox_mod:revervox/root",
   "criteria": {
     "revervox_eat_food": {
+      "conditions": {},
       "trigger": "revervox_mod:revervox_ate_food"
     }
   },
   "display": {
+    "announce_to_chat": true,
     "description": {
       "translate": "advancements.revervox_mod.revervox_ate_food.description"
     },
+    "frame": "task",
+    "hidden": false,
     "icon": {
-      "count": 1,
-      "id": "revervox_mod:revervox_bait"
+      "item": "revervox_mod:revervox_bait"
     },
+    "show_toast": true,
     "title": {
       "translate": "advancements.revervox_mod.revervox_ate_food.title"
     }
@@ -24,5 +28,6 @@
   ],
   "rewards": {
     "experience": 50
-  }
+  },
+  "sends_telemetry_event": true
 }

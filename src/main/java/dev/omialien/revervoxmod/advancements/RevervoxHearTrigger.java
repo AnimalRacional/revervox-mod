@@ -12,6 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class RevervoxHearTrigger extends SimpleCriterionTrigger<RevervoxHearTrigger.TriggerInstance> {
     public static final ResourceLocation ID = new ResourceLocation(RevervoxMod.MOD_ID, "revervox_hears");
+    @Override
+    public @NotNull ResourceLocation getId() {
+        return ID;
+    }
     public void trigger(ServerPlayer player){
         this.trigger(player, (p) -> true);
     }
@@ -21,14 +25,12 @@ public class RevervoxHearTrigger extends SimpleCriterionTrigger<RevervoxHearTrig
         return new TriggerInstance(pPredicate);
     }
 
-    @Override
-    public @NotNull ResourceLocation getId() {
-        return ID;
-    }
-
     public static class TriggerInstance extends AbstractCriterionTriggerInstance {
         public TriggerInstance(ContextAwarePredicate pPlayer) {
             super(ID, pPlayer);
+        }
+        public static TriggerInstance getInstance() {
+            return new TriggerInstance(ContextAwarePredicate.ANY);
         }
     }
 }

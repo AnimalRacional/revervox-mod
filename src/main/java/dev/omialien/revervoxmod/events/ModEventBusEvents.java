@@ -1,13 +1,16 @@
 package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.datagen.RevervoxAdvancementProvider;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,5 +34,11 @@ public class ModEventBusEvents {
                 SpawnPlacementRegisterEvent.Operation.REPLACE);
     }
 
-
+    @SubscribeEvent
+    public static void GatherDataEvent(GatherDataEvent event){
+        RevervoxMod.LOGGER.debug("GATHERDATA");
+        System.out.println("GATHERDATAln");
+        DataGenerator gen = event.getGenerator();
+        gen.addProvider(event.includeServer(), new RevervoxAdvancementProvider(gen.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper()));
+    }
 }

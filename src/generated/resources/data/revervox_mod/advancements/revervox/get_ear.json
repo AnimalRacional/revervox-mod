@@ -5,7 +5,9 @@
       "conditions": {
         "items": [
           {
-            "items": "revervox_mod:revervox_ear"
+            "items": [
+              "revervox_mod:revervox_ear"
+            ]
           }
         ]
       },
@@ -27,14 +29,16 @@
     }
   },
   "display": {
+    "announce_to_chat": true,
     "description": {
       "translate": "advancements.revervox_mod.get_ear.description"
     },
     "frame": "challenge",
+    "hidden": false,
     "icon": {
-      "count": 1,
-      "id": "revervox_mod:revervox_ear"
+      "item": "revervox_mod:revervox_ear"
     },
+    "show_toast": true,
     "title": {
       "translate": "advancements.revervox_mod.get_ear.title"
     }
@@ -46,5 +50,6 @@
     [
       "kill_revervox"
     ]
-  ]
+  ],
+  "sends_telemetry_event": true
 }

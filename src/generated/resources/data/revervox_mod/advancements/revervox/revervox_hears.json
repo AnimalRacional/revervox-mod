@@ -2,17 +2,21 @@
   "parent": "revervox_mod:revervox/root",
   "criteria": {
     "revervox_hears": {
+      "conditions": {},
       "trigger": "revervox_mod:revervox_hears"
     }
   },
   "display": {
+    "announce_to_chat": true,
     "description": {
       "translate": "advancements.revervox_mod.revervox_hears.description"
     },
+    "frame": "task",
+    "hidden": false,
     "icon": {
-      "count": 1,
-      "id": "minecraft:echo_shard"
+      "item": "minecraft:echo_shard"
     },
+    "show_toast": true,
     "title": {
       "translate": "advancements.revervox_mod.revervox_hears.title"
     }
@@ -21,5 +25,6 @@
     [
       "revervox_hears"
     ]
-  ]
+  ],
+  "sends_telemetry_event": true
 }

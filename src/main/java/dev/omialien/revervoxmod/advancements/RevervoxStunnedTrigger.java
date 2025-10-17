@@ -12,6 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 public class RevervoxStunnedTrigger extends SimpleCriterionTrigger<RevervoxStunnedTrigger.TriggerInstance> {
     public static final ResourceLocation ID = new ResourceLocation(RevervoxMod.MOD_ID, "revervox_stunned");
+    @Override
+    public @NotNull ResourceLocation getId() {
+        return ID;
+    }
     // TODO add revervox stunned statistic count?
     public void trigger(ServerPlayer player){
         this.trigger(player, (p) -> true);
@@ -21,14 +25,13 @@ public class RevervoxStunnedTrigger extends SimpleCriterionTrigger<RevervoxStunn
     protected @NotNull TriggerInstance createInstance(@NotNull JsonObject pJson, @NotNull ContextAwarePredicate pPredicate, @NotNull DeserializationContext pDeserializationContext) {
         return new TriggerInstance(pPredicate);
     }
-    @Override
-    public @NotNull ResourceLocation getId() {
-        return ID;
-    }
 
     public static class TriggerInstance extends AbstractCriterionTriggerInstance {
         public TriggerInstance(ContextAwarePredicate pPlayer) {
             super(ID, pPlayer);
+        }
+        public static TriggerInstance getInstance() {
+            return new TriggerInstance(ContextAwarePredicate.ANY);
         }
     }
 }
