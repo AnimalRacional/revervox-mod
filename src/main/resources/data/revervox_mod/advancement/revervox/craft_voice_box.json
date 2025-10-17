@@ -1,0 +1,29 @@
+{
+  "parent": "revervox_mod:revervox/get_ear",
+  "criteria": {
+    "craft_voicebox": {
+      "conditions": {
+        "recipe_id": "revervox_mod:revervox_voice_box"
+      },
+      "trigger": "minecraft:recipe_crafted"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.revervox_mod.craft_voice_box.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "revervox_mod:revervox_voice_box"
+    },
+    "title": {
+      "translate": "advancements.revervox_mod.craft_voice_box.title"
+    }
+  },
+  "requirements": [
+    [
+      "craft_voicebox"
+    ]
+  ]
+}

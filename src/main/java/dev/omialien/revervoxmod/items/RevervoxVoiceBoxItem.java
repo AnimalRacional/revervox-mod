@@ -1,11 +1,12 @@
 package dev.omialien.revervoxmod.items;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
-import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
+import dev.omialien.voicechatrecording.VoiceChatRecording;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording_api.IRecordedAudio;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -20,6 +21,16 @@ import java.util.UUID;
 
 public class RevervoxVoiceBoxItem extends Item {
     private int audioDuration;
+    private AudioChannel audioChannel;
+    private Player playingPlayer;
+
+    private AudioChannel getChannel(Player plr){
+        if ((audioChannel == null || !plr.is(playingPlayer))){
+            playingPlayer = plr;
+            audioChannel = VoiceChatRecording.vcApi.createEntityAudioChannel(UUID.randomUUID(), VoiceChatRecording.vcApi.fromEntity(plr));
+        }
+        return audioChannel;
+    }
 
     public RevervoxVoiceBoxItem(Properties pProperties) {
         super(pProperties);
@@ -30,11 +41,11 @@ public class RevervoxVoiceBoxItem extends Item {
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack item = pPlayer.getItemInHand(pUsedHand);
         boolean audioPlayed = false;
-        if (!pLevel.isClientSide() && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api) {
-            short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
+        if (!pLevel.isClientSide()) {
+            IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
             if(audio != null){
-                this.audioDuration =  audio.length / RecordingSimpleVoiceChatPlugin.SAMPLE_RATE;
-                playAudio(pPlayer, api, audio);
+                this.audioDuration =  audio.getAudio().length / AudioStorage.SAMPLE_RATE;
+                playAudio(pPlayer, VoiceChatRecording.vcApi, audio.getAudio());
                 audioPlayed = true;
                 pPlayer.startUsingItem(pUsedHand);
             } else {this.audioDuration = 1; }
@@ -57,12 +68,9 @@ public class RevervoxVoiceBoxItem extends Item {
     }
 
     private void playAudio(Player pPlayer, VoicechatServerApi api, short[] audio){
-        // TODO use a single audio channel for the item?
         if(audio != null){
-            AudioChannel channel = api.createEntityAudioChannel(UUID.randomUUID(), api.fromEntity(pPlayer));
-            if(channel != null) {
-                channel.setCategory(RevervoxMod.MOD_ID);
-                new AudioPlayer(audio, api, channel).start();
+            if(getChannel(pPlayer) != null) {
+                new AudioPlayer(audio, api, getChannel(pPlayer)).start();
             }
         }
     }

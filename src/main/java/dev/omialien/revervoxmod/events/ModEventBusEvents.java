@@ -22,6 +22,7 @@ public class ModEventBusEvents {
         event.put(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoEntity.createAttributes().build());
         event.put(EntityRegistry.REVERVOX_FAKE_BAT.get(), RevervoxFakeBatEntity.createAttributes().build());
     }
+
     @SubscribeEvent
     public static void registerSpawnPlacement(SpawnPlacementRegisterEvent event) {
         event.register(EntityRegistry.REVERVOX.get(),
@@ -29,4 +30,6 @@ public class ModEventBusEvents {
                 RevervoxGeoEntity::checkRevervoxSpawnRules,
                 SpawnPlacementRegisterEvent.Operation.REPLACE);
     }
+
+
 }

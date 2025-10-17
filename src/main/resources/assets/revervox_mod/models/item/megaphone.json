@@ -1,0 +1,24 @@
+{
+  "loader": "neoforge:separate_transforms",
+  "gui_light": "front",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "revervox_mod:item/megaphone"
+    }
+  },
+  "perspectives": {
+    "firstperson_righthand": {
+      "parent": "revervox_mod:item/megaphone_in_hand"
+    },
+    "firstperson_lefthand": {
+      "parent": "revervox_mod:item/megaphone_in_hand"
+    },
+    "thirdperson_righthand": {
+      "parent": "revervox_mod:item/megaphone_in_hand"
+    },
+    "thirdperson_lefthand": {
+      "parent": "revervox_mod:item/megaphone_in_hand"
+    }
+  }
+}

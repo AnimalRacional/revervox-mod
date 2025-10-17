@@ -78,7 +78,7 @@ description='''${mod_description}'''
     ordering="AFTER"
     side="BOTH"
 [[dependencies.${mod_id}]]
-    modId="voicechat_recording"
+    modId="voicechatrecording"
     mandatory=true
     versionRange="[${voicechatrecording_version},)"
     ordering="AFTER"

@@ -1,6 +1,5 @@
 package dev.omialien.revervoxmod.entity.custom;
 
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
@@ -8,10 +7,10 @@ import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
-import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
-import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.VoiceChatRecording;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording_api.AudioEffect;
+import dev.omialien.voicechatrecording_api.IRecordedAudio;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -39,7 +38,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.Optional;
 import java.util.UUID;
 
-public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IRevervoxEntity, SpeakingEntity {
+public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache;
     private final int TICKS_TO_UPDATE_ROTATION = 200;
     private int ticksLeft = 3;
@@ -140,17 +139,17 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
-        if(!this.level().isClientSide() && pReason == RemovalReason.KILLED && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
+        if(!this.level().isClientSide() && pReason == RemovalReason.KILLED){
             Player target = getPlayerTarget();
             if(target != null){
-                short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
+//                short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
+                IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
                 if(audio != null){
-                    AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(this.getX(), this.getY(), this.getZ()));
+                    AudioChannel channel = VoiceChatRecording.vcApi.createLocationalAudioChannel(UUID.randomUUID(), VoiceChatRecording.vcApi.fromServerLevel(this.level()), VoiceChatRecording.vcApi.createPosition(this.getX(), this.getY(), this.getZ()));
                     if(channel != null) {
                         channel.setFilter((plr) -> ((ServerPlayer)plr.getPlayer()).is(target));
                         channel.setCategory(RevervoxMod.MOD_ID);
-                        this.playAudio(audio, api, channel, new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
-                        api.createAudioPlayer(channel, api.createEncoder(), audio);
+                        this.playAudio(audio.getAudio(), VoiceChatRecording.vcApi, channel, new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
                     }
                 }
             }
@@ -197,9 +196,6 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, IReve
         return this.geoCache;
 
     }
-
-    // TODO n funfa
-
 
     @Override
     public boolean isInvisible() {

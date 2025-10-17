@@ -52,7 +52,11 @@ public class ThrownRevervoxBait extends ThrowableItemProjectile {
         Vec3 hitLocation = pResult.getLocation();
         if (!this.level().isClientSide) {
             if (!hasDropped) {
-                this.level().addFreshEntity(new ItemEntity(this.level(), hitLocation.x, hitLocation.y, hitLocation.z, new ItemStack(Items.FERMENTED_SPIDER_EYE)));
+                ItemEntity drop = new ItemEntity(this.level(), hitLocation.x, hitLocation.y, hitLocation.z, new ItemStack(Items.FERMENTED_SPIDER_EYE));
+                if(this.getOwner() != null){
+                    drop.setThrower(this.getOwner().getUUID());
+                }
+                this.level().addFreshEntity(drop);
                 hasDropped = true;
             }
         }

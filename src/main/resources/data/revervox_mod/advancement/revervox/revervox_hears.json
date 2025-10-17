@@ -1,0 +1,25 @@
+{
+  "parent": "revervox_mod:revervox/root",
+  "criteria": {
+    "revervox_hears": {
+      "trigger": "revervox_mod:revervox_hears"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.revervox_mod.revervox_hears.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "minecraft:echo_shard"
+    },
+    "title": {
+      "translate": "advancements.revervox_mod.revervox_hears.title"
+    }
+  },
+  "requirements": [
+    [
+      "revervox_hears"
+    ]
+  ]
+}

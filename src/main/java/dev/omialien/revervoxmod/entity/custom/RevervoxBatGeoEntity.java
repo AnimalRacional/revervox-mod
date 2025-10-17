@@ -9,17 +9,19 @@ import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
-import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
-import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.VoiceChatRecording;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording_api.AudioEffect;
+import dev.omialien.voicechatrecording_api.IRecordedAudio;
+import dev.omialien.voicechatrecording_api.IRecordedPlayer;
+import dev.omialien.voicechatrecording_api.util.AudioPlayingUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -56,7 +58,7 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.UUID;
 
-public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
     public static final int TICKS_PER_FLAP = Mth.ceil(2.4166098F);
@@ -77,7 +79,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new RVBatSweepAttackGoal());
         this.goalSelector.addGoal(2, new LookAtPlayerGoal(this, Player.class, 3.0F));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundEvents.BAT_LOOP));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundEvents.BAT_LOOP, 32));
         this.targetSelector.addGoal(2, new RVHurtByTargetGoal(this, Player.class));
         super.registerGoals();
     }
@@ -151,8 +153,8 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
 
     @Override
     public void awardKillScore(@NotNull Entity pKilled, int pScoreValue, @NotNull DamageSource pSource) {
-        if(pKilled instanceof Player player && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
-            playPlayerAudio(player, api, () -> createLocationalAudioChannel(api), new AudioEffect().changePitch(1.7f));
+        if(pKilled instanceof Player player){
+            playPlayerAudio(player, VoiceChatRecording.vcApi, () -> createLocationalAudioChannel(VoiceChatRecording.vcApi), new AudioEffect().changePitch(1.7f));
             this.remove(Entity.RemovalReason.DISCARDED);
         }
         super.awardKillScore(pKilled, pScoreValue, pSource);
@@ -171,10 +173,12 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
-        VoicechatServerApi api = (VoicechatServerApi) RecordingSimpleVoiceChat.vcApi;
-        short[] audio = RecordingSimpleVoiceChatPlugin.getRandomAudio(false);
-        if (audio != null) {
-            playAudio(audio, api, createLocationalAudioChannel(api), new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
+        if(!this.level().isClientSide()) {
+            IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
+
+            if (audio != null) {
+                AudioPlayingUtil.playLocationalAudio(audio, this.getEyePosition(), (ServerLevel) this.level(), new AudioEffect().changePitch(1.3f).makeReverb(0.5f, 160, 1), RevervoxMod.MOD_ID, 32f);
+            }
         }
         super.remove(pReason);
     }
@@ -202,10 +206,18 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
     }
 
     @Override
+    public void die(@NotNull DamageSource damageSource) {
+        super.die(damageSource);
+        if(this.dead){
+            this.remove(RemovalReason.KILLED);
+        }
+    }
+
+    @Override
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(time >= getGracePeriodEnd()){
-            RecordedPlayer rec = RecordingSimpleVoiceChatPlugin.getRecordedPlayer(player.getUUID());
+            IRecordedPlayer rec = RevervoxMod.RECORDING_API.getRecordedPlayer(player.getUUID());
             if (rec != null){
                 return rec.isSpeaking() &&
                         rec.getLastSpoke() >= getGracePeriodEnd();
@@ -454,7 +466,6 @@ public class RevervoxBatGeoEntity extends FlyingMob implements IRevervoxEntity, 
                     double attackSpeed = RevervoxBatGeoEntity.this.getAttributeValue(Attributes.ATTACK_SPEED);
                     attackCooldown = (int)(getCurrentSwingDuration() / attackSpeed);
 
-                    //TODO som de ataque
                     if (!RevervoxBatGeoEntity.this.isSilent()) {
                         RevervoxBatGeoEntity.this.level().levelEvent(1039, RevervoxBatGeoEntity.this.blockPosition(), 0);
                     }

@@ -1,12 +1,12 @@
 package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.items.RevervoxVoiceBoxItem;
+import dev.omialien.revervoxmod.items.MegaphoneItem;
 import dev.omialien.revervoxmod.items.RevervoxBaitItem;
 import dev.omialien.revervoxmod.items.RevervoxSword;
+import dev.omialien.revervoxmod.items.RevervoxVoiceBoxItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tiers;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -35,9 +35,14 @@ public class ItemRegistry {
             () -> new Item(new Item.Properties())
     );
 
+    public static final RegistryObject<MegaphoneItem> MEGAPHONE = REGISTRY.register(
+            "megaphone",
+            () -> new MegaphoneItem(new Item.Properties().stacksTo(1))
+    );
+
     public static final RegistryObject<SwordItem> REVERVOX_SWORD = REGISTRY.register(
             "revervox_sword",
-            () -> new RevervoxSword(Tiers.DIAMOND, 3, -2.4F, new Item.Properties())
+            () -> new RevervoxSword(3, -2.4F, new Item.Properties())
     );
     public static final RegistryObject<Item> REVERVOX_BAT_TOOTH = REGISTRY.register(
             "revervox_bat_tooth",

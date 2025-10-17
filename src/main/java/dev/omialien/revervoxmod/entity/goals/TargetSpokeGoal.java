@@ -4,6 +4,8 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.custom.HearingEntity;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
+import dev.omialien.revervoxmod.registries.TriggerRegistry;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,7 +29,7 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
     private final TargetingConditions startAggroTargetConditions;
     private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
 
-    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, SoundEvent soundToLoop) {
+    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, SoundEvent soundToLoop, int range) {
         super(entity, Player.class, 10, false, false, pSelectionPredicate);
         this.entity = entity;
         this.soundToPlay = soundToPlay;
@@ -39,18 +41,18 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
             //ExampleMod.LOGGER.debug("isSpeakingAtMe: " + isSpeakingAtMe + ", isAngryAt: " + isAngryAt + ", hasIndirectPassenger: " + hasIndirectPassenger);
             return (isSpeakingAtMe || isAngryAt) && !hasIndirectPassenger;
         };
-        this.startAggroTargetConditions = TargetingConditions.forCombat().range(this.getFollowDistance()).selector(this.isAngerInducing).ignoreLineOfSight();
+        this.startAggroTargetConditions = TargetingConditions.forCombat().range(range).selector(this.isAngerInducing).ignoreLineOfSight();
     }
-    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay) {
-        this(entity, pSelectionPredicate, soundToPlay, null);
+    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, int range) {
+        this(entity, pSelectionPredicate, soundToPlay, null, range);
     }
-    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate) {
-        this(entity, pSelectionPredicate, null, null);
+    public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, int range) {
+        this(entity, pSelectionPredicate, null, null, range);
     }
     @Override
     public boolean canUse() {
         this.pendingTarget = this.entity.level().getNearestPlayer(this.startAggroTargetConditions, this.entity);
-        return this.pendingTarget != null;
+        return this.pendingTarget != null && !(this.entity.getTarget() instanceof Player);
     }
 
 
@@ -106,6 +108,9 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
                 RevervoxMod.LOGGER.debug("Target: " + this.target.getName());
                 this.pendingTarget = null;
                 super.start();
+                if(target instanceof ServerPlayer spTarget){
+                    TriggerRegistry.HEARD_REVERVOX_TRIGGER.trigger(spTarget);
+                }
             }
         } else {
             super.tick();

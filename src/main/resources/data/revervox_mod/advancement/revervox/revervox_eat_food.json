@@ -1,0 +1,28 @@
+{
+  "parent": "revervox_mod:revervox/root",
+  "criteria": {
+    "revervox_eat_food": {
+      "trigger": "revervox_mod:revervox_ate_food"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.revervox_mod.revervox_ate_food.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "revervox_mod:revervox_bait"
+    },
+    "title": {
+      "translate": "advancements.revervox_mod.revervox_ate_food.title"
+    }
+  },
+  "requirements": [
+    [
+      "revervox_eat_food"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  }
+}

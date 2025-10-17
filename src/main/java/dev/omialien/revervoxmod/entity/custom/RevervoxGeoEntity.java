@@ -1,24 +1,20 @@
 package dev.omialien.revervoxmod.entity.custom;
 
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
 import dev.omialien.revervoxmod.entity.ai.RVClimbNavigation;
-import dev.omialien.revervoxmod.entity.goals.EatFoodGoal;
-import dev.omialien.revervoxmod.entity.goals.RandomRepeatGoal;
-import dev.omialien.revervoxmod.entity.goals.RevervoxHurtByTargetGoal;
-import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
+import dev.omialien.revervoxmod.entity.goals.*;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
+import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
-import dev.omialien.voicechat_recording.RecordingSimpleVoiceChat;
-import dev.omialien.voicechat_recording.voicechat.RecordedPlayer;
-import dev.omialien.voicechat_recording.voicechat.RecordingSimpleVoiceChatPlugin;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioEffect;
-import dev.omialien.voicechat_recording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.VoiceChatRecording;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording_api.AudioEffect;
+import dev.omialien.voicechatrecording_api.IRecordedPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -39,10 +35,9 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -64,6 +59,7 @@ import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.Animation;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
@@ -72,15 +68,18 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);
     private final RawAnimation REVERVO_CLIMB = RawAnimation.begin().thenLoop("move.climb");
     private int remainingPersistentAngerTime;
     private long firstSpeak;
+    private boolean shouldDisappear;
     private static final long NOT_SPOKEN_YET = -1;
     private AudioPlayer currentAudioPlayer;
+    private long noLineOfSightTicks;
+    private boolean stunned;
     @Nullable
     private UUID persistentAngerTarget;
     private int breakCooldown;
@@ -100,7 +99,9 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5),
+        controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5)
+                        .triggerableAnim("Stun", RawAnimation.begin().then("misc.stun", Animation.LoopType.PLAY_ONCE))
+                        .triggerableAnim("SonicBoom", DefaultAnimations.ATTACK_CAST),
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
@@ -126,27 +127,32 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
     @Override
     protected void registerGoals() {
         RevervoxMod.LOGGER.debug("Revervox Spawned");
-        this.goalSelector.addGoal(0, new FloatGoal(this)); // So it doesn't sink in the water
-        this.goalSelector.addGoal(3, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(4, new TemptGoal(this, 0.4D, Ingredient.of(Items.MUSIC_DISC_13), false));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        // So it doesn't sink in the water
+        this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(4, new RandomRepeatGoal(this));
+        this.goalSelector.addGoal(5, new TemptGoal(this, 0.4D, Ingredient.of(Items.SPIDER_EYE), false));
+        this.goalSelector.addGoal(6, new TemptGoal(this, 0.4D, Ingredient.of(Items.FERMENTED_SPIDER_EYE), false));
+        this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.5D));
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
     }
 
+
     protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(1, new EatFoodGoal(this, new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), Items.FERMENTED_SPIDER_EYE.getDefaultInstance())));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 0.7D, false));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get()));
-        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this, LivingEntity.class));
-        this.targetSelector.addGoal(3, new ResetUniversalAngerTargetGoal<>(this, false));
+        this.goalSelector.addGoal(0, new RevervoxStunGoal(this));
+        this.goalSelector.addGoal(1, new RevervoxSonicBoomGoal(this));
+        this.goalSelector.addGoal(2, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
+        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
+        this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true, (entity) -> entity.getType().is(RevervoxTags.Entities.INSECTS)));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createLivingAttributes()
                 .add(Attributes.MAX_HEALTH, 100.0D)
-                .add(Attributes.FOLLOW_RANGE, 50.0D)
+                .add(Attributes.FOLLOW_RANGE, 20.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
                 .add(Attributes.ATTACK_DAMAGE, 14D)
@@ -228,10 +234,10 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
     @Override
     public void awardKillScore(@NotNull Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {
-        if(pEntity instanceof Player player && RecordingSimpleVoiceChat.vcApi instanceof VoicechatServerApi api){
+        if(pEntity instanceof Player player){
             Vec3 loc = this.getEyePosition();
-            playPlayerAudio(player, api, () -> {
-                AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(player.getCommandSenderWorld()), api.createPosition(loc.x, loc.y, loc.z));
+            playPlayerAudio(player, VoiceChatRecording.vcApi, () -> {
+                AudioChannel channel = VoiceChatRecording.vcApi.createLocationalAudioChannel(UUID.randomUUID(), VoiceChatRecording.vcApi.fromServerLevel(this.level()), VoiceChatRecording.vcApi.createPosition(loc.x, loc.y, loc.z));
                 if(channel == null){
                     RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
                     return null;
@@ -240,10 +246,9 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 return channel;
             }, new AudioEffect().addRandomEffects());
             this.remove(Entity.RemovalReason.DISCARDED);
-    }
+        }
         super.awardKillScore(pEntity, pScoreValue, pSource);
     }
-
 
     public boolean hasSpoken(){
         return firstSpeak != NOT_SPOKEN_YET;
@@ -269,17 +274,26 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.currentAudioPlayer = player;
     }
 
+    //TODO fazer depender da distancia que o player ta dele
     @Override
     public boolean isSpeakingAtMe(Player player) {
         long time = System.currentTimeMillis();
         if(hasSpoken() && time >= getGracePeriodEnd()){
-            RecordedPlayer rec = RecordingSimpleVoiceChatPlugin.getRecordedPlayer(player.getUUID());
+            IRecordedPlayer rec = RevervoxMod.RECORDING_API.getRecordedPlayer(player.getUUID());
             if (rec != null){
                 return rec.isSpeaking() &&
                         rec.getLastSpoke() >= getGracePeriodEnd();
             } else return false;
         }
         return false;
+    }
+
+    @Override
+    public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity target) {
+        if (target instanceof Player){
+            this.setShouldDisappear(true);
+        }
+        super.setTarget(target);
     }
 
     public boolean teleportTowards(Entity pTarget) {
@@ -347,6 +361,14 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 offset = offset.offset(0, 1, 0);
             }
 
+            if (this.getTarget() != null) {
+                if (!this.hasLineOfSight(this.getTarget())) {
+                    this.noLineOfSightTicks++;
+                } else {
+                    resetLineOfSight();
+                }
+            }
+
             boolean isFacingBelowSolid = !this.level().getBlockState(blockPosition().relative(getDirection()).below()).isAir();
             boolean isOffsetFacingTwoAboveSolid = !this.level().getBlockState(blockPosition().offset(offset).above(2)).isAir();
 
@@ -359,12 +381,16 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         }
     }
 
-    @Override
-    public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity pTarget) {
-        if(pTarget == null && getTarget() != null){
-            this.remove(RemovalReason.KILLED);
-        }
-        super.setTarget(pTarget);
+    public boolean lostLineOfSightFor(long pTicks) {
+        return this.noLineOfSightTicks >= pTicks;
+    }
+    public void resetLineOfSight(){
+        this.noLineOfSightTicks = 0;
+    }
+
+    public void resetNavigation(){
+        if (this.getTarget() == null) return;
+        this.getNavigation().moveTo(this.getTarget(), this.getAttributeValue(Attributes.MOVEMENT_SPEED));
     }
 
     @Override
@@ -383,16 +409,19 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
             offset = offset < 0.0D ? -1.0D : offset == 0 ? 0.0D : 1.0D;
             if(
                     (RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get() ||
-                    RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get())
+                            RevervoxModServerConfigs.REVERVOX_BREAKS_NONSOLID.get())
             ){
-                // TODO the line of sight check can make it get stuck if it has the player in line of sight but not enough space to get to them
                 if(breakCooldown > 0){ breakCooldown--; }
                 this.checkWalls(this.getBoundingBox().inflate(0.4D, 0, 0.2D).move(0, offset, 0),
                         RevervoxModServerConfigs.REVERVOX_BREAKS_BLOCKS.get()
-                        && (breakCooldown <= 0)
-                        && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks || this.getNavigation().isStuck()
+                                && (breakCooldown <= 0)
+                                && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks
                 );
 
+            }
+        } else {
+            if (shouldDisappear()) {
+                this.remove(RemovalReason.DISCARDED);
             }
         }
 
@@ -448,6 +477,13 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         this.entityData.set(CLIMBING_ACCESSOR, pClimbing);
     }
 
+    public boolean isStunned(){
+        return this.stunned;
+    }
+
+    public void setStunned(boolean pStunned){
+        this.stunned = pStunned;
+    }
 
     public long getGracePeriodEnd(){
         long grace = (long)(RevervoxModServerConfigs.REVERVOX_AFTER_SPEAK_GRACE_PERIOD.get()*1000);
@@ -456,6 +492,7 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
 
 
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
+        // Check if there are other Revervox around
         if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
                 TargetingConditions.DEFAULT,
                 null,
@@ -468,8 +505,8 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         if (pLevel.getMaxLocalRawBrightness(pPos) < 4) {
             // Priority to spawn on alone player
             Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
-            if (player != null){
-                if (!RevervoxModServerConfigs.REVERVOX_ABOVE_GROUND.get() && player.position().y <= pLevel.getSeaLevel()){
+            if (player != null) {
+                if (!RevervoxModServerConfigs.REVERVOX_ABOVE_GROUND.get() && player.position().y <= pLevel.getSeaLevel() - 10){
                     if (player.level().getNearbyPlayers(TargetingConditions.DEFAULT, player, player.getBoundingBox().inflate(100, 50, 100)).isEmpty()){
                         boolean flag = checkMobSpawnRules(pRevervox, pLevel, pSpawnType, pPos, pRandom);
                         if (flag) {
@@ -480,10 +517,10 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
                 }
             }
         }
-        if (!RevervoxModServerConfigs.REVERVOX_ABOVE_GROUND.get() &&  pPos.getY() >= pLevel.getSeaLevel()) {
+        if (!RevervoxModServerConfigs.REVERVOX_ABOVE_GROUND.get() && pPos.getY() >= pLevel.getSeaLevel() - 10) {
             return false;
         } else {
-            // Check if there are other Revervox around
+
             int i = pLevel.getMaxLocalRawBrightness(pPos);
             int j = 4;
             if (pRandom.nextBoolean()) {
@@ -498,4 +535,11 @@ public class RevervoxGeoEntity extends Monster implements IRevervoxEntity, GeoEn
         }
     }
 
+    public boolean shouldDisappear() {
+        return shouldDisappear;
+    }
+
+    private void setShouldDisappear(boolean shouldDisappear) {
+        this.shouldDisappear = shouldDisappear;
+    }
 }

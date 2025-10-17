@@ -1,0 +1,50 @@
+{
+  "parent": "revervox_mod:revervox/revervox_hears",
+  "criteria": {
+    "get_ear": {
+      "conditions": {
+        "items": [
+          {
+            "items": "revervox_mod:revervox_ear"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "kill_revervox": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "revervox_mod:revervox"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.revervox_mod.get_ear.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "revervox_mod:revervox_ear"
+    },
+    "title": {
+      "translate": "advancements.revervox_mod.get_ear.title"
+    }
+  },
+  "requirements": [
+    [
+      "get_ear"
+    ],
+    [
+      "kill_revervox"
+    ]
+  ]
+}

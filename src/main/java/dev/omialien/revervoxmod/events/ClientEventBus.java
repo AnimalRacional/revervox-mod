@@ -3,6 +3,7 @@ package dev.omialien.revervoxmod.events;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.client.*;
 import dev.omialien.revervoxmod.particle.custom.RevervoxParticles;
+import dev.omialien.revervoxmod.particle.custom.RevervoxSonicBoomParticle;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -16,12 +17,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = RevervoxMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class ModEventBusClientEvents {
+public class ClientEventBus {
     @SubscribeEvent
     public static void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ModModelLayers.THINGY_LAYER, ThingyModel::createBodyLayer);
     }
-
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         EntityRenderers.register(EntityRegistry.THINGY.get(), ThingyRenderer::new);
@@ -31,8 +31,9 @@ public class ModEventBusClientEvents {
     }
 
     @SubscribeEvent
-    public static void registerParticleFactories(final RegisterParticleProvidersEvent event) { //Pode n ser este evento
+    public static void registerParticleFactories(final RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(ParticleRegistry.REVERVOX_PARTICLES.get(),
                 RevervoxParticles.Provider::new);
+        event.registerSpriteSet(ParticleRegistry.REVERVOX_SONIC_BOOM_PARTICLES.get(), RevervoxSonicBoomParticle.Provider::new);
     }
 }

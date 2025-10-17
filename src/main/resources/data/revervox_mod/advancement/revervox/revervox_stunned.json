@@ -1,0 +1,29 @@
+{
+  "parent": "revervox_mod:revervox/craft_voice_box",
+  "criteria": {
+    "stun_revervox": {
+      "trigger": "revervox_mod:revervox_stunned"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.revervox_mod.revervox_stunned.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "revervox_mod:megaphone"
+    },
+    "title": {
+      "translate": "advancements.revervox_mod.revervox_stunned.title"
+    }
+  },
+  "requirements": [
+    [
+      "stun_revervox"
+    ]
+  ],
+  "rewards": {
+    "experience": 100
+  }
+}
