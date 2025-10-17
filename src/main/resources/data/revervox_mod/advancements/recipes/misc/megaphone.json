@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "revervox_mod:revervox_ear"
+            "items": ["revervox_mod:revervox_ear"]
           }
         ]
       },
@@ -15,7 +15,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:echo_shard"
+            "items": ["minecraft:echo_shard"]
           }
         ]
       },
