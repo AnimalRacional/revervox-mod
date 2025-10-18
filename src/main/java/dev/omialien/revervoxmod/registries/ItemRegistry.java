@@ -13,41 +13,59 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.function.Supplier;
+
 public class ItemRegistry {
     private static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, RevervoxMod.MOD_ID);
 
-    public static final RegistryObject<ForgeSpawnEggItem> THINGY_SPAWN_EGG = REGISTRY.register("thingy_spawn_egg", () -> new ForgeSpawnEggItem(EntityRegistry.THINGY, 0xdfe610, 0x1b3fff, new Item.Properties().stacksTo(64)));
-    public static final RegistryObject<ForgeSpawnEggItem> REVERVOX_SPAWN_EGG = REGISTRY.register("revervox_spawn_egg", () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX, 0x3b3b3b, 0xffe591, new Item.Properties().stacksTo((64))));
-    public static final RegistryObject<ForgeSpawnEggItem> REVERVOX_BAT_SPAWN_EGG = REGISTRY
-            .register("revervox_bat_spawn_egg",
-                    () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
-                            new Item.Properties().stacksTo(64)));
-    public static final RegistryObject<RevervoxVoiceBoxItem> REVERVOX_VOICE_BOX = REGISTRY.register(
+    public static final RegistryObject<ForgeSpawnEggItem> THINGY_SPAWN_EGG = register(
+            "thingy_spawn_egg",
+            () -> new ForgeSpawnEggItem(EntityRegistry.THINGY, 0xdfe610, 0x1b3fff, new Item.Properties().stacksTo(64)));
+    public static final RegistryObject<ForgeSpawnEggItem> REVERVOX_SPAWN_EGG = register(
+            "revervox_spawn_egg",
+            () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX, 0x3b3b3b, 0xffe591, new Item.Properties().stacksTo((64))));
+    public static final RegistryObject<ForgeSpawnEggItem> REVERVOX_BAT_SPAWN_EGG = register(
+            "revervox_bat_spawn_egg",
+            () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
+                new Item.Properties().stacksTo(64)));
+    public static final RegistryObject<RevervoxVoiceBoxItem> REVERVOX_VOICE_BOX = register(
             "revervox_voice_box",
             () -> new RevervoxVoiceBoxItem(new Item.Properties().stacksTo(1))
     );
-    public static final RegistryObject<RevervoxBaitItem> REVERVOX_BAIT = REGISTRY.register(
+    public static final RegistryObject<RevervoxBaitItem> REVERVOX_BAIT = register(
             "revervox_bait",
             () -> new RevervoxBaitItem(new Item.Properties().stacksTo(16))
     );
-    public static final RegistryObject<Item> REVERVOX_EAR = REGISTRY.register(
+    public static final RegistryObject<Item> REVERVOX_EAR = register(
             "revervox_ear",
             () -> new Item(new Item.Properties())
     );
 
-    public static final RegistryObject<MegaphoneItem> MEGAPHONE = REGISTRY.register(
+    public static final RegistryObject<MegaphoneItem> MEGAPHONE = register(
             "megaphone",
             () -> new MegaphoneItem(new Item.Properties().stacksTo(1))
     );
 
-    public static final RegistryObject<SwordItem> REVERVOX_SWORD = REGISTRY.register(
+    public static final RegistryObject<SwordItem> REVERVOX_SWORD = register(
             "revervox_sword",
             () -> new RevervoxSword(3, -2.4F, new Item.Properties())
     );
-    public static final RegistryObject<Item> REVERVOX_BAT_TOOTH = REGISTRY.register(
+    public static final RegistryObject<Item> REVERVOX_BAT_TOOTH = register(
             "revervox_bat_tooth",
             () -> new Item(new Item.Properties().stacksTo(16))
     );
+
+    private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item, boolean inTab) {
+        RegistryObject<T> reg = REGISTRY.register(name, item);
+        if (inTab) {
+            CreativeTabRegistry.addToTab(reg);
+        }
+        return reg;
+    }
+
+    private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item) {
+        return ItemRegistry.register(name, item, true);
+    }
 
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);
