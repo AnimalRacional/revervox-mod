@@ -3,8 +3,8 @@ package dev.omialien.revervoxmod.registries;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.items.MegaphoneItem;
 import dev.omialien.revervoxmod.items.RevervoxBaitItem;
-import dev.omialien.revervoxmod.items.RevervoxVoiceBoxItem;
 import dev.omialien.revervoxmod.items.RevervoxSword;
+import dev.omialien.revervoxmod.items.RevervoxVoiceBoxItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
 import net.neoforged.bus.api.IEventBus;
@@ -12,41 +12,54 @@ import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.function.Supplier;
+
 public class ItemRegistry {
     private static final DeferredRegister.Items REGISTRY = DeferredRegister.createItems(RevervoxMod.MOD_ID);
 
-    public static final DeferredItem<DeferredSpawnEggItem> THINGY_SPAWN_EGG = REGISTRY.register("thingy_spawn_egg", () -> new DeferredSpawnEggItem(EntityRegistry.THINGY, 0xdfe610, 0x1b3fff, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> REVERVOX_SPAWN_EGG = REGISTRY.register("revervox_spawn_egg", () -> new DeferredSpawnEggItem(EntityRegistry.REVERVOX, 0x3b3b3b, 0xffe591, new Item.Properties()));
-    public static final DeferredItem<DeferredSpawnEggItem> REVERVOX_BAT_SPAWN_EGG = REGISTRY
-            .register("revervox_bat_spawn_egg",
-                    () -> new DeferredSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
-                            new Item.Properties()));
-    public static final DeferredItem<RevervoxVoiceBoxItem> REVERVOX_VOICE_BOX = REGISTRY.register(
+    public static final DeferredItem<DeferredSpawnEggItem> THINGY_SPAWN_EGG = register("thingy_spawn_egg", () -> new DeferredSpawnEggItem(EntityRegistry.THINGY, 0xdfe610, 0x1b3fff, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> REVERVOX_SPAWN_EGG = register("revervox_spawn_egg", () -> new DeferredSpawnEggItem(EntityRegistry.REVERVOX, 0x3b3b3b, 0xffe591, new Item.Properties()));
+    public static final DeferredItem<DeferredSpawnEggItem> REVERVOX_BAT_SPAWN_EGG = register("revervox_bat_spawn_egg",
+        () -> new DeferredSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
+                new Item.Properties()));
+    public static final DeferredItem<RevervoxVoiceBoxItem> REVERVOX_VOICE_BOX = register(
             "revervox_voice_box",
             () -> new RevervoxVoiceBoxItem(new Item.Properties().stacksTo(1))
     );
-    public static final DeferredItem<Item> REVERVOX_EAR = REGISTRY.register(
+    public static final DeferredItem<Item> REVERVOX_EAR = register(
             "revervox_ear",
             () -> new Item(new Item.Properties())
     );
-    public static final DeferredItem<MegaphoneItem> MEGAPHONE = REGISTRY.register(
+    public static final DeferredItem<MegaphoneItem> MEGAPHONE = register(
             "megaphone",
             () -> new MegaphoneItem(new Item.Properties().stacksTo(1))
     );
 
-    public static final DeferredItem<RevervoxBaitItem> REVERVOX_BAIT = REGISTRY.register(
+    public static final DeferredItem<RevervoxBaitItem> REVERVOX_BAIT = register(
             "revervox_bait",
             () -> new RevervoxBaitItem(new Item.Properties().stacksTo(16))
     );
 
-    public static final DeferredItem<SwordItem> REVERVOX_SWORD = REGISTRY.register(
+    public static final DeferredItem<SwordItem> REVERVOX_SWORD = register(
             "revervox_sword",
             () -> new RevervoxSword(3, -2.4F, new Item.Properties())
     );
-    public static final DeferredItem<Item> REVERVOX_BAT_TOOTH = REGISTRY.register(
+    public static final DeferredItem<Item> REVERVOX_BAT_TOOTH = register(
             "revervox_bat_tooth",
             () -> new Item(new Item.Properties().stacksTo(16))
     );
+
+    private static <T extends Item> DeferredItem<T> register(String name, Supplier<T> item, boolean inTab) {
+        DeferredItem<T> obj = REGISTRY.register(name, item);
+        if(inTab) {
+            CreativeTabRegistry.addToTab(obj);
+        }
+        return obj;
+    }
+
+    private static <T extends Item> DeferredItem<T> register(String name, Supplier<T> item) {
+        return register(name, item, true);
+    }
 
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);
