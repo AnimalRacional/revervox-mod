@@ -95,7 +95,6 @@ public class CommonEventBus {
     }
 
 
-    //TODO: Não está a correr
     @SubscribeEvent
     public static void onRecordingApiInitialized(RecordingSetupEvent event) {
         RevervoxMod.RECORDING_API = event.getApi();
@@ -103,19 +102,6 @@ public class CommonEventBus {
         RevervoxMod.AUDIOS = new AudioStorage();
     }
 
-
-    /*
-    TODO: PARA QUE SERVE ISTO?
-    @SubscribeEvent
-    public static void registerPayloads(RegisterPayloadHandlersEvent event){
-        final PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToClient(
-                SoundInstancePacket.TYPE,
-                SoundInstancePacket.STREAM_CODEC,
-                FMLEnvironment.dist == Dist.CLIENT ? RevervoxClientPacketHandler::handleSoundInstancePacket : null
-        );
-    }
-     */
 
 
     @SubscribeEvent
@@ -143,7 +129,7 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void onMicrophonePacket(MicPacketReceivedEvent event){
         if (event.getPlayer() == null) return;
-        if (event.getPlayer().isUsingItem() && event.getPlayer().getUseItem().is(ItemRegistry.MEGAPHONE.get())) { //TODO pus .get() verificar
+        if (event.getPlayer().isUsingItem() && event.getPlayer().getUseItem().is(ItemRegistry.MEGAPHONE.get())) {
             short[] packet = PlayerStateManager.getPlayerDecoder(event.getPlayer().getUUID()).decode(event.getPacket().getOpusEncodedData());
             double packetRMS = AudioUtil.calculateRMS(packet);
             if(!Double.isNaN(packetRMS)){
