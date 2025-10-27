@@ -341,7 +341,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         }
     }
     private boolean isFluid(Block block){
-        return block instanceof LiquidBlock; //TODO verificar se e prciso instance of IFluidBlock
+        return block instanceof LiquidBlock;
     }
 
     @Override

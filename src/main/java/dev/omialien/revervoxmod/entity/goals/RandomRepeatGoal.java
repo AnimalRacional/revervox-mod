@@ -36,7 +36,7 @@ public class RandomRepeatGoal extends Goal {
     private AudioChannel getChannel(){
         if (channel == null && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
             UUID channelID = UUID.randomUUID();
-            channel = createChannel(api, channelID, RevervoxMod.MOD_ID, this.mob);
+            channel = createChannel(api, channelID, this.mob);
         }
         return channel;
     }
@@ -116,13 +116,13 @@ public class RandomRepeatGoal extends Goal {
         }
     }
 
-    private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, String category, Entity nearestEntity) {
+    private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, Entity nearestEntity) {
         EntityAudioChannel channel = api.createEntityAudioChannel(channelID, api.fromEntity(nearestEntity));
         if (channel == null) {
             RevervoxMod.LOGGER.error("Couldn't create channel");
             return null;
         }
-        channel.setCategory(category);
+        channel.setCategory(RevervoxMod.MOD_ID);
         channel.setDistance(RandomRepeatGoal.CHANNEL_DISTANCE);
         return channel;
     }
