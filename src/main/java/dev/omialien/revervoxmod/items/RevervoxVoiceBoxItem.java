@@ -6,7 +6,7 @@ import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.voicechatrecording.VoiceChatRecording;
 import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
-import dev.omialien.voicechatrecording_api.IRecordedAudio;
+import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;

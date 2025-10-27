@@ -2,7 +2,7 @@ package dev.omialien.revervoxmod.voicechat;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
-import dev.omialien.voicechatrecording_api.IRecordedAudio;
+import dev.omialien.voicechatrecording.api.IRecordedAudio;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
