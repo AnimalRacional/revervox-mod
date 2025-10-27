@@ -8,7 +8,7 @@ import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.*;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.voicechatrecording.taskscheduler.TaskScheduler;
-import dev.omialien.voicechatrecording_api.VoiceChatRecordingApi;
+import dev.omialien.voicechatrecording.api.VoiceChatRecordingApi;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
