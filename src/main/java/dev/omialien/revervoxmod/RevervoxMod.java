@@ -3,12 +3,13 @@ package dev.omialien.revervoxmod;
 import com.mojang.logging.LogUtils;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
+import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.events.CommonEventBus;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.*;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
-import dev.omialien.voicechatrecording.taskscheduler.TaskScheduler;
 import dev.omialien.voicechatrecording.api.VoiceChatRecordingApi;
+import dev.omialien.voicechatrecording.taskscheduler.TaskScheduler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -59,6 +60,8 @@ public class RevervoxMod {
         RevervoxPacketHandler.registerPackets();
     }
 
+
+    //TODO fazer eventos genericos para ser facil criar novos eventos e dar trigger atravez dos comandos sem criar novas classes
     public static void summonBatWave(Player player){
         if(!player.level().isClientSide()){
             Vec3 playerPos = player.getPosition(0);
@@ -76,6 +79,22 @@ public class RevervoxMod {
                     player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 27, 100, false, false), player);
                 }
             }
+        }
+    }
+
+    public static void triggerRevervoxBehindEvent(Player player){
+        if (!player.level().isClientSide()) {
+            Vec3 playerPos = player.getPosition(0);
+
+            Vec3 revervoxPos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, -5, 0, 0);
+
+            RevervoxGeoEntity revervox = new RevervoxGeoEntity(EntityRegistry.REVERVOX.get(), player.level());
+            revervox.setPos(revervoxPos.x, revervoxPos.y, revervoxPos.z);
+            revervox.setNoAi(true);
+            revervox.setYHeadRot(player.getYRot());
+            player.level().addFreshEntity(revervox);
+
+            //TODO repetir audio, desaparecer quando o player olha para ele
         }
     }
 

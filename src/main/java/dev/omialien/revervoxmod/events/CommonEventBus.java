@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
+import dev.omialien.revervoxmod.commands.TriggerRevervoxBehindEventCommand;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
@@ -89,9 +90,33 @@ public class CommonEventBus {
         };
     }
 
+    private static Runnable fakeRevervoxBehindEventRequest(ServerLevel level){
+        return () -> {
+            RevervoxMod.LOGGER.debug("Starting fake revervox behind event!");
+            //if(RevervoxModServerConfigs.ENABLE_FAKE_REVERVOX_BEHIND_EVENT.get()) {
+                List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
+                if (!playerList.isEmpty()) {
+                    int randomPlayer = new Random().nextInt(playerList.size());
+                    if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
+                        RevervoxMod.LOGGER.debug("Player met requirements, starting revervox behind event!");
+                        RevervoxMod.triggerRevervoxBehindEvent(playerList.get(randomPlayer));
+                    } else {
+                        RevervoxMod.LOGGER.debug("Player didn't meet requirements, skipping bat event!");
+                    }
+                } else {
+                    RevervoxMod.LOGGER.debug("(Fake Bat Event) playerList is empty");
+                }
+            //}
+            int nextRandomTick = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),(int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get())); //20 minutos max
+            RevervoxMod.LOGGER.debug("next bat event scheduled for {} ticks", nextRandomTick);
+            RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(level), nextRandomTick);
+        };
+    }
+
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         SummonFakeEntityCommand.register(event.getDispatcher());
+        TriggerRevervoxBehindEventCommand.register(event.getDispatcher());
     }
 
 

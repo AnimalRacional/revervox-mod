@@ -13,7 +13,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,14 +30,6 @@ public class RandomRepeatGoal extends Goal {
     @Override
     public boolean canUse() {
         return canSpeak && mob.getTarget() == null;
-    }
-
-    private AudioChannel getChannel(){
-        if (channel == null){
-            UUID channelID = UUID.randomUUID();
-            channel = createChannel(VoiceChatRecording.vcApi, channelID, this.mob);
-        }
-        return channel;
     }
 
     @Override
@@ -65,25 +56,7 @@ public class RandomRepeatGoal extends Goal {
 
         if (nearbyPlayers.isEmpty()) {
             RevervoxMod.LOGGER.debug("No players nearby");
-
-            Level level = this.mob.level();
-            Player nearestPlayer = null;
-            for (Player player : Objects.requireNonNull(level.getServer()).getPlayerList().getPlayers()){
-                if (!player.level().equals(this.mob.level())) continue;
-                if (nearestPlayer != null){
-                    nearestPlayer = this.mob.distanceToSqr(player) < this.mob.distanceToSqr(nearestPlayer) ? player : nearestPlayer;
-                } else {
-                    nearestPlayer = player;
-                }
-            }
-
-            if (nearestPlayer != null) {
-                if (this.mob.teleportTowards(nearestPlayer)){
-                    RevervoxMod.LOGGER.debug("Teleporting towards nearest player: " + nearestPlayer.getName());
-                    this.mob.playPlayerAudio(nearestPlayer, VoiceChatRecording.vcApi, this::getChannel);
-                    audiosPlayed++;
-                }
-            }
+            this.mob.remove(Entity.RemovalReason.DISCARDED);
         } else {
             if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {
                 RevervoxMod.LOGGER.debug("Atleast 2 players nearby");
@@ -112,6 +85,14 @@ public class RandomRepeatGoal extends Goal {
             this.mob.playAudio(audio.getAudio(), VoiceChatRecording.vcApi, getChannel(), new AudioEffect());
             audiosPlayed++;
         }
+    }
+
+    private AudioChannel getChannel(){
+        if (channel == null){
+            UUID channelID = UUID.randomUUID();
+            channel = createChannel(VoiceChatRecording.vcApi, channelID, this.mob);
+        }
+        return channel;
     }
 
     private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, Entity nearestEntity) {
