@@ -25,14 +25,15 @@ public class AudioStorage {
 
     public void addAudio(IRecordedAudio audio){
         if(!storedAudios.containsKey(audio.getPlayerUUID())){
-            storedAudios.put(audio.getPlayerUUID(), new LinkedList<>());
+            storedAudios.put(audio.getPlayerUUID(), Collections.synchronizedList(new LinkedList<>()));
         }
         audio.saveAudio(RevervoxMod.MOD_ID);
         storedAudios.get(audio.getPlayerUUID()).add(audio);
     }
 
     public IRecordedAudio getRandomAudio(UUID player, boolean remove){
-        RevervoxMod.LOGGER.debug("storage: getting random audio specific, remove {} at size {}", remove, this.getTotalAudioCount());
+        RevervoxMod.LOGGER.debug("storage: getting random audio specific, remove {} at size {}",
+                remove, this.getTotalAudioCount());
         List<IRecordedAudio> recs = storedAudios.get(player);
         if(recs == null || recs.isEmpty()) { return null; }
         int idx = rnd.nextInt(recs.size());
@@ -47,10 +48,8 @@ public class AudioStorage {
 
     public IRecordedAudio getRandomAudio(Predicate<UUID> includePlayer, boolean remove){
         RevervoxMod.LOGGER.debug("storage: getting random audio preidcate, remove {} at size {}", remove, this.getTotalAudioCount());
-        List<IRecordedAudio> total = new LinkedList<>();
-        storedAudios.keySet().stream().filter(includePlayer).forEach((uuid) -> {
-            total.addAll(storedAudios.get(uuid));
-        });
+        List<IRecordedAudio> total = storedAudios.keySet().stream().filter(includePlayer)
+                .flatMap((u) -> storedAudios.get(u).stream()).toList();
         if(total.isEmpty()){ return null; }
         int randomIndex = rnd.nextInt(total.size());
         IRecordedAudio randomAudio = total.get(randomIndex);
