@@ -15,19 +15,19 @@ public class RevervoxTags {
         public static final TagKey<Item> ATTRACTS_REVERVOX = createTag("attracts_revervox");
         public static final TagKey<Item> AUDIO_ON_KILL = createTag("audio_on_kill");
         private static TagKey<Item> createTag(String name){
-            return ItemTags.create(ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, name));
+            return ItemTags.create(new ResourceLocation(RevervoxMod.MOD_ID, name));
         }
     }
     public static class Blocks {
         private static TagKey<Block> createTag(String name){
-            return BlockTags.create(ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, name));
+            return BlockTags.create(new ResourceLocation(RevervoxMod.MOD_ID, name));
         }
     }
     public static class Entities {
         public static final TagKey<EntityType<?>> REVERVOX_BONUS_DAMAGE = createTag("revervox_bonus_damage");
         public static final TagKey<EntityType<?>> INSECTS = createTag("insects");
         private static TagKey<EntityType<?>> createTag(String name){
-            return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, name));
+            return TagKey.create(Registries.ENTITY_TYPE, new ResourceLocation(RevervoxMod.MOD_ID, name));
         }
     }
 }
