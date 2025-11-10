@@ -39,6 +39,13 @@ public class RevervoxVoiceBoxItem extends Item {
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
+        /* TODO apparently only one instance of each Item exists, ItemStack is what has information for each stack of that item
+             so we shouldn't store audioDuration, audioChannel or playingPlayer in the Item, but the ItemStack
+             this is done through nbt in 1.20.1 and data components in 1.21.1, so to prevent too much annoyance
+             review if all those variables are needed
+             for example, I don't think we need to store a channel by player, but only by ItemStack
+             https://forums.minecraftforge.net/topic/83388-adding-nbt-to-item/
+        */
         ItemStack item = pPlayer.getItemInHand(pUsedHand);
         boolean audioPlayed = false;
         if (!pLevel.isClientSide() && VoiceChatRecording.vcApi instanceof VoicechatServerApi api) {
