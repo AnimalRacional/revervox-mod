@@ -21,6 +21,7 @@ public class RevervoxModServerConfigs {
     public static final ForgeConfigSpec.ConfigValue<Boolean> REVERVOX_ABOVE_GROUND;
     public static final ForgeConfigSpec.BooleanValue REVERVOX_SONIC_BOOM;
     public static final ForgeConfigSpec.IntValue REVERVOX_SONIC_BOOM_COOLDOWN;
+    public static final ForgeConfigSpec.IntValue REVERVOX_SONIC_BOOM_SECS_OUT_OF_SIGHT;
     public static final ForgeConfigSpec.IntValue REVERVOX_SONIC_BOOM_RANGE;
     public static final ForgeConfigSpec.IntValue MEGAPHONE_COOLDOWN;
     public static final ForgeConfigSpec.BooleanValue CROUCH_PREVENTS_MEGAPHONE_BOOM;
@@ -41,12 +42,13 @@ public class RevervoxModServerConfigs {
         FAKE_BAT_EVENT_CHANCE = BUILDER.comment("Chance of fake bat event occuring. Higher is less likely, lower is more likely").define("Fake Bat Event Chance", 1.0d);
         ENABLE_FAKE_BAT_EVENT = BUILDER.comment("Whether the fake bat event will occur").define("Enable Fake Bat Event", true);
         REVERVOX_BREAKS_BLOCKS = BUILDER.comment("Whether Revervox breaks blocks to get to you").define("Revervox Block Breaking", false);
-        REVERVOX_BREAKS_NONSOLID = BUILDER.comment("Whether Revervox breaks non-solid blocks such as torches and natural blocks such as dirt and stone").define("Revervox breaks non-solid blocks", true);
+        REVERVOX_BREAKS_NONSOLID = BUILDER.comment("Whether Revervox breaks non-solid blocks such as torches and leaves").define("Revervox breaks non-solid blocks", true);
         REVERVOX_ABOVE_GROUND = BUILDER.comment("Whether Revervox spawns above ground").define("Revervox above ground", false);
 
         REVERVOX_SONIC_BOOM = BUILDER.comment("Whether Revervox uses the Sonic Boom ability").define("Revervox Sonic Boom", true);
-        REVERVOX_SONIC_BOOM_COOLDOWN = BUILDER.comment("Cooldown (in seconds) between Revervox Sonic Booms").defineInRange("Revervox Sonic Boom Cooldown", 5, 1, 100);
-        REVERVOX_SONIC_BOOM_RANGE = BUILDER.comment("Range (in blocks) of Revervox's Sonic Boom").defineInRange("Revervox Sonic Boom Range", 30, 10, 100);
+        REVERVOX_SONIC_BOOM_COOLDOWN = BUILDER.comment("Cooldown (in seconds) between Revervox Sonic Booms").defineInRange("Revervox Sonic Boom Cooldown", 35, 1, 100);
+        REVERVOX_SONIC_BOOM_SECS_OUT_OF_SIGHT = BUILDER.comment("Time (in seconds) that Revervox needs to be out of sight before being able to use a sonic boom").defineInRange("Revervox Sonic Boom Secs out of Sight", 5, 1, 100);
+        REVERVOX_SONIC_BOOM_RANGE = BUILDER.comment("Range (in blocks) of Revervox's Sonic Boom").defineInRange("Revervox Sonic Boom Range", 16, 5, 100);
         MEGAPHONE_COOLDOWN = BUILDER.comment("Cooldown (in seconds) between Megaphone uses").defineInRange("Megaphone Cooldown" ,4, 0, 100);
         CROUCH_PREVENTS_MEGAPHONE_BOOM = BUILDER.comment("Whether crouching will stop your megaphone from doing a sonic boom").define("Crouch stops Megaphone Boom", true);
 

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class RandomRepeatGoal extends Goal {
     private final RevervoxGeoEntity mob;
-    private static final int CHANNEL_DISTANCE = 50;
+    private static final int CHANNEL_DISTANCE = 30;
     private EntityAudioChannel channel;
     private int audiosPlayed = 0;
     private boolean canSpeak = true;
@@ -49,7 +49,7 @@ public class RandomRepeatGoal extends Goal {
         if (this.mob.getCurrentAudioPlayer() != null && this.mob.getCurrentAudioPlayer().isPlaying()) return;
 
         List<Player> nearbyPlayers = new ArrayList<>(this.mob.level().
-                getNearbyPlayers(TargetingConditions.forNonCombat(), this.mob, this.mob.getBoundingBox()
+                getNearbyPlayers(TargetingConditions.forNonCombat().ignoreLineOfSight(), this.mob, this.mob.getBoundingBox()
                         .inflate(CHANNEL_DISTANCE)));
 
         RevervoxMod.LOGGER.debug("Nearby Players: " + Arrays.toString(nearbyPlayers.toArray()));

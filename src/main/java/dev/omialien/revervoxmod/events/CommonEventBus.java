@@ -9,7 +9,7 @@ import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
-import dev.omialien.revervoxmod.voicechat.AudioUtil;
+import dev.omialien.revervoxmod.util.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;

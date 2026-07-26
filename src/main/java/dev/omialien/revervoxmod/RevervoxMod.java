@@ -86,7 +86,7 @@ public class RevervoxMod {
         if (!player.level().isClientSide()) {
             Vec3 playerPos = player.getPosition(0);
 
-            Vec3 revervoxPos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, -5, 0, 0);
+            Vec3 revervoxPos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, -3, 0, 0);
 
             RevervoxGeoEntity revervox = new RevervoxGeoEntity(EntityRegistry.REVERVOX.get(), player.level());
             revervox.setPos(revervoxPos.x, revervoxPos.y, revervoxPos.z);

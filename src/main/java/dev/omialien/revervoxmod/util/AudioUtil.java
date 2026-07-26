@@ -1,4 +1,4 @@
-package dev.omialien.revervoxmod.voicechat;
+package dev.omialien.revervoxmod.util;
 
 import dev.omialien.voicechatrecording.configs.RecordingCommonConfig;
 

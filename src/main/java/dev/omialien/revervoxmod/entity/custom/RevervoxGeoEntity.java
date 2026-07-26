@@ -11,6 +11,7 @@ import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
+import dev.omialien.revervoxmod.util.ViewUtil;
 import dev.omialien.voicechatrecording.VoiceChatRecording;
 import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
 import dev.omialien.voicechatrecording.api.AudioEffect;
@@ -72,7 +73,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);
-    private final RawAnimation REVERVO_CLIMB = RawAnimation.begin().thenLoop("move.climb");
+    private final RawAnimation REVERVOX_CLIMB = RawAnimation.begin().thenLoop("move.climb");
     private int remainingPersistentAngerTime;
     private long firstSpeak;
     private boolean shouldDisappear;
@@ -80,6 +81,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     private AudioPlayer currentAudioPlayer;
     private long noLineOfSightTicks;
     private boolean stunned;
+    private boolean hasSeenTarget;
     @Nullable
     private UUID persistentAngerTarget;
     private int breakCooldown;
@@ -89,6 +91,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         moveControl = new MMEntityMoveHelper(this, 90);
         firstSpeak = NOT_SPOKEN_YET;
         breakCooldown = 0;
+        hasSeenTarget = false;
     }
 
     @Override
@@ -105,7 +108,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
-                        return state.setAndContinue(REVERVO_CLIMB);
+                        return state.setAndContinue(REVERVOX_CLIMB);
                     }
 
                     state.resetCurrentAnimation();
@@ -218,6 +221,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     @Override
     protected SoundEvent getHurtSound(@NotNull DamageSource dmgSrc) {
         return SoundRegistry.REVERVOX_HURT.get();
+    }
+
+    public void setHasSeenTarget(boolean hasSeenTarget) {
+        this.hasSeenTarget = hasSeenTarget;
+    }
+
+    public boolean getHasSeenTarget() {
+        return this.hasSeenTarget;
     }
 
     @Override
@@ -371,6 +382,9 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                     this.noLineOfSightTicks++;
                 } else {
                     resetLineOfSight();
+                }
+                if (!getHasSeenTarget() && ViewUtil.isInSight(this, this.getTarget())){
+                    setHasSeenTarget(true);
                 }
             }
 
