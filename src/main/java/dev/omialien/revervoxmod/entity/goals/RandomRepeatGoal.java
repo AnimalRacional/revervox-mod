@@ -1,14 +1,11 @@
 package dev.omialien.revervoxmod.entity.goals;
 
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
-import de.maxhenkel.voicechat.api.audiochannel.EntityAudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
-import dev.omialien.voicechatrecording.VoiceChatRecording;
-import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
+import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
@@ -20,12 +17,11 @@ import java.util.stream.Collectors;
 public class RandomRepeatGoal extends Goal {
     private final RevervoxGeoEntity mob;
     private static final int CHANNEL_DISTANCE = 30;
-    private EntityAudioChannel channel;
     private int audiosPlayed = 0;
     private boolean canSpeak = true;
     public RandomRepeatGoal(RevervoxGeoEntity revervoxGeoEntity) {
         this.mob = revervoxGeoEntity;
-        RevervoxMod.TASKS.schedule(setCanSpeak(), 0);
+        setCanSpeak().run();
     }
     @Override
     public boolean canUse() {
@@ -34,7 +30,6 @@ public class RandomRepeatGoal extends Goal {
 
     @Override
     public void stop() {
-        channel = null;
         super.stop();
     }
 
@@ -43,10 +38,13 @@ public class RandomRepeatGoal extends Goal {
     }
 
     public void tick() {
+        if (!(this.mob.level() instanceof ServerLevel level)) {
+            return;
+        }
         canSpeak = false;
         if (audiosPlayed >= RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get()) this.mob.remove(Entity.RemovalReason.DISCARDED);
         RevervoxMod.LOGGER.debug("Less than " + RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get() + " audios!");
-        if (this.mob.getCurrentAudioPlayer() != null && this.mob.getCurrentAudioPlayer().isPlaying()) return;
+        // TODO it may be able to play an audio while another is still playing
 
         List<Player> nearbyPlayers = new ArrayList<>(this.mob.level().
                 getNearbyPlayers(TargetingConditions.forNonCombat().ignoreLineOfSight(), this.mob, this.mob.getBoundingBox()
@@ -68,7 +66,9 @@ public class RandomRepeatGoal extends Goal {
                         if (player1.distanceToSqr(player2) > (double) CHANNEL_DISTANCE /2) {
                             RevervoxMod.LOGGER.debug("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE/2);
                             Player furthestPlayer = player1.distanceToSqr(this.mob) > player2.distanceToSqr(this.mob) ? player1 : player2;
-                            this.mob.playPlayerAudio(furthestPlayer, VoiceChatRecording.vcApi, this::getChannel);
+                            IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudioAnyFallback(furthestPlayer.getUUID(), true);
+                            AudioPlayingUtil.playLocationalAudio(audio, this.mob.getEyePosition(), level, RevervoxMod.MOD_ID);
+                            this.mob.onSpeak((int)(audio.getDuration() * 1000));
                             audiosPlayed++;
                             return;
                         }
@@ -82,28 +82,10 @@ public class RandomRepeatGoal extends Goal {
                 audio = RevervoxMod.AUDIOS.getRandomAudio(true);
             }
             if(audio == null){ return; }
-            this.mob.playAudio(audio.getAudio(), VoiceChatRecording.vcApi, getChannel(), new AudioEffect());
+            AudioPlayingUtil.playFromEntity(audio, this.mob, RevervoxMod.MOD_ID);
+            this.mob.onSpeak((int)(audio.getDuration() * 1000));
             audiosPlayed++;
         }
-    }
-
-    private AudioChannel getChannel(){
-        if (channel == null){
-            UUID channelID = UUID.randomUUID();
-            channel = createChannel(VoiceChatRecording.vcApi, channelID, this.mob);
-        }
-        return channel;
-    }
-
-    private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, Entity nearestEntity) {
-        EntityAudioChannel channel = api.createEntityAudioChannel(channelID, api.fromEntity(nearestEntity));
-        if (channel == null) {
-            RevervoxMod.LOGGER.error("Couldn't create channel");
-            return null;
-        }
-        channel.setCategory(RevervoxMod.MOD_ID);
-        channel.setDistance(RandomRepeatGoal.CHANNEL_DISTANCE);
-        return channel;
     }
 
     private Runnable setCanSpeak() {
