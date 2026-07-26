@@ -491,6 +491,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
 
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
+        int rand = pRandom.nextInt(RevervoxModServerConfigs.REVERVOX_SPAWN_CHANCE.get());
+        if (rand != 0){
+            return false;
+        }
         // Check if there are other Revervox around
         if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
                 TargetingConditions.DEFAULT,
