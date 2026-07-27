@@ -101,7 +101,8 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5)
                         .triggerableAnim("Stun", RawAnimation.begin().then("misc.stun", Animation.LoopType.PLAY_ONCE))
-                        .triggerableAnim("SonicBoom", DefaultAnimations.ATTACK_CAST),
+                        .triggerableAnim("SonicBoom", DefaultAnimations.ATTACK_CAST)
+                        .triggerableAnim("Eat", RawAnimation.begin().then("misc.eat", Animation.LoopType.PLAY_ONCE)),
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
@@ -141,8 +142,8 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(0, new RevervoxStunGoal(this));
-        this.goalSelector.addGoal(1, new RevervoxSonicBoomGoal(this));
-        this.goalSelector.addGoal(2, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
+        this.goalSelector.addGoal(1, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
+        this.goalSelector.addGoal(2, new RevervoxSonicBoomGoal(this));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
@@ -240,7 +241,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     @Override
     public @NotNull ItemStack eat(Level pLevel, @NotNull ItemStack pFood) {
         pLevel.playSound(null, this.getX(), this.getY(), this.getZ(), this.getEatingSound(pFood), SoundSource.NEUTRAL, 1.0F, 1.0F + (pLevel.random.nextFloat() - pLevel.random.nextFloat()) * 0.4F);
-
         this.gameEvent(GameEvent.EAT);
         return pFood;
     }
