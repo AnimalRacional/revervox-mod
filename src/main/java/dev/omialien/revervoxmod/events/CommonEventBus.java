@@ -8,8 +8,8 @@ import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
-import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.util.AudioUtil;
+import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;
@@ -17,6 +17,8 @@ import dev.omialien.voicechatrecording.api.events.AudioRecordedEvent;
 import dev.omialien.voicechatrecording.api.events.MicPacketReceivedEvent;
 import dev.omialien.voicechatrecording.api.events.RecordingSetupEvent;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -24,6 +26,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -35,6 +38,7 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 import java.util.Random;
+
 @Mod.EventBusSubscriber(modid = RevervoxMod.MOD_ID)
 public class CommonEventBus {
     @SubscribeEvent
@@ -45,12 +49,15 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void revervoxBatSpawnEvent(MobSpawnEvent.FinalizeSpawn event){
         if (event.getEntity() instanceof Bat && !event.getLevel().isClientSide()) {
-            if (new Random().nextInt(RevervoxModServerConfigs.REVERVOX_BAT_SPAWN_CHANCE.get()) == 0){
-                RevervoxBatGeoEntity bat = new RevervoxBatGeoEntity(EntityRegistry.REVERVOX_BAT.get(), event.getLevel().getLevel());
-                bat.moveTo(event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
-                RevervoxMod.LOGGER.debug("Spawning Revervox Bat! at " + event.getEntity().getX() + ", " + event.getEntity().getY() + ", " + event.getEntity().getZ());
-                event.setSpawnCancelled(true);
-                event.getLevel().addFreshEntity(bat);
+            Position entityPos = event.getEntity().position();
+            if (!event.getLevel().getBlockState(BlockPos.containing(entityPos)).getFluidState().is(Fluids.WATER)){
+                if(new Random().nextInt(RevervoxModServerConfigs.REVERVOX_BAT_SPAWN_CHANCE.get()) == 0){
+                    RevervoxBatGeoEntity bat = new RevervoxBatGeoEntity(EntityRegistry.REVERVOX_BAT.get(), event.getLevel().getLevel());
+                    bat.moveTo(event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
+                    RevervoxMod.LOGGER.debug("Spawning Revervox Bat! at " + event.getEntity().getX() + ", " + event.getEntity().getY() + ", " + event.getEntity().getZ());
+                    event.setSpawnCancelled(true);
+                    event.getLevel().addFreshEntity(bat);
+                }
             }
         }
     }
