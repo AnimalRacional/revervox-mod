@@ -2,14 +2,18 @@ package dev.omialien.revervoxmod;
 
 import com.mojang.logging.LogUtils;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
+import dev.omialien.revervoxmod.entity.custom.FakeRevervoxGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
-import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.events.CommonEventBus;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.*;
+import dev.omialien.revervoxmod.util.PlayerVisibilityUtil;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
+import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.VoiceChatRecordingApi;
+import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import dev.omialien.voicechatrecording.taskscheduler.TaskScheduler;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -24,6 +28,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+
+import java.util.Random;
+import java.util.UUID;
 
 @Mod(RevervoxMod.MOD_ID)
 public class RevervoxMod {
@@ -84,18 +91,35 @@ public class RevervoxMod {
 
     public static void triggerRevervoxBehindEvent(Player player){
         if (!player.level().isClientSide()) {
-            Vec3 playerPos = player.getPosition(0);
+            // Stop seeing other players in a 50 block radius
+            PlayerVisibilityUtil.isolatePlayer((ServerPlayer) player);
 
-            Vec3 revervoxPos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, -3, 0, 0);
-
-            RevervoxGeoEntity revervox = new RevervoxGeoEntity(EntityRegistry.REVERVOX.get(), player.level());
-            revervox.setPos(revervoxPos.x, revervoxPos.y, revervoxPos.z);
-            revervox.setNoAi(true);
-            revervox.setYHeadRot(player.getYRot());
-            player.level().addFreshEntity(revervox);
-
-            //TODO repetir audio, desaparecer quando o player olha para ele
+            TASKS.schedule(() -> SpawnFakeRevervox(player), new Random().nextInt(10, 20) * 20L);
         }
+    }
+
+    private static void SpawnFakeRevervox(Player player){
+        Vec3 playerPos = player.getPosition(0);
+        Vec3 revervoxPos = RevervoxMod.applyLocalCoordinates(player.getYRot(), playerPos, -3, 0, 0);
+
+        FakeRevervoxGeoEntity revervox = new FakeRevervoxGeoEntity(EntityRegistry.REVERVOX.get(), player.level());
+        UUID nearestPlayerId = player.getUUID();
+        IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio((u) -> u != nearestPlayerId, false);
+        if(audio == null){
+            audio = RevervoxMod.AUDIOS.getRandomAudio(false);
+        }
+        if(audio == null){ return; }
+        AudioPlayingUtil.playFromEntity(audio, revervox, RevervoxMod.MOD_ID);
+        revervox.setPos(revervoxPos.x, revervoxPos.y, revervoxPos.z);
+        revervox.setYHeadRot(player.getYRot());
+        revervox.setNoAi(true);
+        revervox.setTarget(player);
+        revervox.setBehindEvent(true);
+        revervox.setBehindEventStartTime(player.level().getGameTime());
+        revervox.setYHeadRot(player.getYRot());
+        player.level().addFreshEntity(revervox);
+
+
     }
 
     public static Vec3 applyLocalCoordinates(float yRot, Vec3 vec3, float forwards, float up, float left){
