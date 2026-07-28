@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
+import dev.omialien.revervoxmod.commands.TriggerRevervoxBehindEventCommand;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.datagen.AdvancementProvider;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
@@ -13,8 +14,9 @@ import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
+import dev.omialien.revervoxmod.util.PlayerVisibilityUtil;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
-import dev.omialien.revervoxmod.voicechat.AudioUtil;
+import dev.omialien.revervoxmod.util.AudioUtil;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;
@@ -22,13 +24,17 @@ import dev.omialien.voicechatrecording.api.events.AudioRecordedEvent;
 import dev.omialien.voicechatrecording.api.events.MicPacketReceivedEvent;
 import dev.omialien.voicechatrecording.api.events.RecordingSetupEvent;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -58,12 +64,49 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void revervoxBatSpawnEvent(FinalizeSpawnEvent event){
         if (event.getEntity() instanceof Bat && !event.getLevel().isClientSide()) {
-            if (new Random().nextInt(RevervoxModServerConfigs.REVERVOX_BAT_SPAWN_CHANCE.get()) == 0){
-                RevervoxBatGeoEntity bat = new RevervoxBatGeoEntity(EntityRegistry.REVERVOX_BAT.get(), event.getLevel().getLevel());
-                bat.moveTo(event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
-                RevervoxMod.LOGGER.debug("Spawning Revervox Bat! at " + event.getEntity().getX() + ", " + event.getEntity().getY() + ", " + event.getEntity().getZ());
-                event.setSpawnCancelled(true);
-                event.getLevel().addFreshEntity(bat);
+            Position entityPos = event.getEntity().position();
+            if (!event.getLevel().getBlockState(BlockPos.containing(entityPos)).getFluidState().is(Fluids.WATER)){
+                if(new Random().nextInt(RevervoxModServerConfigs.REVERVOX_BAT_SPAWN_CHANCE.get()) == 0){
+                    RevervoxBatGeoEntity bat = new RevervoxBatGeoEntity(EntityRegistry.REVERVOX_BAT.get(), event.getLevel().getLevel());
+                    bat.moveTo(event.getEntity().getX(), event.getEntity().getY(), event.getEntity().getZ());
+                    RevervoxMod.LOGGER.debug("Spawning Revervox Bat! at " + event.getEntity().getX() + ", " + event.getEntity().getY() + ", " + event.getEntity().getZ());
+                    event.setSpawnCancelled(true);
+                    event.getLevel().addFreshEntity(bat);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerStartTracking(PlayerEvent.StartTracking event) {
+        if (event.getEntity() instanceof ServerPlayer observer
+                && event.getTarget() instanceof ServerPlayer
+                && observer.getTags().contains("revervox_behind_event_target")) {
+
+            int targetId = event.getTarget().getId();
+            ChunkMap chunkMap = observer.serverLevel().getChunkSource().chunkMap;
+            ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(targetId);
+
+            if (trackedEntity != null) {
+                trackedEntity.removePlayer(observer);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            if (serverPlayer.getTags().contains("revervox_behind_event_target")) {
+                PlayerVisibilityUtil.restorePlayerVision(serverPlayer);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (event.isWasDeath() && event.getEntity() instanceof ServerPlayer newPlayer) {
+            if (newPlayer.getTags().contains("revervox_behind_event_target")) {
+                PlayerVisibilityUtil.restorePlayerVision(newPlayer);
             }
         }
     }
@@ -103,9 +146,34 @@ public class CommonEventBus {
         };
     }
 
+    private static Runnable fakeRevervoxBehindEventRequest(ServerLevel level){
+        return () -> {
+            RevervoxMod.LOGGER.debug("Starting fake revervox behind event!");
+            //if(RevervoxModServerConfigs.ENABLE_FAKE_REVERVOX_BEHIND_EVENT.get()) {
+            List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
+            if (!playerList.isEmpty() && playerList.size() > 1) {
+                int randomPlayer = new Random().nextInt(playerList.size());
+                //TODO so players que tem outro player por perto
+                if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
+                    RevervoxMod.LOGGER.debug("Player met requirements, starting revervox behind event!");
+                    RevervoxMod.triggerRevervoxBehindEvent(playerList.get(randomPlayer));
+                } else {
+                    RevervoxMod.LOGGER.debug("Player didn't meet requirements, skipping revervox behind event!");
+                }
+            } else {
+                RevervoxMod.LOGGER.debug("(revervox behind Event) playerList is empty");
+            }
+            //}
+            int nextRandomTick = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),(int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get())); //20 minutos max
+            RevervoxMod.LOGGER.debug("next revervox behind event scheduled for {} ticks", nextRandomTick);
+            RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(level), nextRandomTick);
+        };
+    }
+
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         SummonFakeEntityCommand.register(event.getDispatcher());
+        TriggerRevervoxBehindEventCommand.register(event.getDispatcher());
     }
 
     @SubscribeEvent

@@ -13,14 +13,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class RandomRepeatGoal extends Goal {
     private final RevervoxGeoEntity mob;
-    private static final int CHANNEL_DISTANCE = 50;
+    public static final int CHANNEL_DISTANCE = 30;
     private EntityAudioChannel channel;
     private int audiosPlayed = 0;
     private boolean canSpeak = true;
@@ -33,13 +32,6 @@ public class RandomRepeatGoal extends Goal {
         return canSpeak && mob.getTarget() == null;
     }
 
-    private AudioChannel getChannel(){
-        if (channel == null && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
-            UUID channelID = UUID.randomUUID();
-            channel = createChannel(api, channelID, this.mob);
-        }
-        return channel;
-    }
 
     @Override
     public void stop() {
@@ -59,32 +51,14 @@ public class RandomRepeatGoal extends Goal {
         if (VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
 
             List<Player> nearbyPlayers = new ArrayList<>(this.mob.level().
-                    getNearbyPlayers(TargetingConditions.forNonCombat(), this.mob, this.mob.getBoundingBox()
+                    getNearbyPlayers(TargetingConditions.forNonCombat().ignoreLineOfSight(), this.mob, this.mob.getBoundingBox()
                             .inflate(CHANNEL_DISTANCE)));
 
             RevervoxMod.LOGGER.debug("Nearby Players: " + Arrays.toString(nearbyPlayers.toArray()));
 
             if (nearbyPlayers.isEmpty()) {
                 RevervoxMod.LOGGER.debug("No players nearby");
-
-                Level level = this.mob.level();
-                Player nearestPlayer = null;
-                for (Player player : Objects.requireNonNull(level.getServer()).getPlayerList().getPlayers()){
-                    if (!player.level().equals(this.mob.level())) continue;
-                    if (nearestPlayer != null){
-                        nearestPlayer = this.mob.distanceToSqr(player) < this.mob.distanceToSqr(nearestPlayer) ? player : nearestPlayer;
-                    } else {
-                        nearestPlayer = player;
-                    }
-                }
-
-                if (nearestPlayer != null) {
-                    if (this.mob.teleportTowards(nearestPlayer)){
-                        RevervoxMod.LOGGER.debug("Teleporting towards nearest player: " + nearestPlayer.getName());
-                        this.mob.playPlayerAudio(nearestPlayer, api, this::getChannel);
-                        audiosPlayed++;
-                    }
-                }
+                this.mob.remove(Entity.RemovalReason.DISCARDED);
             } else {
                 if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {
                     RevervoxMod.LOGGER.debug("Atleast 2 players nearby");
@@ -114,6 +88,14 @@ public class RandomRepeatGoal extends Goal {
                 audiosPlayed++;
             }
         }
+    }
+
+    private AudioChannel getChannel(){
+        if (channel == null){
+            UUID channelID = UUID.randomUUID();
+            channel = createChannel(VoiceChatRecording.vcApi, channelID, this.mob);
+        }
+        return channel;
     }
 
     private static EntityAudioChannel createChannel(VoicechatServerApi api, UUID channelID, Entity nearestEntity) {

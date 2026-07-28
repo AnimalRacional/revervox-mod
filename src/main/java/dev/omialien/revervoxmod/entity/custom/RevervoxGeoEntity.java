@@ -12,10 +12,11 @@ import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
+import dev.omialien.revervoxmod.util.ViewUtil;
 import dev.omialien.voicechatrecording.VoiceChatRecording;
-import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
 import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedPlayer;
+import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -80,6 +81,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     private AudioPlayer currentAudioPlayer;
     private long noLineOfSightTicks;
     private boolean stunned;
+    private boolean hasSeenTarget;
     @Nullable
     private UUID persistentAngerTarget;
     private int breakCooldown;
@@ -89,6 +91,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         moveControl = new MMEntityMoveHelper(this, 90);
         firstSpeak = NOT_SPOKEN_YET;
         breakCooldown = 0;
+        hasSeenTarget = false;
     }
 
     @Override
@@ -101,7 +104,8 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5)
                         .triggerableAnim("Stun", RawAnimation.begin().then("misc.stun", Animation.LoopType.PLAY_ONCE))
-                .triggerableAnim("SonicBoom", DefaultAnimations.ATTACK_CAST),
+                        .triggerableAnim("SonicBoom", DefaultAnimations.ATTACK_CAST)
+                        .triggerableAnim("Eat", RawAnimation.begin().then("misc.eat", Animation.LoopType.PLAY_ONCE)),
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
@@ -150,8 +154,8 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
     protected void addBehaviourGoals() {
         this.goalSelector.addGoal(0, new RevervoxStunGoal(this));
-        this.goalSelector.addGoal(1, new RevervoxSonicBoomGoal(this));
-        this.goalSelector.addGoal(2, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
+        this.goalSelector.addGoal(1, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
+        this.goalSelector.addGoal(2, new RevervoxSonicBoomGoal(this));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
@@ -164,11 +168,16 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                 .add(Attributes.FOLLOW_RANGE, 20.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
-                .add(Attributes.ATTACK_DAMAGE, 14D)
+                .add(Attributes.ATTACK_DAMAGE, 7D)
                 .add(Attributes.ATTACK_SPEED, 0.3D)
                 .add(Attributes.MOVEMENT_SPEED, 0.5D)
                 .add(Attributes.STEP_HEIGHT, 1)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
+    }
+
+    @Override
+    public boolean canDisableShield() {
+        return true;
     }
 
     @Override
@@ -223,6 +232,14 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     @Override
     protected SoundEvent getHurtSound(@NotNull DamageSource dmgSrc) {
         return SoundRegistry.REVERVOX_HURT.get();
+    }
+
+    public void setHasSeenTarget(boolean hasSeenTarget) {
+        this.hasSeenTarget = hasSeenTarget;
+    }
+
+    public boolean getHasSeenTarget() {
+        return this.hasSeenTarget;
     }
 
     @Override
@@ -371,6 +388,9 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                 } else {
                     resetLineOfSight();
                 }
+                if (!getHasSeenTarget() && ViewUtil.isInSight(this, this.getTarget())){
+                    setHasSeenTarget(true);
+                }
             }
 
             boolean isFacingBelowSolid = !this.level().getBlockState(blockPosition().relative(getDirection()).below()).isAir();
@@ -497,13 +517,17 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
 
     public static boolean checkRevervoxSpawnRules(EntityType<RevervoxGeoEntity> pRevervox, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
+        int rand = pRandom.nextInt(RevervoxModServerConfigs.REVERVOX_SPAWN_CHANCE.get());
+        if (rand != 0){
+            return false;
+        }
         // Check if there are other Revervox around
         if (pLevel.getNearestEntity(RevervoxGeoEntity.class,
                 TargetingConditions.DEFAULT,
                 null,
                 pPos.getX(),
                 pPos.getY(), pPos.getZ(),
-                new AABB(pPos).inflate(RevervoxModServerConfigs.REVERVOX_SPAWN_CHANCE.get())) != null) {
+                new AABB(pPos).inflate(RevervoxModServerConfigs.REVERVOX_MIN_DISTANCE.get())) != null) {
 
             return false;
         }

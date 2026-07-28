@@ -19,23 +19,32 @@ import net.minecraft.world.phys.Vec3;
 
 public class RevervoxSonicBoomGoal extends Goal {
     private final RevervoxGeoEntity mob;
+    private long lastSonicBoomTime;
     public RevervoxSonicBoomGoal(RevervoxGeoEntity mob){
         this.getFlags().add(Flag.MOVE);
         this.mob = mob;
+        this.lastSonicBoomTime = 0;
+    }
+
+    @Override
+    public boolean requiresUpdateEveryTick() {
+        return true;
     }
 
     @Override
     public boolean canUse() {
-        Player player = this.mob.getTarget() instanceof Player ? (Player) this.mob.getTarget() : null;
-        boolean isTargetAboveGroundAndMobBelow = this.mob.position().y() < this.mob.level().getSeaLevel()
-                && (player != null
-                && player.position().y() > this.mob.level().getSeaLevel());
+        Player target = this.mob.getTarget() instanceof Player ? (Player) this.mob.getTarget() : null;
+        if (target == null) return false;
+
+        long currentTime = this.mob.level().getGameTime();
+        if (currentTime - this.lastSonicBoomTime < (RevervoxModServerConfigs.REVERVOX_SONIC_BOOM_COOLDOWN.get() * 20L) || !this.mob.getHasSeenTarget()) {return false;}
+
+        boolean isTargetAboveGround = target.position().y() > this.mob.level().getSeaLevel();
         return RevervoxModServerConfigs.REVERVOX_SONIC_BOOM.get()
-                && player != null
-                && this.mob.distanceTo(player) <= RevervoxModServerConfigs.REVERVOX_SONIC_BOOM_RANGE.get()
-                && !this.mob.hasLineOfSight(player)
-                && this.mob.lostLineOfSightFor(RevervoxModServerConfigs.REVERVOX_SONIC_BOOM_COOLDOWN.get() * 20)
-                && !isTargetAboveGroundAndMobBelow;
+                && this.mob.distanceTo(target) <= RevervoxModServerConfigs.REVERVOX_SONIC_BOOM_RANGE.get()
+                && !this.mob.hasLineOfSight(target)
+                && this.mob.lostLineOfSightFor(RevervoxModServerConfigs.REVERVOX_SONIC_BOOM_SECS_OUT_OF_SIGHT.get() * 20L)
+                && !isTargetAboveGround;
     }
 
     @Override
@@ -79,6 +88,7 @@ public class RevervoxSonicBoomGoal extends Goal {
         //this.mob.level().playSound(null, this.mob.getX(), this.mob.getY(), this.mob.getZ(), SoundRegistry.MEGAPHONE_USE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         this.mob.resetLineOfSight();
         this.mob.level().playSound(null, BlockPos.containing(this.mob.position()), SoundEvents.WARDEN_SONIC_BOOM, SoundSource.HOSTILE, 1.0F, 1.0F);
+        lastSonicBoomTime = this.mob.level().getGameTime();
     }
 
 }

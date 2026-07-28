@@ -195,6 +195,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             voicechatrecording_version: voicechatrecording_version
     ]
     inputs.properties replaceProperties
+    exclude 'META-INF/accesstransformer.cfg'
     expand replaceProperties
     from "src/main/templates"
     into "build/generated/sources/modMetadata"
