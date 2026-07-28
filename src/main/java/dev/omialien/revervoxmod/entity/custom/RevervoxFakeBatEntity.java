@@ -1,20 +1,19 @@
 package dev.omialien.revervoxmod.entity.custom;
 
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechatrecording.VoiceChatRecording;
-import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
-import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
+import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -38,7 +37,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.Optional;
 import java.util.UUID;
 
-public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, SpeakingEntity {
+public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity {
     private final AnimatableInstanceCache geoCache;
     private final int TICKS_TO_UPDATE_ROTATION = 200;
     private int ticksLeft = 3;
@@ -59,7 +58,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, Speak
     @Override
     public LivingEntity getTarget() {
         UUID tgt = entityData.get(TARGET_ACCESSOR).orElse(null);
-        if(targetCache != null && tgt != null && targetCache.getUUID().equals(tgt)){
+        if(targetCache != null && targetCache.getUUID().equals(tgt)){
             return targetCache;
         }
         if(tgt == null){ return null; }
@@ -145,18 +144,12 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, Speak
 
     @Override
     public void remove(@NotNull RemovalReason pReason) {
-        if(!this.level().isClientSide() && pReason == RemovalReason.KILLED && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
+        if(this.level() instanceof ServerLevel level && pReason == RemovalReason.KILLED && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
             Player target = getPlayerTarget();
             if(target != null){
-//                short[] audio = VoiceChatRecordingPlugin.getRandomAudio(false);
                 IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
                 if(audio != null){
-                    AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(this.getX(), this.getY(), this.getZ()));
-                    if(channel != null) {
-                        channel.setFilter((plr) -> ((ServerPlayer)plr.getPlayer()).is(target));
-                        channel.setCategory(RevervoxMod.MOD_ID);
-                        this.playAudio(audio.getAudio(), api, channel, new AudioEffect().changePitch(1.5f).makeReverb(0.5f, 160, 2));
-                    }
+                    AudioPlayingUtil.playLocationalAudio(audio, this.getEyePosition(), level, RevervoxMod.MOD_ID);
                 }
             }
         }
@@ -215,28 +208,11 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity, Speak
         return false;
     }
 
-
-
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 5.0D)
                 .add(Attributes.ATTACK_DAMAGE, 0)
                 .add(Attributes.FLYING_SPEED, 3.5D)
                 .add(Attributes.ATTACK_SPEED, 1.8D);
-    }
-    private AudioPlayer currentAudioPlayer;
-    @Override
-    public AudioPlayer getCurrentAudioPlayer() {
-        return currentAudioPlayer;
-    }
-
-    @Override
-    public void setCurrentAudioPlayer(AudioPlayer player) {
-        this.currentAudioPlayer = player;
-    }
-
-    @Override
-    public void onSpeak(long audioDuration) {
-
     }
 }

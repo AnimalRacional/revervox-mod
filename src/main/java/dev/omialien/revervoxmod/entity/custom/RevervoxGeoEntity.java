@@ -1,7 +1,5 @@
 package dev.omialien.revervoxmod.entity.custom;
 
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
@@ -13,10 +11,9 @@ import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.revervoxmod.util.ViewUtil;
-import dev.omialien.voicechatrecording.VoiceChatRecording;
 import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedPlayer;
-import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
+import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -69,7 +66,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob, HearingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final EntityDataAccessor<Boolean> CLIMBING_ACCESSOR = SynchedEntityData.defineId(RevervoxGeoEntity.class, EntityDataSerializers.BOOLEAN);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(50, 60);
@@ -78,7 +75,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     private long firstSpeak;
     private boolean shouldDisappear;
     private static final long NOT_SPOKEN_YET = -1;
-    private AudioPlayer currentAudioPlayer;
     private long noLineOfSightTicks;
     private boolean stunned;
     private boolean hasSeenTarget;
@@ -262,17 +258,15 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
     @Override
     public void awardKillScore(@NotNull Entity pEntity, int pScoreValue, @NotNull DamageSource pSource) {
-        if(pEntity instanceof Player player && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
-            Vec3 loc = this.getEyePosition();
-            playPlayerAudio(player, api, () -> {
-                AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(loc.x, loc.y, loc.z));
-                if(channel == null){
-                    RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
-                    return null;
-                }
-                channel.setCategory(RevervoxMod.MOD_ID);
-                return channel;
-            }, new AudioEffect().addRandomEffects());
+        if(this.level() instanceof ServerLevel level && pEntity instanceof Player player){
+            AudioPlayingUtil.playLocationalAudio(
+                    RevervoxMod.AUDIOS.getRandomAudioAnyFallback(player.getUUID(), true),
+                    this.getEyePosition(),
+                    level,
+                    AudioEffect.random(),
+                    RevervoxMod.MOD_ID,
+                    32f
+            );
             this.remove(Entity.RemovalReason.DISCARDED);
         }
         super.awardKillScore(pEntity, pScoreValue, pSource);
@@ -289,16 +283,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         if(!hasSpoken() && !level().isClientSide()){
             firstSpeak = System.currentTimeMillis() + audioDuration;
         }
-    }
-
-    @Override
-    public AudioPlayer getCurrentAudioPlayer() {
-        return this.currentAudioPlayer;
-    }
-
-    @Override
-    public void setCurrentAudioPlayer(AudioPlayer player) {
-        this.currentAudioPlayer = player;
     }
 
     //TODO fazer depender da distancia que o player ta dele

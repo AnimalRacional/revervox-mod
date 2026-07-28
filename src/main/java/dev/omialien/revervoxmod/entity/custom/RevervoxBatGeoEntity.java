@@ -1,7 +1,5 @@
 package dev.omialien.revervoxmod.entity.custom;
 
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
-import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
@@ -9,12 +7,10 @@ import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
-import dev.omialien.voicechatrecording.VoiceChatRecording;
-import dev.omialien.voicechatrecording.voicechat.audio.AudioPlayer;
-import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.IRecordedPlayer;
+import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -58,13 +54,12 @@ import java.util.EnumSet;
 import java.util.Random;
 import java.util.UUID;
 
-public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, NeutralMob, HearingEntity, SpeakingEntity {
+public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, NeutralMob, HearingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
     public static final int TICKS_PER_FLAP = Mth.ceil(2.4166098F);
     private static final EntityDataAccessor<Byte> DATA_ID_FLAGS = SynchedEntityData.defineId(RevervoxBatGeoEntity.class, EntityDataSerializers.BYTE);
     private int remainingPersistentAngerTime;
-    private AudioPlayer currentAudioPlayer;
     @Nullable
     private UUID persistentAngerTarget;
     private long spawnTime;
@@ -158,22 +153,18 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
 
     @Override
     public void awardKillScore(@NotNull Entity pKilled, int pScoreValue, @NotNull DamageSource pSource) {
-        if(pKilled instanceof Player player && VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
-            playPlayerAudio(player, api, () -> createLocationalAudioChannel(api), new AudioEffect().changePitch(1.7f));
+        if(level() instanceof ServerLevel level && pKilled instanceof Player player){
+            AudioPlayingUtil.playLocationalAudio(
+                    RevervoxMod.AUDIOS.getRandomAudioAnyFallback(player.getUUID(), true),
+                    this.getEyePosition(),
+                    level,
+                    AudioEffect.pitch(1.7f),
+                    RevervoxMod.MOD_ID,
+                    32f
+            );
             this.remove(Entity.RemovalReason.DISCARDED);
         }
         super.awardKillScore(pKilled, pScoreValue, pSource);
-    }
-
-    private AudioChannel createLocationalAudioChannel(VoicechatServerApi api){
-        Vec3 loc = this.getEyePosition();
-        AudioChannel channel = api.createLocationalAudioChannel(UUID.randomUUID(), api.fromServerLevel(this.level()), api.createPosition(loc.x, loc.y, loc.z));
-        if(channel == null){
-            RevervoxMod.LOGGER.error("Couldn't create disappearing channel");
-            return null;
-        }
-        channel.setCategory(RevervoxMod.MOD_ID);
-        return channel;
     }
 
     @Override
@@ -251,16 +242,6 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         return this.random.nextInt(4) != 0 ? null : SoundRegistry.REVERVOX_BAT_IDLE.get();
     }
 
-    @Override
-    public AudioPlayer getCurrentAudioPlayer() {
-        return this.currentAudioPlayer;
-    }
-
-    @Override
-    public void setCurrentAudioPlayer(AudioPlayer player) {
-        this.currentAudioPlayer = player;
-    }
-
     final Random dropRng = new Random();
     @Override
     public boolean doHurtTarget(@NotNull Entity target) {
@@ -269,6 +250,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         triggerAnim("Attack", "attack.bite");
         Level level = this.level();
         if(!level.isClientSide()){
+            // TODO use loot tables for this
             int rand = dropRng.nextInt(RevervoxModServerConfigs.REVERVOX_BAT_TOOTH_DROP_CHANCE.get());
             if(rand == 0){
                 ItemEntity item = new ItemEntity(level, this.getX(), this.getY(), this.getZ(), new ItemStack(ItemRegistry.REVERVOX_BAT_TOOTH.get()));
@@ -363,13 +345,7 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         }
     }
 
-
-    @Override
-    public void onSpeak(long audioDuration) {
-    }
-
     static class RVHurtByTargetGoal extends TargetGoal {
-
         private static final TargetingConditions HURT_BY_TARGETING = TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting();
         private int timestamp;
         private final Class<?>[] toTarget;
