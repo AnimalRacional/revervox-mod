@@ -44,7 +44,8 @@
   "revervox_mod.configuration.megaphoneCooldown.tooltip": "Cooldown (in seconds) between Megaphone uses",
   "revervox_mod.configuration.crouchStopsMegaphone": "Crouch stops megaphone boom",
   "revervox_mod.configuration.crouchStopsMegaphone.tooltip": "Whether crouching will stop your megaphone from doing a sonic boom",
-
+  "revervox_mod.configuration.revervoxUnheardBeforeDisappear": "Revervox Unheard Before Disappearing",
+  "revervox_mod.configuration.revervoxUnheardBeforeDisappear.tooltip": "Amount of times Revervox will try to speak without anyone nearby before disappearing",
 
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",

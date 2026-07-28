@@ -22,14 +22,14 @@ public class RandomRepeatGoal extends Goal {
     public static final int CHANNEL_DISTANCE = 30;
     private EntityAudioChannel channel;
     private int audiosPlayed = 0;
-    private boolean canSpeak = true;
+    private int unheardAudios = 0;
+    private long nextAudioAllowed = 0;
     public RandomRepeatGoal(RevervoxGeoEntity revervoxGeoEntity) {
         this.mob = revervoxGeoEntity;
-        RevervoxMod.TASKS.schedule(setCanSpeak(), 0);
     }
     @Override
     public boolean canUse() {
-        return canSpeak && mob.getTarget() == null;
+        return (this.mob.level().getGameTime() > this.nextAudioAllowed) && this.mob.getTarget() == null;
     }
 
 
@@ -44,8 +44,10 @@ public class RandomRepeatGoal extends Goal {
     }
 
     public void tick() {
-        canSpeak = false;
-        if (audiosPlayed >= RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get()) this.mob.remove(Entity.RemovalReason.DISCARDED);
+        if (audiosPlayed >= RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get()) {
+            this.mob.remove(Entity.RemovalReason.DISCARDED);
+            return;
+        }
         RevervoxMod.LOGGER.debug("Less than " + RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get() + " audios!");
         if (this.mob.getCurrentAudioPlayer() != null && this.mob.getCurrentAudioPlayer().isPlaying()) return;
         if (VoiceChatRecording.vcApi instanceof VoicechatServerApi api){
@@ -58,7 +60,10 @@ public class RandomRepeatGoal extends Goal {
 
             if (nearbyPlayers.isEmpty()) {
                 RevervoxMod.LOGGER.debug("No players nearby");
-                this.mob.remove(Entity.RemovalReason.DISCARDED);
+                this.nextAudioAllowed = this.mob.level().getGameTime() + 60;
+                if (++unheardAudios >= RevervoxModServerConfigs.REVERVOX_UNHEARD_BEFORE_DISAPPEAR.get()) {
+                    this.mob.remove(Entity.RemovalReason.DISCARDED);
+                }
             } else {
                 if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {
                     RevervoxMod.LOGGER.debug("Atleast 2 players nearby");
@@ -71,6 +76,7 @@ public class RandomRepeatGoal extends Goal {
                                 RevervoxMod.LOGGER.debug("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE/2);
                                 Player furthestPlayer = player1.distanceToSqr(this.mob) > player2.distanceToSqr(this.mob) ? player1 : player2;
                                 this.mob.playPlayerAudio(furthestPlayer, api, this::getChannel);
+                                // TODO this.nextAudioAllowed = this.mob.level().getGameTime() + ((int)(audio.getDuration() * 20));
                                 audiosPlayed++;
                                 return;
                             }
@@ -108,17 +114,4 @@ public class RandomRepeatGoal extends Goal {
         channel.setDistance(RandomRepeatGoal.CHANNEL_DISTANCE);
         return channel;
     }
-
-    private Runnable setCanSpeak() {
-        return () -> {
-            if (this.mob.isAlive()){
-                canSpeak = true;
-                int ticksToSpeak = new Random().nextInt(5*20,10*20);
-
-                RevervoxMod.TASKS.schedule(setCanSpeak(), ticksToSpeak);
-            }
-        };
-    }
-
-
 }

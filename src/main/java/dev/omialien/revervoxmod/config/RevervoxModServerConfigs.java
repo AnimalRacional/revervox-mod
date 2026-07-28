@@ -25,5 +25,6 @@ public class RevervoxModServerConfigs {
     public static final ModConfigSpec.IntValue REVERVOX_SONIC_BOOM_RANGE = BUILDER.defineInRange("revervoxSonicBoomRange", 16, 5, 100);
     public static final ModConfigSpec.IntValue MEGAPHONE_COOLDOWN = BUILDER.defineInRange("megaphoneCooldown", 4, 0, 100);
     public static final ModConfigSpec.BooleanValue CROUCH_PREVENTS_MEGAPHONE_BOOM = BUILDER.define("crouchStopsMegaphone", true);
+    public static final ModConfigSpec.IntValue REVERVOX_UNHEARD_BEFORE_DISAPPEAR = BUILDER.defineInRange("revervoxUnheardBeforeDisappear", 10, 1, 100);
     public static final ModConfigSpec SPEC = BUILDER.build();
 }
