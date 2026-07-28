@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod;
 
 import com.mojang.logging.LogUtils;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
+import dev.omialien.revervoxmod.entity.RevervoxCooldownManager;
 import dev.omialien.revervoxmod.entity.custom.FakeRevervoxGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.registries.*;
@@ -37,6 +38,7 @@ public class RevervoxMod {
     public static final TaskScheduler TASKS = new TaskScheduler();
     public static AudioStorage AUDIOS = new AudioStorage();
     public static VoiceChatRecordingApi RECORDING_API = null;
+    public static RevervoxCooldownManager COOLDOWN = new RevervoxCooldownManager();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.

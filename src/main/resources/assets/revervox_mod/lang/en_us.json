@@ -46,6 +46,10 @@
   "revervox_mod.configuration.crouchStopsMegaphone.tooltip": "Whether crouching will stop your megaphone from doing a sonic boom",
   "revervox_mod.configuration.revervoxUnheardBeforeDisappear": "Revervox Unheard Before Disappearing",
   "revervox_mod.configuration.revervoxUnheardBeforeDisappear.tooltip": "Amount of times Revervox will try to speak without anyone nearby before disappearing",
+  "revervox_mod.configuration.revervoxSpawnCooldown": "Revervox Spawn Cooldown",
+  "revervox_mod.configuration.revervoxSpawnCooldown.tooltip": "How long, in ticks, Revervox will avoid spawning near a player after spawning close to them",
+  "revervox_mod.configuration.revervoxCooldownRange": "Revervox Cooldown Range",
+  "revervox_mod.configuration.revervoxCooldownRange.tooltip": "The range at which players will be put into Revervox spawning cooldown after it spawns or attacks. If above 10000, the cooldown will be global",
 
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",

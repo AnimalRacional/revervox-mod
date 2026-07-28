@@ -1,10 +1,12 @@
 package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.commands.RevervoxCooldownCommand;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
 import dev.omialien.revervoxmod.commands.TriggerRevervoxBehindEventCommand;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.datagen.AdvancementProvider;
+import dev.omialien.revervoxmod.entity.RevervoxCooldownManager;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
@@ -118,6 +120,7 @@ public class CommonEventBus {
         RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", nextEvent);
         RevervoxMod.TASKS.schedule(fakeBatEventSpawnRequest(
                 event.getServer().getLevel(Level.OVERWORLD)), nextEvent);
+        RevervoxMod.COOLDOWN = new RevervoxCooldownManager();
         //TODO RANDOM EVENT: se 2 players tiverem juntos, os dois param de ver um ao outro e
         // ouvem a voz do outro amigo atras deles, quando virarem se, levam com um jumpscare do
         // revervox e volta tudo ao normal. arranjar maneira de dar counter ao evento
@@ -174,6 +177,7 @@ public class CommonEventBus {
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         SummonFakeEntityCommand.register(event.getDispatcher());
         TriggerRevervoxBehindEventCommand.register(event.getDispatcher());
+        RevervoxCooldownCommand.register(event.getDispatcher());
     }
 
     @SubscribeEvent

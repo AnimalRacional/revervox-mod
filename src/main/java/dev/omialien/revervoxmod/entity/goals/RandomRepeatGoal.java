@@ -13,6 +13,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -20,23 +21,20 @@ import java.util.stream.Collectors;
 public class RandomRepeatGoal extends Goal {
     private final RevervoxGeoEntity mob;
     public static final int CHANNEL_DISTANCE = 30;
-    private EntityAudioChannel channel;
     private int audiosPlayed = 0;
     private int unheardAudios = 0;
     private long nextAudioAllowed = 0;
     public RandomRepeatGoal(RevervoxGeoEntity revervoxGeoEntity) {
         this.mob = revervoxGeoEntity;
     }
+
+    private void setAudioCooldown(double duration) {
+        this.nextAudioAllowed = this.mob.level().getGameTime() + ((int)(duration * 20)) + new Random().nextInt(5*20, 15*20);
+    }
+
     @Override
     public boolean canUse() {
         return (this.mob.level().getGameTime() > this.nextAudioAllowed) && this.mob.getTarget() == null;
-    }
-
-
-    @Override
-    public void stop() {
-        channel = null;
-        super.stop();
     }
 
     public boolean canContinueToUse() {
@@ -80,8 +78,19 @@ public class RandomRepeatGoal extends Goal {
                                 IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudioAnyFallback(furthestPlayer.getUUID(), true);
                                 AudioPlayingUtil.playLocationalAudio(audio, this.mob.getEyePosition(), level, RevervoxMod.MOD_ID);
                                 this.mob.onSpeak((int)(audio.getDuration() * 1000));
-                                // TODO this.nextAudioAllowed = this.mob.level().getGameTime() + ((int)(audio.getDuration() * 20));
+                                this.setAudioCooldown(audio.getDuration());
                                 audiosPlayed++;
+                                double range = RevervoxModServerConfigs.REVERVOX_COOLDOWN_RANGE.get();
+                                if (range > 10000d) {
+                                    RevervoxMod.COOLDOWN.markSpawn(level.players().stream().map(Entity::getUUID).iterator(), level.getGameTime());
+                                } else {
+                                    Iterator<UUID> players = this.mob.level().getNearbyPlayers(
+                                            TargetingConditions.forNonCombat(),
+                                            null,
+                                            AABB.ofSize(this.mob.position(), range, range, range)
+                                    ).stream().map(Entity::getUUID).iterator();
+                                    RevervoxMod.COOLDOWN.markSpawn(players, level.getGameTime());
+                                }
                                 return;
                             }
                         }
@@ -94,6 +103,18 @@ public class RandomRepeatGoal extends Goal {
                     audio = RevervoxMod.AUDIOS.getRandomAudio(true);
                 }
                 if(audio == null){ return; }
+                double range = RevervoxModServerConfigs.REVERVOX_COOLDOWN_RANGE.get();
+                if (range > 10000d) {
+                    RevervoxMod.COOLDOWN.markSpawn(level.players().stream().map(Entity::getUUID).iterator(), level.getGameTime());
+                } else {
+                    Iterator<UUID> players = this.mob.level().getNearbyPlayers(
+                            TargetingConditions.forNonCombat(),
+                            null,
+                            AABB.ofSize(this.mob.position(), range, range, range)
+                    ).stream().map(Entity::getUUID).iterator();
+                    RevervoxMod.COOLDOWN.markSpawn(players, level.getGameTime());
+                }
+                this.setAudioCooldown(audio.getDuration());
                 AudioPlayingUtil.playFromEntity(audio, this.mob, RevervoxMod.MOD_ID);
                 this.mob.onSpeak((int)(audio.getDuration() * 1000));
                 audiosPlayed++;

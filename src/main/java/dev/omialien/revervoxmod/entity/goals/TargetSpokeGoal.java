@@ -1,20 +1,26 @@
 package dev.omialien.revervoxmod.entity.goals;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.HearingEntity;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.TriggerRegistry;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.Iterator;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends NearestAttackableTargetGoal<Player> {
@@ -55,6 +61,22 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
 
 
     public void start() {
+        if (!(this.mob.level() instanceof ServerLevel level)) {
+            return;
+        }
+        if (this.target != null) {
+            double range = RevervoxModServerConfigs.REVERVOX_COOLDOWN_RANGE.get();
+            if (range > 10000d) {
+                RevervoxMod.COOLDOWN.markSpawn(level.players().stream().map(Entity::getUUID).iterator(), level.getGameTime());
+            } else {
+                Iterator<UUID> players = this.mob.level().getNearbyPlayers(
+                        TargetingConditions.forNonCombat(),
+                        null,
+                        AABB.ofSize(this.mob.position(), range, range, range)
+                ).stream().map(Entity::getUUID).iterator();
+                RevervoxMod.COOLDOWN.markSpawn(players, level.getGameTime());
+            }
+        }
         this.aggroTime = this.adjustedTickDelay(5);
         if (this.soundToPlay != null){
             entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), soundToPlay, SoundSource.HOSTILE, 1.0F, 1.0F);

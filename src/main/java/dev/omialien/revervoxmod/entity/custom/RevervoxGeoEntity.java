@@ -515,6 +515,20 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
             return false;
         }
+
+        // Check if any player nearby is in cooldown
+        long gameTime = pLevel.getLevelData().getGameTime();
+        double range = RevervoxModServerConfigs.REVERVOX_COOLDOWN_RANGE.get();
+        if (range < 10000 && pLevel.players().stream().anyMatch((p) -> RevervoxMod.COOLDOWN.isInCooldown(p.getUUID(), gameTime) && p.distanceToSqr(pPos.getCenter()) <= (range*range))) {
+            RevervoxMod.LOGGER.debug("Currently in cooldown, not spawning");
+            return false;
+        } else if(range >= 10000) {
+            if (pLevel.players().stream().anyMatch((p) -> RevervoxMod.COOLDOWN.isInCooldown(p.getUUID(), gameTime))) {
+                RevervoxMod.LOGGER.debug("Global cooldown, not spawning");
+                return false;
+            }
+        }
+
         if (pLevel.getMaxLocalRawBrightness(pPos) < 4) {
             // Priority to spawn on alone player
             Player player = pLevel.getNearestPlayer(TargetingConditions.DEFAULT, pPos.getX(), pPos.getY(), pPos.getZ());
