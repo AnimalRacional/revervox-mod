@@ -18,14 +18,14 @@ public class RandomRepeatGoal extends Goal {
     private final RevervoxGeoEntity mob;
     public static final int CHANNEL_DISTANCE = 30;
     private int audiosPlayed = 0;
-    private boolean canSpeak = true;
+    private int unheardAudios = 0;
+    private long nextAudioAllowed = 0;
     public RandomRepeatGoal(RevervoxGeoEntity revervoxGeoEntity) {
         this.mob = revervoxGeoEntity;
-        setCanSpeak().run();
     }
     @Override
     public boolean canUse() {
-        return canSpeak && mob.getTarget() == null;
+        return (this.mob.level().getGameTime() > nextAudioAllowed) && mob.getTarget() == null;
     }
 
     @Override
@@ -41,10 +41,12 @@ public class RandomRepeatGoal extends Goal {
         if (!(this.mob.level() instanceof ServerLevel level)) {
             return;
         }
-        canSpeak = false;
-        if (audiosPlayed >= RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get()) this.mob.remove(Entity.RemovalReason.DISCARDED);
+        if (audiosPlayed >= RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get()) {
+            this.mob.remove(Entity.RemovalReason.DISCARDED);
+            RevervoxMod.LOGGER.debug("Removed for max audios played");
+            return;
+        }
         RevervoxMod.LOGGER.debug("Less than " + RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get() + " audios!");
-        // TODO it may be able to play an audio while another is still playing
 
         List<Player> nearbyPlayers = new ArrayList<>(this.mob.level().
                 getNearbyPlayers(TargetingConditions.forNonCombat().ignoreLineOfSight(), this.mob, this.mob.getBoundingBox()
@@ -54,7 +56,11 @@ public class RandomRepeatGoal extends Goal {
 
         if (nearbyPlayers.isEmpty()) {
             RevervoxMod.LOGGER.debug("No players nearby");
-            this.mob.remove(Entity.RemovalReason.DISCARDED);
+            this.nextAudioAllowed = this.mob.level().getGameTime() + 60;
+            if (++unheardAudios >= RevervoxModServerConfigs.REVERVOX_UNHEARD_BEFORE_DISAPPEAR.get()) {
+                this.mob.remove(Entity.RemovalReason.DISCARDED);
+                RevervoxMod.LOGGER.debug("Unheard disappeared");
+            }
         } else {
             if (nearbyPlayers.size() <= 4 && nearbyPlayers.size() > 1) {
                 RevervoxMod.LOGGER.debug("Atleast 2 players nearby");
@@ -69,6 +75,7 @@ public class RandomRepeatGoal extends Goal {
                             IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudioAnyFallback(furthestPlayer.getUUID(), true);
                             AudioPlayingUtil.playLocationalAudio(audio, this.mob.getEyePosition(), level, RevervoxMod.MOD_ID);
                             this.mob.onSpeak((int)(audio.getDuration() * 1000));
+                            this.nextAudioAllowed = this.mob.level().getGameTime() + ((int)(audio.getDuration() * 20));
                             audiosPlayed++;
                             return;
                         }
@@ -87,17 +94,4 @@ public class RandomRepeatGoal extends Goal {
             audiosPlayed++;
         }
     }
-
-    private Runnable setCanSpeak() {
-        return () -> {
-            if (this.mob.isAlive()){
-                canSpeak = true;
-                int ticksToSpeak = new Random().nextInt(5*20,10*20);
-
-                RevervoxMod.TASKS.schedule(setCanSpeak(), ticksToSpeak);
-            }
-        };
-    }
-
-
 }

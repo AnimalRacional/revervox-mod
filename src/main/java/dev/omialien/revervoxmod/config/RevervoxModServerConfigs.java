@@ -8,6 +8,7 @@ public class RevervoxModServerConfigs {
     public static final ForgeConfigSpec.ConfigValue<Integer> RECORDING_LIMIT;
     public static final ForgeConfigSpec.ConfigValue<Integer> MINIMUM_AUDIO_COUNT;
     public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_MAX_AUDIOS;
+    public static final ForgeConfigSpec.IntValue REVERVOX_UNHEARD_BEFORE_DISAPPEAR;
     public static final ForgeConfigSpec.ConfigValue<Double> REVERVOX_AFTER_SPEAK_GRACE_PERIOD;
     public static final ForgeConfigSpec.ConfigValue<Double> REVERVOX_BAT_AFTER_SPAWN_GRACE_PERIOD;
     public static final ForgeConfigSpec.ConfigValue<Integer> REVERVOX_BAT_SPAWN_CHANCE;
@@ -34,6 +35,7 @@ public class RevervoxModServerConfigs {
         MINIMUM_AUDIO_COUNT = BUILDER.comment("The minimum amount of audios before they start being deleted").define("Minimum Audio Count", 50);
 
         REVERVOX_MAX_AUDIOS = BUILDER.comment("Maximum audios that Revervox will play before disappearing").define("Revervox Max Audios", 12);
+        REVERVOX_UNHEARD_BEFORE_DISAPPEAR = BUILDER.comment("Amount of times Revervox will try to speak without anyone nearby before disappearing").defineInRange("Revervox Unheard Before Disappearing", 10, 1, 100);
         REVERVOX_AFTER_SPEAK_GRACE_PERIOD = BUILDER.comment("Time in seconds that Revervox will wait after speaking before being able to get angry").define("Revervox After Speaking Grace Period", 1.5d);
         REVERVOX_BAT_AFTER_SPAWN_GRACE_PERIOD = BUILDER.comment("Time in seconds that Revervox Bat will wait after spawn before being able to get angry").define("Revervox Bat After Spawning Grace Period", 0.5d);
         REVERVOX_SPAWN_CHANCE = BUILDER.comment("Chance of Revervox spawning (1 in x)").defineInRange("Revervox Spawn Chance", 2, 1, Integer.MAX_VALUE);
