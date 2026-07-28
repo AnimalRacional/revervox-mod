@@ -2,9 +2,9 @@ package dev.omialien.revervoxmod;
 
 import com.mojang.logging.LogUtils;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
+import dev.omialien.revervoxmod.entity.RevervoxCooldownManager;
 import dev.omialien.revervoxmod.entity.custom.FakeRevervoxGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
-import dev.omialien.revervoxmod.events.CommonEventBus;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.*;
 import dev.omialien.revervoxmod.util.PlayerVisibilityUtil;
@@ -18,7 +18,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,10 +35,10 @@ import java.util.UUID;
 public class RevervoxMod {
     public static final String MOD_ID = "revervox_mod";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final LevelResource AUDIO_DIRECTORY = new LevelResource("player_audios");
     final public static TaskScheduler TASKS = new TaskScheduler();
     public static AudioStorage AUDIOS = new AudioStorage();
     public static VoiceChatRecordingApi RECORDING_API = null;
+    public static RevervoxCooldownManager COOLDOWN = new RevervoxCooldownManager();
 
     public RevervoxMod(){
         LOGGER.warn("Old forge version!");
@@ -55,7 +54,6 @@ public class RevervoxMod {
 
     private void commonSetup(IEventBus bus){
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new CommonEventBus());
 
         EntityRegistry.register(bus);
         SoundRegistry.register(bus);

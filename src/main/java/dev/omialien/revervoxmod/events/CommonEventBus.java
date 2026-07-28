@@ -1,9 +1,11 @@
 package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.commands.RevervoxCooldownCommand;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
 import dev.omialien.revervoxmod.commands.TriggerRevervoxBehindEventCommand;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
+import dev.omialien.revervoxmod.entity.RevervoxCooldownManager;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
@@ -106,6 +108,7 @@ public class CommonEventBus {
         RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", nextEvent);
         RevervoxMod.TASKS.schedule(fakeBatEventSpawnRequest(
                 event.getServer().getLevel(Level.OVERWORLD)), nextEvent);
+        RevervoxMod.COOLDOWN = new RevervoxCooldownManager();
     }
 
     private static Runnable fakeBatEventSpawnRequest(ServerLevel level){
@@ -159,6 +162,7 @@ public class CommonEventBus {
     public static void onRegisterCommands(RegisterCommandsEvent event) {
         SummonFakeEntityCommand.register(event.getDispatcher());
         TriggerRevervoxBehindEventCommand.register(event.getDispatcher());
+        RevervoxCooldownCommand.register(event.getDispatcher());
     }
 
 

@@ -27,6 +27,8 @@ public class RevervoxModServerConfigs {
     public static final ForgeConfigSpec.IntValue REVERVOX_SONIC_BOOM_RANGE;
     public static final ForgeConfigSpec.IntValue MEGAPHONE_COOLDOWN;
     public static final ForgeConfigSpec.BooleanValue CROUCH_PREVENTS_MEGAPHONE_BOOM;
+    public static final ForgeConfigSpec.IntValue REVERVOX_SPAWN_COOLDOWN;
+    public static final ForgeConfigSpec.DoubleValue REVERVOX_COOLDOWN_RANGE;
 
     static {
         BUILDER.push("Server Configs for Revervox Mod");
@@ -48,6 +50,8 @@ public class RevervoxModServerConfigs {
         REVERVOX_BREAKS_BLOCKS = BUILDER.comment("Whether Revervox breaks blocks to get to you").define("Revervox Block Breaking", false);
         REVERVOX_BREAKS_NONSOLID = BUILDER.comment("Whether Revervox breaks non-solid blocks such as torches and leaves").define("Revervox breaks non-solid blocks", true);
         REVERVOX_ABOVE_GROUND = BUILDER.comment("Whether Revervox spawns above ground").define("Revervox above ground", false);
+        REVERVOX_SPAWN_COOLDOWN = BUILDER.comment("How long, in ticks, Revervox will avoid spawning near a player after spawning close to them").defineInRange("Revervox Spawn Cooldown", 6000, 0, Integer.MAX_VALUE);
+        REVERVOX_COOLDOWN_RANGE = BUILDER.comment("The range at which players will be put into Revervox spawning cooldown after it spawns or attacks. If above 10000, the cooldown will be global").defineInRange("Revervox Cooldown Range", 200.0, 1.0, Double.MAX_VALUE);
 
         REVERVOX_SONIC_BOOM = BUILDER.comment("Whether Revervox uses the Sonic Boom ability").define("Revervox Sonic Boom", true);
         REVERVOX_SONIC_BOOM_COOLDOWN = BUILDER.comment("Cooldown (in seconds) between Revervox Sonic Booms").defineInRange("Revervox Sonic Boom Cooldown", 35, 1, 100);

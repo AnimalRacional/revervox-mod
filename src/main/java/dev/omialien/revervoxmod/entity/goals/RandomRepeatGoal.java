@@ -10,6 +10,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +24,11 @@ public class RandomRepeatGoal extends Goal {
     public RandomRepeatGoal(RevervoxGeoEntity revervoxGeoEntity) {
         this.mob = revervoxGeoEntity;
     }
+
+    private void setAudioCooldown(double duration) {
+        this.nextAudioAllowed = this.mob.level().getGameTime() + ((int)(duration * 20)) + new Random().nextInt(5*20, 15*20);
+    }
+
     @Override
     public boolean canUse() {
         return (this.mob.level().getGameTime() > nextAudioAllowed) && mob.getTarget() == null;
@@ -46,13 +52,10 @@ public class RandomRepeatGoal extends Goal {
             RevervoxMod.LOGGER.debug("Removed for max audios played");
             return;
         }
-        RevervoxMod.LOGGER.debug("Less than " + RevervoxModServerConfigs.REVERVOX_MAX_AUDIOS.get() + " audios!");
 
         List<Player> nearbyPlayers = new ArrayList<>(this.mob.level().
                 getNearbyPlayers(TargetingConditions.forNonCombat().ignoreLineOfSight(), this.mob, this.mob.getBoundingBox()
                         .inflate(CHANNEL_DISTANCE)));
-
-        RevervoxMod.LOGGER.debug("Nearby Players: " + Arrays.toString(nearbyPlayers.toArray()));
 
         if (nearbyPlayers.isEmpty()) {
             RevervoxMod.LOGGER.debug("No players nearby");
@@ -75,8 +78,19 @@ public class RandomRepeatGoal extends Goal {
                             IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudioAnyFallback(furthestPlayer.getUUID(), true);
                             AudioPlayingUtil.playLocationalAudio(audio, this.mob.getEyePosition(), level, RevervoxMod.MOD_ID);
                             this.mob.onSpeak((int)(audio.getDuration() * 1000));
-                            this.nextAudioAllowed = this.mob.level().getGameTime() + ((int)(audio.getDuration() * 20));
+                            this.setAudioCooldown(audio.getDuration());
                             audiosPlayed++;
+                            double range = RevervoxModServerConfigs.REVERVOX_COOLDOWN_RANGE.get();
+                            if (range > 10000d) {
+                                RevervoxMod.COOLDOWN.markSpawn(level.players().stream().map(Entity::getUUID).iterator(), level.getGameTime());
+                            } else {
+                                Iterator<UUID> players = this.mob.level().getNearbyPlayers(
+                                        TargetingConditions.forNonCombat(),
+                                        null,
+                                        AABB.ofSize(this.mob.position(), range, range, range)
+                                ).stream().map(Entity::getUUID).iterator();
+                                RevervoxMod.COOLDOWN.markSpawn(players, level.getGameTime());
+                            }
                             return;
                         }
                     }
@@ -89,6 +103,18 @@ public class RandomRepeatGoal extends Goal {
                 audio = RevervoxMod.AUDIOS.getRandomAudio(true);
             }
             if(audio == null){ return; }
+            double range = RevervoxModServerConfigs.REVERVOX_COOLDOWN_RANGE.get();
+            if (range > 10000d) {
+                RevervoxMod.COOLDOWN.markSpawn(level.players().stream().map(Entity::getUUID).iterator(), level.getGameTime());
+            } else {
+                Iterator<UUID> players = this.mob.level().getNearbyPlayers(
+                        TargetingConditions.forNonCombat(),
+                        null,
+                        AABB.ofSize(this.mob.position(), range, range, range)
+                ).stream().map(Entity::getUUID).iterator();
+                RevervoxMod.COOLDOWN.markSpawn(players, level.getGameTime());
+            }
+            this.setAudioCooldown(audio.getDuration());
             AudioPlayingUtil.playFromEntity(audio, this.mob, RevervoxMod.MOD_ID);
             this.mob.onSpeak((int)(audio.getDuration() * 1000));
             audiosPlayed++;
