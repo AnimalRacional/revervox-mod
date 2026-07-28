@@ -3,7 +3,10 @@ package dev.omialien.revervoxmod.entity.custom;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.util.PlayerVisibilityUtil;
 import dev.omialien.revervoxmod.util.ViewUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,8 +18,10 @@ public class FakeRevervoxGeoEntity extends RevervoxGeoEntity{
     private static final int BEHIND_EVENT_DURATION_TICKS = 200;
     private long behindEventStartTime;
     private boolean behindEvent;
+    private boolean playedSound;
     public FakeRevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+        this.playedSound = false;
     }
 
     @Override
@@ -34,6 +39,9 @@ public class FakeRevervoxGeoEntity extends RevervoxGeoEntity{
         if (player == null) return;
         if (ViewUtil.isInSight(player, this)){
             RevervoxMod.TASKS.schedule(() -> remove(RemovalReason.DISCARDED), 10);
+            //TODO replace with custom sound?
+            if (!this.playedSound) this.level().playSound(null, BlockPos.containing(this.position()), SoundEvents.AMBIENT_CAVE.value(), SoundSource.HOSTILE, 1.0F, 1.0F);
+            this.playedSound = true;
             PlayerVisibilityUtil.restorePlayerVision((ServerPlayer) player);
             return;
         }

@@ -501,7 +501,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                 null,
                 pPos.getX(),
                 pPos.getY(), pPos.getZ(),
-                new AABB(pPos).inflate(RevervoxModServerConfigs.REVERVOX_SPAWN_CHANCE.get())) != null) {
+                new AABB(pPos).inflate(RevervoxModServerConfigs.REVERVOX_MIN_DISTANCE.get())) != null) {
 
             return false;
         }
