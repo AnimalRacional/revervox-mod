@@ -15,7 +15,6 @@ import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedPlayer;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -24,7 +23,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
@@ -51,10 +49,7 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -307,40 +302,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         super.setTarget(target);
     }
 
-    public boolean teleportTowards(Entity pTarget) {
-        Vec3 vec3 = new Vec3(this.getX() - pTarget.getX(), this.getY(0.5D) - pTarget.getEyeY(), this.getZ() - pTarget.getZ());
-        vec3 = vec3.normalize();
-        double d1 = this.getX() + (this.random.nextDouble() - 0.5D) * 8.0D - vec3.x * 16.0D;
-        double d2 = this.getY() + (double)(this.random.nextInt(16) - 8) - vec3.y * 16.0D;
-        double d3 = this.getZ() + (this.random.nextDouble() - 0.5D) * 8.0D - vec3.z * 16.0D;
-        return this.teleport(d1, d2, d3);
-    }
-
-
-    private boolean teleport(double pX, double pY, double pZ) {
-        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(pX, pY, pZ);
-
-        while(blockpos$mutableblockpos.getY() > this.level().getMinBuildHeight() && !this.level().getBlockState(blockpos$mutableblockpos).isSolidRender(this.level(), blockpos$mutableblockpos)) {
-            blockpos$mutableblockpos.move(Direction.DOWN);
-        }
-
-        BlockState blockstate = this.level().getBlockState(blockpos$mutableblockpos);
-        boolean flag = blockstate.isSolidRender(this.level(), blockpos$mutableblockpos);
-        boolean flag1 = blockstate.getFluidState().is(FluidTags.WATER);
-        if (flag && !flag1) {
-            EntityTeleportEvent.EnderEntity event = EventHooks.onEnderTeleport(this, pX, pY, pZ);
-            if (event.isCanceled()) return false;
-            Vec3 vec3 = this.position();
-            boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), false);
-            if (flag2) {
-                this.level().gameEvent(GameEvent.TELEPORT, vec3, GameEvent.Context.of(this));
-            }
-
-            return flag2;
-        } else {
-            return false;
-        }
-    }
     private boolean isFluid(Block block){
         return block instanceof LiquidBlock;
     }
