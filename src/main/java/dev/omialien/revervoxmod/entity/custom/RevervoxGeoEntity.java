@@ -148,7 +148,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         this.goalSelector.addGoal(1, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
         this.goalSelector.addGoal(2, new RevervoxSonicBoomGoal(this));
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
-        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 50));
+        this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 30));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true, (entity) -> entity.getType().is(RevervoxTags.Entities.INSECTS)));
     }
@@ -336,6 +336,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                 if (!getHasSeenTarget() && ViewUtil.isInSight(this, this.getTarget())){
                     setHasSeenTarget(true);
                 }
+                reevaluateTarget();
             }
 
             boolean isFacingBelowSolid = !this.level().getBlockState(blockPosition().relative(getDirection()).below()).isAir();
@@ -347,6 +348,15 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
             this.setClimbing((this.horizontalCollision && this.getTarget() != null) && (isOffsetFacingTwoAboveSolid || !isFacingBelowSolid) && (breakCooldown <= 0) && (this.getTarget().getY() > this.getY()));
             this.setSprinting(this.getTarget() != null);
+        }
+    }
+
+    private void reevaluateTarget(){
+        if (this.getTarget() == null) return;
+        Player nearestPlayer = this.level().getNearestPlayer(this, 30);
+        if (isSpeakingAtMe(nearestPlayer)) {
+            this.setTarget(nearestPlayer);
+            this.setHasSeenTarget(false);
         }
     }
 
