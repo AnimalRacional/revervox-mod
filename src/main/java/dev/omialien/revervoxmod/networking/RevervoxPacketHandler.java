@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.networking;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
+import dev.omialien.revervoxmod.networking.packets.StopSoundInstancePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -25,6 +26,13 @@ public class RevervoxPacketHandler {
                 AddSoundInstancePacket::encode,
                 AddSoundInstancePacket::decode,
                 DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> AddSoundInstancePacket::handle)
+        );
+        INSTANCE.registerMessage(
+                id++,
+                StopSoundInstancePacket.class,
+                StopSoundInstancePacket::encode,
+                StopSoundInstancePacket::decode,
+                DistExecutor.unsafeCallWhenOn(Dist.CLIENT, () -> () -> StopSoundInstancePacket::handle)
         );
     }
 }

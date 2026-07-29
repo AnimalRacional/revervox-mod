@@ -1,10 +1,13 @@
 package dev.omialien.revervoxmod.networking.packets;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.sound.EntityFollowingSoundInstance;
+import dev.omialien.revervoxmod.entity.custom.sound.RevervoxFollowingSoundInstance;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
@@ -50,8 +53,16 @@ public class AddSoundInstancePacket {
             RevervoxMod.LOGGER.debug("Sound instance packet received!");
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->{
                 Level level = net.minecraft.client.Minecraft.getInstance().level;
-                if (level != null && level.getEntity(entityID) instanceof LivingEntity entity){
-                    net.minecraft.client.Minecraft.getInstance().getSoundManager().play(new EntityFollowingSoundInstance(entity, sound, soundSource, looping));
+                if (level == null) {
+                    RevervoxMod.LOGGER.error("Could not find entity with id {}", entityID);
+                    return;
+                }
+                Entity entity = level.getEntity(entityID);
+                if (entity instanceof RevervoxGeoEntity lEntity) {
+                    net.minecraft.client.Minecraft.getInstance().getSoundManager().play(new RevervoxFollowingSoundInstance(lEntity, sound, soundSource));
+                }
+                else if (entity instanceof LivingEntity lEntity){
+                    net.minecraft.client.Minecraft.getInstance().getSoundManager().play(new EntityFollowingSoundInstance(lEntity, sound, soundSource, looping));
                 } else {
                     RevervoxMod.LOGGER.error("Could not find entity with id {}", entityID);
                 }

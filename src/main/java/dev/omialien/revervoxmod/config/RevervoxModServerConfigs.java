@@ -29,6 +29,8 @@ public class RevervoxModServerConfigs {
     public static final ForgeConfigSpec.BooleanValue CROUCH_PREVENTS_MEGAPHONE_BOOM;
     public static final ForgeConfigSpec.IntValue REVERVOX_SPAWN_COOLDOWN;
     public static final ForgeConfigSpec.DoubleValue REVERVOX_COOLDOWN_RANGE;
+    public static final ForgeConfigSpec.IntValue REVERVOX_GIVE_UP_SILENT;
+    public static final ForgeConfigSpec.IntValue REVERVOX_FORGET_PAIN;
     public static final ForgeConfigSpec.BooleanValue ENABLE_FAKE_REVERVOX_BEHIND_EVENT;
     public static final ForgeConfigSpec.ConfigValue<Double> FAKE_REVERVOX_BEHIND_EVENT_CHANCE;
 
@@ -63,6 +65,8 @@ public class RevervoxModServerConfigs {
         REVERVOX_SONIC_BOOM_RANGE = BUILDER.comment("Range (in blocks) of Revervox's Sonic Boom").defineInRange("Revervox Sonic Boom Range", 16, 5, 100);
         MEGAPHONE_COOLDOWN = BUILDER.comment("Cooldown (in seconds) between Megaphone uses").defineInRange("Megaphone Cooldown" ,4, 0, 100);
         CROUCH_PREVENTS_MEGAPHONE_BOOM = BUILDER.comment("Whether crouching will stop your megaphone from doing a sonic boom").define("Crouch stops Megaphone Boom", true);
+        REVERVOX_GIVE_UP_SILENT = BUILDER.comment("How long (in milliseconds) you have to stop speaking for Revervox to lose track of you").defineInRange("Revervox Silence Give Up Time", 10000, 1, Integer.MAX_VALUE);
+        REVERVOX_FORGET_PAIN = BUILDER.comment("How many ticks it will take for Revervox to lose track of the person who last attacked it").defineInRange("Revervox Forget Pain Timer", 300, 1, Integer.MAX_VALUE);
 
         BUILDER.pop();
         SPEC = BUILDER.build();
