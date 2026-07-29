@@ -3,6 +3,7 @@ package dev.omialien.revervoxmod.entity.goals;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.custom.HearingEntity;
+import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.registries.TriggerRegistry;
 import net.minecraft.server.level.ServerLevel;
@@ -33,6 +34,7 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
     private final Predicate<LivingEntity> isAngerInducing;
     private final TargetingConditions startAggroTargetConditions;
     private final TargetingConditions continueAggroTargetConditions = TargetingConditions.forCombat().ignoreLineOfSight();
+    private boolean hasPlayedAudio = false;
 
     public TargetSpokeGoal(M entity, Predicate<LivingEntity> pSelectionPredicate, SoundEvent soundToPlay, SoundEvent soundToLoop, int range) {
         super(entity, Player.class, 10, false, false, pSelectionPredicate);
@@ -82,27 +84,36 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
             entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(), soundToPlay, SoundSource.HOSTILE, 1.0F, 1.0F);
         }
         if (this.soundToLoop != null){
-            PacketDistributor.sendToPlayersTrackingEntity(
-                    this.mob,
-                    new SoundInstancePacket(
-                            this.mob.getId(),
-                            soundToLoop,
-                            SoundSource.HOSTILE,
-                            true
-                    )
-            );
+            if (!hasPlayedAudio && this.mob instanceof RevervoxGeoEntity revervox) {
+                revervox.startPlaying();
+                hasPlayedAudio = true;
+            } else {
+                PacketDistributor.sendToPlayersTrackingEntity(
+                        this.mob,
+                        new SoundInstancePacket(
+                                this.mob.getId(),
+                                soundToLoop,
+                                SoundSource.HOSTILE,
+                                true
+                        )
+                );
+            }
         }
         super.start();
     }
 
     public void stop() {
         this.pendingTarget = null;
+        hasPlayedAudio = false;
         super.stop();
     }
 
     public boolean canContinueToUse() {
         if (this.pendingTarget != null) {
             if (!this.isAngerInducing.test(this.pendingTarget)) {
+                if (this.target instanceof RevervoxGeoEntity revervox) {
+                    revervox.sendStopPlayingPacket();
+                }
                 return false;
             } else {
                 this.entity.lookAt(this.pendingTarget, 10.0F, 10.0F);
@@ -111,9 +122,17 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
         } else {
             if (this.target != null) {
                 if (this.entity.hasIndirectPassenger(this.target)) {
+                    if (this.target instanceof RevervoxGeoEntity revervox) {
+                        revervox.sendStopPlayingPacket();
+                    }
                     return false;
                 }
-
+                if (this.target instanceof Player player && this.mob instanceof RevervoxGeoEntity revervox) {
+                    if (!revervox.lastSpokeWithin(player, RevervoxModServerConfigs.REVERVOX_GIVE_UP_SILENT.get())) {
+                        revervox.sendStopPlayingPacket();
+                        return false;
+                    }
+                }
                 if (this.continueAggroTargetConditions.test(this.entity, this.target)) {
                     return true;
                 }

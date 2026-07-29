@@ -13,6 +13,7 @@ import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
 import dev.omialien.revervoxmod.networking.RevervoxClientPacketHandler;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
+import dev.omialien.revervoxmod.networking.packets.StopSoundInstancePacket;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
@@ -221,11 +222,16 @@ public class CommonEventBus {
 
     @SubscribeEvent
     public static void registerPayloads(RegisterPayloadHandlersEvent event){
-        final PayloadRegistrar registrar = event.registrar("1");
+        final PayloadRegistrar registrar = event.registrar("2");
         registrar.playToClient(
                 SoundInstancePacket.TYPE,
                 SoundInstancePacket.STREAM_CODEC,
                 FMLEnvironment.dist == Dist.CLIENT ? RevervoxClientPacketHandler::handleSoundInstancePacket : null
+        );
+        registrar.playToClient(
+                StopSoundInstancePacket.TYPE,
+                StopSoundInstancePacket.STREAM_CODEC,
+                FMLEnvironment.dist == Dist.CLIENT ? RevervoxClientPacketHandler::handleStopSoundInstancePacket : null
         );
     }
 

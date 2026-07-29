@@ -30,5 +30,7 @@ public class RevervoxModServerConfigs {
     public static final ModConfigSpec.IntValue REVERVOX_UNHEARD_BEFORE_DISAPPEAR = BUILDER.defineInRange("revervoxUnheardBeforeDisappear", 10, 1, 100);
     public static final ModConfigSpec.IntValue REVERVOX_SPAWN_COOLDOWN = BUILDER.defineInRange("revervoxSpawnCooldown", 6000, 0, Integer.MAX_VALUE);
     public static final ModConfigSpec.DoubleValue REVERVOX_COOLDOWN_RANGE = BUILDER.defineInRange("revervoxCooldownRange", 200.0, 1.0, Double.MAX_VALUE);
+    public static final ModConfigSpec.IntValue REVERVOX_GIVE_UP_SILENT = BUILDER.defineInRange("revervoxGiveUpTime", 10000, 1, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue REVERVOX_FORGET_PAIN = BUILDER.defineInRange("revervoxForgetPain", 300, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

@@ -5,6 +5,8 @@ import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
 import dev.omialien.revervoxmod.entity.ai.RVClimbNavigation;
 import dev.omialien.revervoxmod.entity.goals.*;
+import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
+import dev.omialien.revervoxmod.networking.packets.StopSoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.DamageTypeRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
@@ -50,6 +52,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -68,7 +71,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     private final RawAnimation REVERVOX_CLIMB = RawAnimation.begin().thenLoop("move.climb");
     private int remainingPersistentAngerTime;
     private long firstSpeak;
-    private boolean shouldDisappear;
     private static final long NOT_SPOKEN_YET = -1;
     private long noLineOfSightTicks;
     private boolean stunned;
@@ -294,12 +296,18 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         return false;
     }
 
-    @Override
-    public void setTarget(@org.jetbrains.annotations.Nullable LivingEntity target) {
-        if (target instanceof Player){
-            this.setShouldDisappear(true);
+    // Returns true if player spoke within the last time ms
+    public boolean lastSpokeWithin(Player player, long time) {
+        long curTime = System.currentTimeMillis();
+        if (hasSpoken() && curTime >= getGracePeriodEnd()) {
+            IRecordedPlayer rec = RevervoxMod.RECORDING_API.getRecordedPlayer(player.getUUID());
+            if (rec != null) {
+                return rec.getLastSpoke() + time >= curTime;
+            } else {
+                return false;
+            }
         }
-        super.setTarget(target);
+        return false;
     }
 
     private boolean isFluid(Block block){
@@ -381,8 +389,8 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
     @Override
     protected void customServerAiStep() {
-        boolean targetDirectlyAboveThreeBlocks = this.getTarget() != null && this.getTarget().getY() - this.getY() >= 3.0D;
         if (this.getTarget() != null) {
+            boolean targetDirectlyAboveThreeBlocks = this.getTarget() != null && this.getTarget().getY() - this.getY() >= 3.0D;
             double playerDirectionOffset = (this.getTarget().getY() - this.getY());
             double offset = Double.compare(playerDirectionOffset, 0.0D);
             offset = offset < 0.0D ? -1.0D : offset == 0 ? 0.0D : 1.0D;
@@ -397,10 +405,6 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                                 && !this.hasLineOfSight(this.getTarget()) && !targetDirectlyAboveThreeBlocks
                 );
 
-            }
-        } else {
-            if (shouldDisappear()) {
-                this.remove(RemovalReason.DISCARDED);
             }
         }
 
@@ -533,11 +537,40 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         }
     }
 
-    public boolean shouldDisappear() {
-        return shouldDisappear;
+    boolean stopPlaying = false;
+    public void startPlaying() {
+        if (this.level().isClientSide) { return; }
+        this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundRegistry.REVERVOX_ALERT.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
+        PacketDistributor.sendToPlayersTrackingEntity(
+                this,
+                new SoundInstancePacket(
+                        this.getId(),
+                        SoundRegistry.REVERVOX_LOOP.get(),
+                        SoundSource.HOSTILE,
+                        true
+                )
+        );
     }
 
-    private void setShouldDisappear(boolean shouldDisappear) {
-        this.shouldDisappear = shouldDisappear;
+    public void sendStopPlayingPacket() {
+        if (this.level().isClientSide) { return; }
+        PacketDistributor.sendToPlayersTrackingEntity(
+                this,
+                new StopSoundInstancePacket(
+                        this.getId()
+                )
+        );
+    }
+
+    public void forceStopPlaying() {
+        stopPlaying = true;
+    }
+
+    public boolean shouldStopPlaying() {
+        if (stopPlaying) {
+            stopPlaying = false;
+            return true;
+        }
+        return false;
     }
 }
