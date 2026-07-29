@@ -15,8 +15,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 
 public class FakeRevervoxGeoEntity extends RevervoxGeoEntity{
-    private static final int BEHIND_EVENT_DURATION_TICKS = 200;
-    private long behindEventStartTime;
+    public static final int BEHIND_EVENT_DURATION_TICKS = 200;
     private boolean behindEvent;
     private boolean playedSound;
     public FakeRevervoxGeoEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
@@ -43,12 +42,6 @@ public class FakeRevervoxGeoEntity extends RevervoxGeoEntity{
             if (!this.playedSound) this.level().playSound(null, BlockPos.containing(this.position()), SoundEvents.AMBIENT_CAVE.value(), SoundSource.HOSTILE, 1.0F, 1.0F);
             this.playedSound = true;
             PlayerVisibilityUtil.restorePlayerVision((ServerPlayer) player);
-            return;
-        }
-
-        if (this.level().getDayTime() - getBehindEventStartTime() > BEHIND_EVENT_DURATION_TICKS){
-            this.remove(RemovalReason.DISCARDED);
-            PlayerVisibilityUtil.restorePlayerVision((ServerPlayer) player);
         }
     }
 
@@ -59,6 +52,12 @@ public class FakeRevervoxGeoEntity extends RevervoxGeoEntity{
             if (isBehindEvent()) {
                 tickBehindEvent();
             }
+        }
+    }
+    public void disappear(){
+        if (this.isAlive()){
+            this.remove(RemovalReason.DISCARDED);
+            if (this.getTarget() != null) PlayerVisibilityUtil.restorePlayerVision((ServerPlayer) this.getTarget());
         }
     }
 
@@ -80,14 +79,6 @@ public class FakeRevervoxGeoEntity extends RevervoxGeoEntity{
 
     public void setBehindEvent(boolean behindEvent) {
         this.behindEvent = behindEvent;
-    }
-
-    public long getBehindEventStartTime() {
-        return behindEventStartTime;
-    }
-
-    public void setBehindEventStartTime(long behindEventStartTime) {
-        this.behindEventStartTime = behindEventStartTime;
     }
 
 }
