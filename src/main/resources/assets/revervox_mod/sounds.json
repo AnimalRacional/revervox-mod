@@ -49,7 +49,12 @@
   },
   "megaphone": {
     "subtitle": "sounds.revervox_mod.megaphone.use",
-    "category": "hostile",
+    "category": "player",
     "sounds": [ "revervox_mod:megaphone" ]
+  },
+  "revervox_scream": {
+    "subtitle": "sounds.revervox_mod.revervox_scream",
+    "category": "hostile",
+    "sounds": [ "revervox_mod:revervox_scream" ]
   }
 }

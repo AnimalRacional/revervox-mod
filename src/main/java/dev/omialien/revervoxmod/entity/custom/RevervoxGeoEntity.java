@@ -103,7 +103,8 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
         controllers.add(DefaultAnimations.genericWalkRunIdleController(this).transitionLength(5)
                         .triggerableAnim("Stun", RawAnimation.begin().then("misc.stun", Animation.LoopType.PLAY_ONCE))
                         .triggerableAnim("SonicBoom", DefaultAnimations.ATTACK_CAST)
-                        .triggerableAnim("Eat", RawAnimation.begin().then("misc.eat", Animation.LoopType.PLAY_ONCE)),
+                        .triggerableAnim("Eat", RawAnimation.begin().then("misc.eat", Animation.LoopType.PLAY_ONCE))
+                        .triggerableAnim("Scream", RawAnimation.begin().then("misc.roar", Animation.LoopType.PLAY_ONCE)),
                 DefaultAnimations.genericAttackAnimation(this, DefaultAnimations.ATTACK_SWING).transitionLength(5),
                 new AnimationController<GeoAnimatable>(this, "Climb", 5, state ->{
                     if (this.isClimbing()){
@@ -130,22 +131,23 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     protected void registerGoals() {
         RevervoxMod.LOGGER.debug("Revervox Spawned");
         // So it doesn't sink in the water
-        this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(4, new RandomRepeatGoal(this));
-        this.goalSelector.addGoal(5, new TemptGoal(this, 0.4D, Ingredient.of(Items.SPIDER_EYE), false));
-        this.goalSelector.addGoal(6, new TemptGoal(this, 0.4D, Ingredient.of(Items.FERMENTED_SPIDER_EYE), false));
-        this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.5D));
-        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(2, new FloatGoal(this));
+        this.goalSelector.addGoal(6, new RandomRepeatGoal(this));
+        this.goalSelector.addGoal(7, new TemptGoal(this, 0.4D, Ingredient.of(Items.SPIDER_EYE), false));
+        this.goalSelector.addGoal(8, new TemptGoal(this, 0.4D, Ingredient.of(Items.FERMENTED_SPIDER_EYE), false));
+        this.goalSelector.addGoal(9, new WaterAvoidingRandomStrollGoal(this, 0.5D));
+        this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
 
         this.addBehaviourGoals();
     }
 
 
     protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(0, new RevervoxStunGoal(this));
-        this.goalSelector.addGoal(1, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
-        this.goalSelector.addGoal(2, new RevervoxSonicBoomGoal(this));
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 0.7D, false));
+        this.goalSelector.addGoal(0, new RevervoxStunGoal(this, this::isStunned, "Stun", 55, SoundRegistry.REVERVOX_STUN.get(), () -> {}, () -> this.setStunned(false)));
+        this.goalSelector.addGoal(1, new RevervoxStunGoal(this, () -> lostTarget, "Scream", 55, SoundRegistry.REVERVOX_SCREAM.get(), () -> {}, () -> this.lostTarget = false));
+        this.goalSelector.addGoal(3, new EatFoodGoal(this, RevervoxTags.Items.ATTRACTS_REVERVOX));
+        this.goalSelector.addGoal(4, new RevervoxSonicBoomGoal(this));
+        this.goalSelector.addGoal(5, new MeleeAttackGoal(this, 0.7D, false));
         this.targetSelector.addGoal(1, new TargetSpokeGoal<>(this, this::isAngryAt, SoundRegistry.REVERVOX_ALERT.get(), SoundRegistry.REVERVOX_LOOP.get(), 30));
         this.targetSelector.addGoal(2, new RevervoxHurtByTargetGoal(this));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, LivingEntity.class, 10, true, true, (entity) -> entity.getType().is(RevervoxTags.Entities.INSECTS)));
@@ -539,9 +541,10 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                 new AddSoundInstancePacket(this.getId(), SoundRegistry.REVERVOX_LOOP.get(), SoundSource.HOSTILE, true)
         );
     }
-
-    public void sendStopPlayingPacket() {
+    private boolean lostTarget = false;
+    public void mobLostTarget() {
         if (this.level().isClientSide) { return; }
+        this.lostTarget = true;
         RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> this),
                 new StopSoundInstancePacket(this.getId())
         );

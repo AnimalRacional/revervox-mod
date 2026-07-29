@@ -40,7 +40,7 @@ public class RevervoxHurtByTargetGoal extends HurtByTargetGoal {
                         < this.mob.tickCount
         ) {
             if (this.mob instanceof RevervoxGeoEntity revervox) {
-                revervox.sendStopPlayingPacket();
+                revervox.mobLostTarget();
             }
             return false;
         }
