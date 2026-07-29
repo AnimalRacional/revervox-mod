@@ -76,6 +76,9 @@ public class RandomRepeatGoal extends Goal {
                             RevervoxMod.LOGGER.debug("Atleast 2 players with distance greater than " + CHANNEL_DISTANCE/2);
                             Player furthestPlayer = player1.distanceToSqr(this.mob) > player2.distanceToSqr(this.mob) ? player1 : player2;
                             IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudioAnyFallback(furthestPlayer.getUUID(), true);
+                            if (audio == null) {
+                                return;
+                            }
                             AudioPlayingUtil.playLocationalAudio(audio, this.mob.getEyePosition(), level, RevervoxMod.MOD_ID);
                             this.mob.onSpeak((int)(audio.getDuration() * 1000));
                             this.setAudioCooldown(audio.getDuration());
