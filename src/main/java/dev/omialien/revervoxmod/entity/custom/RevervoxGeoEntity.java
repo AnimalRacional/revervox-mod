@@ -329,6 +329,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
                 if (!getHasSeenTarget() && ViewUtil.isInSight(this, this.getTarget())){
                     setHasSeenTarget(true);
                 }
+                reevaluateTarget();
             }
 
             boolean isFacingBelowSolid = !this.level().getBlockState(blockPosition().relative(getDirection()).below()).isAir();
@@ -340,6 +341,15 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
 
             this.setClimbing((this.horizontalCollision && this.getTarget() != null) && (isOffsetFacingTwoAboveSolid || !isFacingBelowSolid) && (breakCooldown <= 0) && (this.getTarget().getY() > this.getY()));
             this.setSprinting(this.getTarget() != null);
+        }
+    }
+
+    private void reevaluateTarget(){
+        if (this.getTarget() == null) return;
+        Player nearestPlayer = this.level().getNearestPlayer(this, 50);
+        if (isSpeakingAtMe(nearestPlayer)) {
+            this.setTarget(nearestPlayer);
+            this.setHasSeenTarget(false);
         }
     }
 
