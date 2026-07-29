@@ -112,7 +112,7 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
         if (this.pendingTarget != null) {
             if (!this.isAngerInducing.test(this.pendingTarget)) {
                 if (this.target instanceof RevervoxGeoEntity revervox) {
-                    revervox.sendStopPlayingPacket();
+                    revervox.mobLostTarget();
                 }
                 return false;
             } else {
@@ -123,13 +123,13 @@ public class TargetSpokeGoal<M extends Mob & HearingEntity & NeutralMob> extends
             if (this.target != null) {
                 if (this.entity.hasIndirectPassenger(this.target)) {
                     if (this.target instanceof RevervoxGeoEntity revervox) {
-                        revervox.sendStopPlayingPacket();
+                        revervox.mobLostTarget();
                     }
                     return false;
                 }
                 if (this.target instanceof Player player && this.mob instanceof RevervoxGeoEntity revervox) {
                     if (!revervox.lastSpokeWithin(player, RevervoxModServerConfigs.REVERVOX_GIVE_UP_SILENT.get())) {
-                        revervox.sendStopPlayingPacket();
+                        revervox.mobLostTarget();
                         return false;
                     }
                 }

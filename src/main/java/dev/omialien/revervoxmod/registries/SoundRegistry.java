@@ -20,6 +20,7 @@ public class SoundRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> REVERVOX_BAT_ALERT = registerSound("revervox_bat_alert");
     public static final DeferredHolder<SoundEvent, SoundEvent> MEGAPHONE_USE = registerSound("megaphone"); //TODO change this audio
     public static final DeferredHolder<SoundEvent, SoundEvent> REVERVOX_STUN = registerSound("revervox_stun");
+    public static final DeferredHolder<SoundEvent, SoundEvent> REVERVOX_SCREAM = registerSound("revervox_scream");
 
     private static DeferredHolder<SoundEvent, SoundEvent> registerSound(String name){
         return REGISTRY.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, name)));
