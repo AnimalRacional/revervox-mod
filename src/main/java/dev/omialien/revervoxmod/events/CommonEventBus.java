@@ -92,6 +92,15 @@ public class CommonEventBus {
     }
 
     @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            if (serverPlayer.getTags().contains("revervox_behind_event_target")) {
+                PlayerVisibilityUtil.restorePlayerVision(serverPlayer);
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (event.isWasDeath() && event.getEntity() instanceof ServerPlayer newPlayer) {
             if (newPlayer.getTags().contains("revervox_behind_event_target")) {
@@ -144,7 +153,7 @@ public class CommonEventBus {
             RevervoxMod.LOGGER.debug("Starting fake revervox behind event!");
             if(RevervoxModServerConfigs.ENABLE_FAKE_REVERVOX_BEHIND_EVENT.get()) {
                 List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
-                if (!playerList.isEmpty() && playerList.size() > 1) {
+                if (playerList.size() > 1) {
                     int randomPlayer = new Random().nextInt(playerList.size());
                     if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
                         ServerPlayer otherPlayer = (ServerPlayer) playerList.get(randomPlayer).level().getNearestPlayer(playerList.get(randomPlayer), 35);

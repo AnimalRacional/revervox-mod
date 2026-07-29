@@ -70,6 +70,7 @@ public class FakeRevervoxGeoEntity extends RevervoxGeoEntity{
     @Override
     public boolean hurt(DamageSource pSource, float pAmount) {
         this.remove(RemovalReason.DISCARDED);
+        if (this.getTarget() != null) PlayerVisibilityUtil.restorePlayerVision((ServerPlayer) this.getTarget());
         return super.hurt(pSource, pAmount);
     }
 

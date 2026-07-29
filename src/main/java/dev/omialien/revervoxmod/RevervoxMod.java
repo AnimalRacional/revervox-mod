@@ -107,7 +107,8 @@ public class RevervoxMod {
             audio = RevervoxMod.AUDIOS.getRandomAudio(false);
         }
         if(audio == null){ return; }
-        AudioPlayingUtil.playFromEntity(audio, revervox, RevervoxMod.MOD_ID);
+        IRecordedAudio finalAudio = audio;
+        TASKS.schedule(() -> AudioPlayingUtil.playFromEntity(finalAudio, revervox, RevervoxMod.MOD_ID), 5);// small delay in case it disappears instantly
         revervox.setPos(revervoxPos.x, revervoxPos.y, revervoxPos.z);
         revervox.setYHeadRot(player.getYRot());
         revervox.setNoAi(true);
