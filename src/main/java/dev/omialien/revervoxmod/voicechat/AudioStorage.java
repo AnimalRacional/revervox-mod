@@ -50,7 +50,7 @@ public class AudioStorage {
         if ( audio != null ) {
             return audio;
         }
-        return this.getRandomAudio(player, remove);
+        return this.getRandomAudio(remove);
     }
 
     public IRecordedAudio getRandomAudio(Predicate<UUID> includePlayer, boolean remove){
