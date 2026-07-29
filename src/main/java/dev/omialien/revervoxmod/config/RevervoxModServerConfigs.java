@@ -16,6 +16,8 @@ public class RevervoxModServerConfigs {
     public static final ModConfigSpec.IntValue REVERVOX_SPAWN_CHANCE = BUILDER.defineInRange("revervoxSpawnChance", 2, 1, Integer.MAX_VALUE);
     public static final ModConfigSpec.DoubleValue FAKE_BAT_EVENT_CHANCE = BUILDER.defineInRange("batEventChance", 1d, 0.1d, 20d);
     public static final ModConfigSpec.BooleanValue ENABLE_FAKE_BAT_EVENT = BUILDER.define("enableBatEvent", true);
+    public static final ModConfigSpec.DoubleValue FAKE_REVERVOX_BEHIND_EVENT_CHANCE = BUILDER.defineInRange("fakeRevervoxEventChance", 1d, 0.1d, 20d);
+    public static final ModConfigSpec.BooleanValue ENABLE_FAKE_REVERVOX_BEHIND_EVENT = BUILDER.define("enableFakeRevervoxEvent", true);
     public static final ModConfigSpec.BooleanValue REVERVOX_BREAKS_BLOCKS = BUILDER.define("revervoxBlockBreaking", false);
     public static final ModConfigSpec.BooleanValue REVERVOX_ABOVE_GROUND = BUILDER.define("revervoxAboveGround", false);
     public static final ModConfigSpec.BooleanValue REVERVOX_BREAKS_NONSOLID = BUILDER.define("revervoxBreakNonSolid", true);

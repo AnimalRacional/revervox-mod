@@ -105,6 +105,15 @@ public class CommonEventBus {
     }
 
     @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            if (serverPlayer.getTags().contains("revervox_behind_event_target")) {
+                PlayerVisibilityUtil.restorePlayerVision(serverPlayer);
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (event.isWasDeath() && event.getEntity() instanceof ServerPlayer newPlayer) {
             if (newPlayer.getTags().contains("revervox_behind_event_target")) {
@@ -115,15 +124,17 @@ public class CommonEventBus {
 
     @SubscribeEvent
     public static void onRegisterEvents(ServerStartingEvent event) {
-        int nextEvent = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
+        int BatEventTime = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
                 (int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()));
-        RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", nextEvent);
+        RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", BatEventTime);
         RevervoxMod.TASKS.schedule(fakeBatEventSpawnRequest(
-                event.getServer().getLevel(Level.OVERWORLD)), nextEvent);
+                event.getServer().getLevel(Level.OVERWORLD)), BatEventTime);
+        int RevervoxBehindEventTime = new Random().nextInt((int) (600 * RevervoxModServerConfigs.FAKE_REVERVOX_BEHIND_EVENT_CHANCE.get()),
+                (int) (800 * RevervoxModServerConfigs.FAKE_REVERVOX_BEHIND_EVENT_CHANCE.get()));
+        RevervoxMod.LOGGER.debug("Scheduling Revervox behind for {} ticks", RevervoxBehindEventTime);
+        RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(
+                event.getServer().getLevel(Level.OVERWORLD)), RevervoxBehindEventTime);
         RevervoxMod.COOLDOWN = new RevervoxCooldownManager();
-        //TODO RANDOM EVENT: se 2 players tiverem juntos, os dois param de ver um ao outro e
-        // ouvem a voz do outro amigo atras deles, quando virarem se, levam com um jumpscare do
-        // revervox e volta tudo ao normal. arranjar maneira de dar counter ao evento
     }
 
     private static Runnable fakeBatEventSpawnRequest(ServerLevel level){
@@ -152,22 +163,28 @@ public class CommonEventBus {
     private static Runnable fakeRevervoxBehindEventRequest(ServerLevel level){
         return () -> {
             RevervoxMod.LOGGER.debug("Starting fake revervox behind event!");
-            //if(RevervoxModServerConfigs.ENABLE_FAKE_REVERVOX_BEHIND_EVENT.get()) {
-            List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
-            if (!playerList.isEmpty() && playerList.size() > 1) {
-                int randomPlayer = new Random().nextInt(playerList.size());
-                //TODO so players que tem outro player por perto
-                if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
-                    RevervoxMod.LOGGER.debug("Player met requirements, starting revervox behind event!");
-                    RevervoxMod.triggerRevervoxBehindEvent(playerList.get(randomPlayer));
+            if(RevervoxModServerConfigs.ENABLE_FAKE_REVERVOX_BEHIND_EVENT.get()) {
+                List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
+                RevervoxMod.LOGGER.debug("(Fake Revervox Behind Event) playerList size: {}", playerList.size());
+                if (playerList.size() > 1) {
+                    int randomPlayer = new Random().nextInt(playerList.size());
+                    if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
+                        ServerPlayer otherPlayer = (ServerPlayer) playerList.get(randomPlayer).level().getNearestPlayer(playerList.get(randomPlayer), 35);
+                        if (otherPlayer == null) {
+                            RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(level), 600); // volta a tentar em 30 segundos
+                            RevervoxMod.LOGGER.debug("Player didn't have a second player nearby, retrying in 30 secs!");
+                            return;
+                        }
+                        RevervoxMod.LOGGER.debug("Player met requirements, starting revervox behind event!");
+                        RevervoxMod.triggerRevervoxBehindEvent(playerList.get(randomPlayer));
+                    } else {
+                        RevervoxMod.LOGGER.debug("Player didn't meet requirements, skipping revervox behind event!");
+                    }
                 } else {
-                    RevervoxMod.LOGGER.debug("Player didn't meet requirements, skipping revervox behind event!");
+                    RevervoxMod.LOGGER.debug("(revervox behind Event) playerList is below 2 players");
                 }
-            } else {
-                RevervoxMod.LOGGER.debug("(revervox behind Event) playerList is empty");
             }
-            //}
-            int nextRandomTick = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),(int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get())); //20 minutos max
+            int nextRandomTick = new Random().nextInt((int) (600 * RevervoxModServerConfigs.FAKE_REVERVOX_BEHIND_EVENT_CHANCE.get()),(int) (800 * RevervoxModServerConfigs.FAKE_REVERVOX_BEHIND_EVENT_CHANCE.get()));
             RevervoxMod.LOGGER.debug("next revervox behind event scheduled for {} ticks", nextRandomTick);
             RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(level), nextRandomTick);
         };

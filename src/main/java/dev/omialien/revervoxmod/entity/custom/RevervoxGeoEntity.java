@@ -354,7 +354,7 @@ public class RevervoxGeoEntity extends Monster implements GeoEntity, NeutralMob,
     private void reevaluateTarget(){
         if (this.getTarget() == null) return;
         Player nearestPlayer = this.level().getNearestPlayer(this, 30);
-        if (isSpeakingAtMe(nearestPlayer)) {
+        if (nearestPlayer != null && isSpeakingAtMe(nearestPlayer)) {
             this.setTarget(nearestPlayer);
             this.setHasSeenTarget(false);
         }
