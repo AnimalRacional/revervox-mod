@@ -29,6 +29,8 @@ public class RevervoxModServerConfigs {
     public static final ForgeConfigSpec.BooleanValue CROUCH_PREVENTS_MEGAPHONE_BOOM;
     public static final ForgeConfigSpec.IntValue REVERVOX_SPAWN_COOLDOWN;
     public static final ForgeConfigSpec.DoubleValue REVERVOX_COOLDOWN_RANGE;
+    public static final ForgeConfigSpec.BooleanValue ENABLE_FAKE_REVERVOX_BEHIND_EVENT;
+    public static final ForgeConfigSpec.ConfigValue<Double> FAKE_REVERVOX_BEHIND_EVENT_CHANCE;
 
     static {
         BUILDER.push("Server Configs for Revervox Mod");
@@ -46,7 +48,9 @@ public class RevervoxModServerConfigs {
         REVERVOX_SWORD_BONUS_DAMAGE = BUILDER.comment("How much extra damage the Revervox sword deals to Revervox entities").define("Revervox Sword Bonus Damage", 7);
         REVERVOX_BAT_TOOTH_DROP_CHANCE = BUILDER.comment("The chance of a Revervox bat dropping its tooth on attack (1 in x)").define("Revervox Bat Tooth Drop Chance", 10);
         FAKE_BAT_EVENT_CHANCE = BUILDER.comment("Chance of fake bat event occurring. Higher is less likely, lower is more likely").define("Fake Bat Event Chance", 1.0d);
+        FAKE_REVERVOX_BEHIND_EVENT_CHANCE = BUILDER.comment("Chance of fake Revervox behind event occurring. Higher is less likely, lower is more likely").define("Fake Revervox Behind Event Chance", 1.0d);
         ENABLE_FAKE_BAT_EVENT = BUILDER.comment("Whether the fake bat event will occur").define("Enable Fake Bat Event", true);
+        ENABLE_FAKE_REVERVOX_BEHIND_EVENT = BUILDER.comment("Whether the Fake Revervox behind player event will occur (not seeing other players during it is intended)").define("Enable Fake Revervox Behind Event", true);
         REVERVOX_BREAKS_BLOCKS = BUILDER.comment("Whether Revervox breaks blocks to get to you").define("Revervox Block Breaking", false);
         REVERVOX_BREAKS_NONSOLID = BUILDER.comment("Whether Revervox breaks non-solid blocks such as torches and leaves").define("Revervox breaks non-solid blocks", true);
         REVERVOX_ABOVE_GROUND = BUILDER.comment("Whether Revervox spawns above ground").define("Revervox above ground", false);

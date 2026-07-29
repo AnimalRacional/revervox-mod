@@ -103,11 +103,16 @@ public class CommonEventBus {
 
     @SubscribeEvent
     public static void onRegisterEvents(ServerStartingEvent event) {
-        int nextEvent = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
+        int BatEventTime = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
                 (int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()));
-        RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", nextEvent);
+        RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", BatEventTime);
         RevervoxMod.TASKS.schedule(fakeBatEventSpawnRequest(
-                event.getServer().getLevel(Level.OVERWORLD)), nextEvent);
+                event.getServer().getLevel(Level.OVERWORLD)), BatEventTime);
+        int RevervoxBehindEventTime = new Random().nextInt((int) (20000 * RevervoxModServerConfigs.FAKE_REVERVOX_BEHIND_EVENT_CHANCE.get()),
+                (int) (30000 * RevervoxModServerConfigs.FAKE_REVERVOX_BEHIND_EVENT_CHANCE.get()));
+        RevervoxMod.LOGGER.debug("Scheduling revervox behind for {} ticks", RevervoxBehindEventTime);
+        RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(
+                event.getServer().getLevel(Level.OVERWORLD)), RevervoxBehindEventTime);
         RevervoxMod.COOLDOWN = new RevervoxCooldownManager();
     }
 
@@ -137,22 +142,27 @@ public class CommonEventBus {
     private static Runnable fakeRevervoxBehindEventRequest(ServerLevel level){
         return () -> {
             RevervoxMod.LOGGER.debug("Starting fake revervox behind event!");
-            //if(RevervoxModServerConfigs.ENABLE_FAKE_REVERVOX_BEHIND_EVENT.get()) {
+            if(RevervoxModServerConfigs.ENABLE_FAKE_REVERVOX_BEHIND_EVENT.get()) {
                 List<ServerPlayer> playerList = level.getServer().getPlayerList().getPlayers();
                 if (!playerList.isEmpty() && playerList.size() > 1) {
                     int randomPlayer = new Random().nextInt(playerList.size());
-                    //TODO so players que tem outro player por perto
                     if ((playerList.get(randomPlayer).level().equals(level)) && (playerList.get(randomPlayer).getY() < level.getSeaLevel() - 25)) {
+                        ServerPlayer otherPlayer = (ServerPlayer) playerList.get(randomPlayer).level().getNearestPlayer(playerList.get(randomPlayer), 35);
+                        if (otherPlayer == null) {
+                            RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(level), 600); // volta a tentar em 30 segundos
+                            RevervoxMod.LOGGER.debug("Player didn't have a second player nearby, retrying in 30 secs!");
+                            return;
+                        }
                         RevervoxMod.LOGGER.debug("Player met requirements, starting revervox behind event!");
                         RevervoxMod.triggerRevervoxBehindEvent(playerList.get(randomPlayer));
                     } else {
                         RevervoxMod.LOGGER.debug("Player didn't meet requirements, skipping revervox behind event!");
                     }
                 } else {
-                    RevervoxMod.LOGGER.debug("(revervox behind Event) playerList is empty");
+                    RevervoxMod.LOGGER.debug("(revervox behind Event) playerList is below 2 players");
                 }
-            //}
-            int nextRandomTick = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),(int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get())); //20 minutos max
+            }
+            int nextRandomTick = new Random().nextInt((int) (20000 * RevervoxModServerConfigs.FAKE_REVERVOX_BEHIND_EVENT_CHANCE.get()),(int) (30000 * RevervoxModServerConfigs.FAKE_REVERVOX_BEHIND_EVENT_CHANCE.get()));
             RevervoxMod.LOGGER.debug("next revervox behind event scheduled for {} ticks", nextRandomTick);
             RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(level), nextRandomTick);
         };
