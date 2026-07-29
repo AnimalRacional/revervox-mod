@@ -46,7 +46,8 @@ public class MMWalkNodeProcessor extends WalkNodeEvaluator {
                             pos, CollisionContext.empty()
                     ) != Shapes.empty()
                             )) {
-                pos.setY(y--);
+                pos.setY(--y);
+                blockState = this.level.getBlockState(pos);
             }
             y++;
         }
