@@ -114,7 +114,7 @@ public class RevervoxMod {
         revervox.setNoAi(true);
         revervox.setTarget(player);
         revervox.setBehindEvent(true);
-        revervox.setBehindEventStartTime(player.level().getGameTime());
+        TASKS.schedule(revervox::disappear, FakeRevervoxGeoEntity.BEHIND_EVENT_DURATION_TICKS);
         revervox.setYHeadRot(player.getYRot());
         player.level().addFreshEntity(revervox);
 
