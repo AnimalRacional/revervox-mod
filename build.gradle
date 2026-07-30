@@ -64,7 +64,7 @@ neoForge {
     }
 
     // This line is optional. Access Transformers are automatically detected
-    accessTransformers = project.files('src/main/templates/META-INF/accesstransformer.cfg')
+    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -195,7 +195,6 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             voicechatrecording_version: voicechatrecording_version
     ]
     inputs.properties replaceProperties
-    exclude 'META-INF/accesstransformer.cfg'
     expand replaceProperties
     from "src/main/templates"
     into "build/generated/sources/modMetadata"
