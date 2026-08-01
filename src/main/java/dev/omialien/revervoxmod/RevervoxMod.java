@@ -9,6 +9,8 @@ import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.*;
 import dev.omialien.revervoxmod.util.PlayerVisibilityUtil;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
+import dev.omialien.revervoxmod.worldgen.biome.RevervoxTerrablender;
+import dev.omialien.revervoxmod.worldgen.biome.surface.RevervoxSurfaceRules;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.VoiceChatRecordingApi;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
@@ -27,6 +29,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+import terrablender.api.SurfaceRuleManager;
 
 import java.util.Random;
 import java.util.UUID;
@@ -61,6 +64,8 @@ public class RevervoxMod {
         CreativeTabRegistry.register(bus);
         ParticleRegistry.register(bus);
         TriggerRegistry.init();
+        RevervoxTerrablender.registerBiomes();
+        SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, RevervoxSurfaceRules.makeRules());
 
         RevervoxPacketHandler.registerPackets();
     }

@@ -1,6 +1,7 @@
 package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.datagen.RevervoxWorldGenProvider;
 import dev.omialien.revervoxmod.datagen.RevervoxAdvancementProvider;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
@@ -40,5 +41,6 @@ public class ModEventBusEvents {
         System.out.println("GATHERDATAln");
         DataGenerator gen = event.getGenerator();
         gen.addProvider(event.includeServer(), new RevervoxAdvancementProvider(gen.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper()));
+        gen.addProvider(event.includeServer(), new RevervoxWorldGenProvider(gen.getPackOutput(), event.getLookupProvider()));
     }
 }
