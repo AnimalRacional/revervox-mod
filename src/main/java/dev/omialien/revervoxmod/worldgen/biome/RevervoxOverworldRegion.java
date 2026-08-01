@@ -24,23 +24,26 @@ public class RevervoxOverworldRegion extends Region {
         /*
         // EASY WAY: adds a new region and replaces a biome with a new one
         super.addModifiedVanillaOverworldBiomes(mapper, modifiedVanillaOverworldBuilder -> {
-            modifiedVanillaOverworldBuilder.replaceBiome(Biomes.FOREST, ModBiomes.REVERVOX_BIOME);
+            modifiedVanillaOverworldBuilder.replaceBiome(Biomes.DEEP_DARK, RevervoxBiomes.REVERVOX_BIOME);
         });
          */
+
         // PROPER WAY:
         VanillaParameterOverlayBuilder builder = new VanillaParameterOverlayBuilder();
         // Overlap Vanilla's parameters with our own for our REVERVOX biome.
         // The parameters for this biome are chosen arbitrarily.
         new ParameterUtils.ParameterPointListBuilder()
-                .temperature(ParameterUtils.Temperature.span(ParameterUtils.Temperature.COOL, ParameterUtils.Temperature.FROZEN))
+                .temperature(ParameterUtils.Temperature.span(ParameterUtils.Temperature.FROZEN, ParameterUtils.Temperature.COOL))
                 .humidity(ParameterUtils.Humidity.span(ParameterUtils.Humidity.ARID, ParameterUtils.Humidity.DRY))
                 .continentalness(ParameterUtils.Continentalness.INLAND)
-                .erosion(ParameterUtils.Erosion.EROSION_0, ParameterUtils.Erosion.EROSION_1)
-                .depth(ParameterUtils.Depth.SURFACE, ParameterUtils.Depth.FLOOR)
-                .weirdness(ParameterUtils.Weirdness.MID_SLICE_NORMAL_ASCENDING, ParameterUtils.Weirdness.MID_SLICE_NORMAL_DESCENDING)
+                .erosion(ParameterUtils.Erosion.EROSION_4)
+                .depth(Climate.Parameter.point(0.95F)) // Biome height that it can generate
+                .weirdness(ParameterUtils.Weirdness.MID_SLICE_NORMAL_DESCENDING) // Separate into blobs
+                .offset(0.16F) // Biome global size
                 .build().forEach(point -> builder.add(point, RevervoxBiomes.REVERVOX_BIOME));
 
         // Add our points to the mapper
         builder.build().forEach(mapper);
+
     }
 }

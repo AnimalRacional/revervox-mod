@@ -8,7 +8,7 @@
   },
   "downfall": 0.8,
   "effects": {
-    "fog_color": 2269670,
+    "fog_color": 1509153,
     "foliage_color": 13763580,
     "grass_color": 8324092,
     "mood_sound": {
@@ -23,9 +23,9 @@
       "replace_current_music": false,
       "sound": "revervox_mod:revervox_loop"
     },
-    "sky_color": 3197208,
-    "water_color": 15216187,
-    "water_fog_color": 12524326
+    "sky_color": 3147594,
+    "water_color": 265774,
+    "water_fog_color": 133407
   },
   "features": [
     [],
@@ -90,7 +90,7 @@
       "minecraft:freeze_top_layer"
     ]
   ],
-  "has_precipitation": true,
+  "has_precipitation": false,
   "spawn_costs": {},
   "spawners": {
     "ambient": [
@@ -110,10 +110,10 @@
         "weight": 2
       },
       {
-        "type": "minecraft:wolf",
-        "maxCount": 4,
-        "minCount": 4,
-        "weight": 5
+        "type": "revervox_mod:revervox_bat",
+        "maxCount": 5,
+        "minCount": 3,
+        "weight": 2
       },
       {
         "type": "minecraft:sheep",
