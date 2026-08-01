@@ -20,7 +20,7 @@ public class VoiceRepeaterBlockEntity extends BlockEntity {
     private final static String PLAYER_ID = "audio_player_id";
     private final static String AUDIO_ID = "audio_id";
     public VoiceRepeaterBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(BlockEntityRegistry.VOICE_REPEATER.get(), pPos, pBlockState);
+        super(BlockEntityRegistry.TAPEBOX.get(), pPos, pBlockState);
     }
 
     public AudioId getAudio() {

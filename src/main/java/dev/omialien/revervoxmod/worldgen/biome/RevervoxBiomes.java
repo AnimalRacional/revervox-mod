@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.worldgen.biome;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
+import dev.omialien.revervoxmod.worldgen.RevervoxPlacedFeatures;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
@@ -53,7 +54,8 @@ public class RevervoxBiomes {
 
         BiomeDefaultFeatures.addDefaultMushrooms(biomeBuilder);
         BiomeDefaultFeatures.addDefaultExtraVegetation(biomeBuilder);
-        //biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, ModPlacedFeatures.PINE_PLACED_KEY);
+        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
+                RevervoxPlacedFeatures.ECHO_DARK_GRASS_PLACED_KEY);
 
         return new Biome.BiomeBuilder()
                 .hasPrecipitation(false)

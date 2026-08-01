@@ -9,6 +9,7 @@
   "item.revervox_mod.megaphone": "Megaphone",
   "item.revervox_mod.revervox_bat_tooth": "Revervox Bat Tooth",
   "item.revervox_mod.revervox_bait": "Revervox Bait",
+  "item.revervox_mod.tape_recorder": "Tape Recorder",
   "sound.revervox_mod.thingy.death": "Thingy dies",
   "sound.revervox_mod.thingy.hurt": "Thingy hurts",
   "entity.revervox_mod.thingy": "Thingy",
@@ -35,5 +36,8 @@
   "advancements.revervox_mod.revervox_ate_food.title": "Good boy!",
   "advancements.revervox_mod.revervox_ate_food.description": "Have Revervox eat your bait",
   "advancements.revervox_mod.revervox_stunned.title": "Red light!",
-  "advancements.revervox_mod.revervox_stunned.description": "Stun Revervox using a megaphone"
+  "advancements.revervox_mod.revervox_stunned.description": "Stun Revervox using a megaphone",
+  "block.revervox_mod.echo_dark_surface_block": "Echo Dark Ground",
+  "block.revervox_mod.echo_dark_grass": "Echo Dark Grass",
+  "block.revervox_mod.tapebox": "Tapebox"
 }

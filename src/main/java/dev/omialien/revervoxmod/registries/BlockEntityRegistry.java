@@ -10,10 +10,10 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class BlockEntityRegistry {
     private static final DeferredRegister<BlockEntityType<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, RevervoxMod.MOD_ID);
-    public static final RegistryObject<BlockEntityType<VoiceRepeaterBlockEntity>> VOICE_REPEATER = REGISTRY.register(
-            "voice_repeater",
+    public static final RegistryObject<BlockEntityType<VoiceRepeaterBlockEntity>> TAPEBOX = REGISTRY.register(
+            "tapebox",
             () -> BlockEntityType.Builder.of(
-                    VoiceRepeaterBlockEntity::new, BlockRegistry.VOICE_REPEATER_BLOCK.get()
+                    VoiceRepeaterBlockEntity::new, BlockRegistry.TAPEBOX.get()
             ).build(null));
 
     public static void register(IEventBus eventBus) {

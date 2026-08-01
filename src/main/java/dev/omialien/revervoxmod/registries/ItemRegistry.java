@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.items.*;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -54,6 +55,19 @@ public class ItemRegistry {
     public static final RegistryObject<Item> TAPE_RECORDER = register(
             "tape_recorder",
             () -> new TapeRecorderItem(new Item.Properties())
+    );
+
+    public static final RegistryObject<Item> ECHO_DARK_SURFACE_BLOCK = register(
+            "echo_dark_surface_block",
+            () -> new BlockItem(BlockRegistry.ECHO_DARK_SURFACE_BLOCK.get(), new Item.Properties().stacksTo(64))
+    );
+    public static final RegistryObject<Item> TAPEBOX = register(
+            "tapebox",
+            () -> new BlockItem(BlockRegistry.TAPEBOX.get(), new Item.Properties().stacksTo(64))
+    );
+    public static final RegistryObject<Item> ECHO_DARK_GRASS = register(
+            "echo_dark_grass",
+            () -> new BlockItem(BlockRegistry.ECHO_DARK_GRASS.get(), new Item.Properties().stacksTo(64))
     );
 
     private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item, boolean inTab) {

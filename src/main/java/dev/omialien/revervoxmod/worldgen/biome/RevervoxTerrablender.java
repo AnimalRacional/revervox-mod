@@ -6,6 +6,6 @@ import terrablender.api.Regions;
 
 public class RevervoxTerrablender {
     public static void registerBiomes(){
-        Regions.register(new RevervoxOverworldRegion(new ResourceLocation(RevervoxMod.MOD_ID, "overworld"), 7));
+        Regions.register(new RevervoxOverworldRegion(new ResourceLocation(RevervoxMod.MOD_ID, "overworld"), 6));
     }
 }

@@ -41,7 +41,7 @@ public class RevervoxAdvancementProvider extends ForgeAdvancementProvider {
                             new ItemStack(ItemRegistry.REVERVOX_VOICE_BOX.get()),
                             Component.translatable("advancements.revervox_mod.root.title"),
                             Component.translatable("advancements.revervox_mod.root.description"),
-                            new ResourceLocation(RevervoxMod.MOD_ID, "textures/block/tapebox_side.png"),
+                            new ResourceLocation(RevervoxMod.MOD_ID, "textures/block/tapebox.png"),
                             FrameType.TASK,
                             false,
                             false,

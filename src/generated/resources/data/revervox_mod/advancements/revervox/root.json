@@ -23,7 +23,7 @@
   },
   "display": {
     "announce_to_chat": false,
-    "background": "revervox_mod:textures/block/tapebox_side.png",
+    "background": "revervox_mod:textures/block/tapebox.png",
     "description": {
       "translate": "advancements.revervox_mod.root.description"
     },

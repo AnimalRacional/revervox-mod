@@ -1,0 +1,37 @@
+package dev.omialien.revervoxmod.worldgen;
+
+import dev.omialien.revervoxmod.RevervoxMod;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.placement.PlacementUtils;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.placement.*;
+
+import java.util.List;
+
+public class RevervoxPlacedFeatures {
+    public static final ResourceKey<PlacedFeature> ECHO_DARK_GRASS_PLACED_KEY =
+            ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_grass_placed"));
+
+    public static void bootstrap(BootstapContext<PlacedFeature> context) {
+        HolderGetter<ConfiguredFeature<?, ?>> configured = context.lookup(Registries.CONFIGURED_FEATURE);
+
+        context.register(ECHO_DARK_GRASS_PLACED_KEY, new PlacedFeature(
+                configured.getOrThrow(RevervoxConfiguredFeatures.ECHO_DARK_GRASS_KEY),
+                List.of(
+                        CountPlacement.of(90),
+                        InSquarePlacement.spread(),
+                        PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT,
+                        EnvironmentScanPlacement.scanningFor(Direction.DOWN,
+                                BlockPredicate.solid(), BlockPredicate.ONLY_IN_AIR_PREDICATE, 12),
+                        RandomOffsetPlacement.vertical(ConstantInt.of(1)),
+                        BiomeFilter.biome()
+                )));
+    }
+}
