@@ -7,6 +7,7 @@ import dev.omialien.revervoxmod.commands.TriggerRevervoxBehindEventCommand;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.RevervoxCooldownManager;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
+import dev.omialien.revervoxmod.items.TapeRecorderItem;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
@@ -14,6 +15,7 @@ import dev.omialien.revervoxmod.util.AudioUtil;
 import dev.omialien.revervoxmod.util.PlayerVisibilityUtil;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
+import dev.omialien.voicechatrecording.AudioId;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;
 import dev.omialien.voicechatrecording.api.events.AudioRecordedEvent;
@@ -25,6 +27,7 @@ import net.minecraft.core.Position;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ambient.Bat;
@@ -40,14 +43,27 @@ import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 @Mod.EventBusSubscriber(modid = RevervoxMod.MOD_ID)
 public class CommonEventBus {
     @SubscribeEvent
     public static void tickEvent(TickEvent.ServerTickEvent event){
         RevervoxMod.TASKS.tick();
+        while (!recordedAudios.isEmpty()) {
+            IRecordedAudio audio = recordedAudios.remove();
+            ServerPlayer player = event.getServer().getPlayerList().getPlayer(audio.getPlayerUUID());
+            if (player != null) {
+                ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+                if (stack.getItem() == ItemRegistry.TAPE_RECORDER.get() && !TapeRecorderItem.hasRecording(stack)) {
+                    RevervoxMod.LOGGER.debug("Recorded audio in tape recorder!");
+                    TapeRecorderItem.record(AudioId.of(audio.getPlayerUUID(), audio.getId()), stack);
+                    audio.saveAudio(RevervoxMod.BLOCK_NAMESPACE);
+                }
+            } else {
+                RevervoxMod.LOGGER.warn("Offline player recorded audio: {}", audio.getPlayerUUID());
+            }
+        }
     }
 
     @SubscribeEvent
@@ -112,6 +128,7 @@ public class CommonEventBus {
 
     @SubscribeEvent
     public static void onRegisterEvents(ServerStartingEvent event) {
+        recordedAudios = new ArrayDeque<>();
         int BatEventTime = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
                 (int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()));
         RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", BatEventTime);
@@ -193,7 +210,7 @@ public class CommonEventBus {
     }
 
 
-
+    private static Queue<IRecordedAudio> recordedAudios = new ArrayDeque<>();
     @SubscribeEvent
     public static void onAudioRecordedEvent(AudioRecordedEvent event){
         if(event.getAudio().getFilterResult() == IRecordedAudio.FilterResult.PASSED){
@@ -204,6 +221,7 @@ public class CommonEventBus {
             RevervoxMod.LOGGER.debug("Audio recorded and stored!");
             RevervoxMod.AUDIOS.addAudio(event.getAudio());
         }
+        recordedAudios.add(event.getAudio());
     }
 
     @SubscribeEvent

@@ -37,6 +37,7 @@ import java.util.UUID;
 @Mod(RevervoxMod.MOD_ID)
 public class RevervoxMod {
     public static final String MOD_ID = "revervox_mod";
+    public static final String BLOCK_NAMESPACE = "revervox_blocks";
     public static final Logger LOGGER = LogUtils.getLogger();
     final public static TaskScheduler TASKS = new TaskScheduler();
     public static AudioStorage AUDIOS = new AudioStorage();
@@ -58,6 +59,9 @@ public class RevervoxMod {
     private void commonSetup(IEventBus bus){
         MinecraftForge.EVENT_BUS.register(this);
 
+        RecipeSerializerRegistry.register(bus);
+        BlockRegistry.register(bus);
+        BlockEntityRegistry.register(bus);
         EntityRegistry.register(bus);
         SoundRegistry.register(bus);
         ItemRegistry.register(bus);

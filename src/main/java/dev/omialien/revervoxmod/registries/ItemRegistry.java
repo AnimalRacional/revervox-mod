@@ -1,10 +1,7 @@
 package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.items.MegaphoneItem;
-import dev.omialien.revervoxmod.items.RevervoxBaitItem;
-import dev.omialien.revervoxmod.items.RevervoxSword;
-import dev.omialien.revervoxmod.items.RevervoxVoiceBoxItem;
+import dev.omialien.revervoxmod.items.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -53,6 +50,10 @@ public class ItemRegistry {
     public static final RegistryObject<Item> REVERVOX_BAT_TOOTH = register(
             "revervox_bat_tooth",
             () -> new Item(new Item.Properties().stacksTo(16))
+    );
+    public static final RegistryObject<Item> TAPE_RECORDER = register(
+            "tape_recorder",
+            () -> new TapeRecorderItem(new Item.Properties())
     );
 
     private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item, boolean inTab) {
