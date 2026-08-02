@@ -46,7 +46,9 @@ import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.Animation;
 import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -138,7 +140,9 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         });
         controller.triggerableAnim("attack.bite", DefaultAnimations.ATTACK_BITE);
         controllers.add(DefaultAnimations.genericFlyIdleController(this).transitionLength(5),
-                controller);
+                controller,
+                new AnimationController<>(this, "Stare", 0, state -> PlayState.STOP)
+                        .triggerableAnim("Stare", RawAnimation.begin().then("misc.stare", Animation.LoopType.PLAY_ONCE)));
     }
 
     @Override
