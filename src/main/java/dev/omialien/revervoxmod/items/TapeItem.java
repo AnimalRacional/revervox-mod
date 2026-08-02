@@ -32,8 +32,7 @@ public class TapeItem extends Item {
 
     @Override
     public @NotNull String getDescriptionId(ItemStack pStack) {
-        CompoundTag tag = pStack.getTag();
-        if (tag != null && tag.contains(PLAYER_ID)) {
+        if (TapeItem.hasRecording(pStack)) {
             return super.getDescriptionId(pStack) + "_recorded";
         } else {
             return super.getDescriptionId(pStack);
@@ -60,7 +59,7 @@ public class TapeItem extends Item {
 
     public static AudioId getAudio(ItemStack stack) {
         CompoundTag tag = stack.getTag();
-        return tag == null ? null : tag.contains(PLAYER_ID) ?
+        return TapeItem.hasRecording(stack) ?
                 AudioId.of(tag.getUUID(PLAYER_ID), tag.getUUID(AUDIO_ID)) : null;
     }
 

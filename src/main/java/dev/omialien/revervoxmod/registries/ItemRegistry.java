@@ -55,7 +55,7 @@ public class ItemRegistry {
 
     public static final RegistryObject<Item> TAPE_RECORDER_ON = register(
             "tape_recorder_on",
-            () -> new Item(new Item.Properties().stacksTo(1))
+            () -> new TapeRecorderItem(new Item.Properties().stacksTo(1))
     );
 
     public static final RegistryObject<Item> TAPE_RECORDER_OFF = register(
