@@ -8,6 +8,7 @@ import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.RevervoxCooldownManager;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
 import dev.omialien.revervoxmod.items.TapeItem;
+import dev.omialien.revervoxmod.items.TapeRecorderItem;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
@@ -59,7 +60,7 @@ public class CommonEventBus {
             ServerPlayer player = event.getServer().getPlayerList().getPlayer(audio.getPlayerUUID());
             if (player != null) {
                 ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                if (stack.getItem() == ItemRegistry.TAPE_RECORDER_ON.get()) {
+                if (stack.getItem() == ItemRegistry.TAPE_RECORDER_ON.get() && (player.getTicksUsingItem() > 2 || TapeRecorderItem.hasStoppedUsing(player))) {
                     RevervoxMod.LOGGER.debug("Recorded audio in tape recorder!");
                     TapeItem.record(AudioId.of(audio.getPlayerUUID(), audio.getId()), stack, player);
                     CompoundTag tag = stack.getTag();
@@ -219,7 +220,6 @@ public class CommonEventBus {
         event.addCategory(RevervoxMod.MOD_ID, "Revervox", "The volume of monsters", null);
         RevervoxMod.AUDIOS = new AudioStorage();
     }
-
 
     private static Queue<IRecordedAudio> recordedAudios = new ArrayDeque<>();
     @SubscribeEvent
