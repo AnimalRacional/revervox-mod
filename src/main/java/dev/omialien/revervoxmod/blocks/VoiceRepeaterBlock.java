@@ -8,6 +8,7 @@ import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 
 public class VoiceRepeaterBlock extends BaseEntityBlock {
     public static final BooleanProperty CURRENTLY_PLAYING = BooleanProperty.create("voice_repeater_playing");
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public VoiceRepeaterBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState(this.stateDefinition.any().setValue(CURRENTLY_PLAYING, false));
@@ -74,6 +77,7 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
                 AudioId id = TapeRecorderItem.getAudio(stack);
                 if (level.getBlockEntity(pPos) instanceof VoiceRepeaterBlockEntity be) {
                     be.setAudio(id);
+                    pLevel.updateNeighborsAt(pPos, pState.getBlock());
                     stack.shrink(1);
                 }
             }
@@ -81,12 +85,16 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
         } else {
             if (pLevel instanceof ServerLevel level && level.getBlockEntity(pPos) instanceof VoiceRepeaterBlockEntity be) {
                 be.popOutTape();
+                pLevel.updateNeighborsAt(pPos, pState.getBlock());
             }
         }
         return InteractionResult.PASS;
     }
 
     private void play(BlockState pState, ServerLevel pLevel, BlockPos pPos) {
+        if (isPlaying(pState)) {
+            return;
+        }
         if (pLevel.getBlockEntity(pPos) instanceof VoiceRepeaterBlockEntity be) {
             AudioId audioId = be.getAudio();
             if (audioId != null) {
@@ -106,9 +114,21 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
     }
 
     @Override
+    public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pNeighborBlock, BlockPos pNeighborPos, boolean pMovedByPiston) {
+        super.neighborChanged(pState, pLevel, pPos, pNeighborBlock, pNeighborPos, pMovedByPiston);
+        boolean powered = pLevel.hasNeighborSignal(pPos);
+        if (powered != pState.getValue(POWERED)) {
+            pLevel.setBlock(pPos, pState.setValue(POWERED, powered), UPDATE_ALL);
+            if (powered && pLevel instanceof ServerLevel level) {
+                this.play(pState, level, pPos);
+            }
+        }
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         super.createBlockStateDefinition(pBuilder);
-        pBuilder.add(CURRENTLY_PLAYING);
+        pBuilder.add(CURRENTLY_PLAYING, POWERED);
     }
 
     @Override
@@ -125,5 +145,25 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState pState) {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
+        if (pLevel.getBlockEntity(pPos) instanceof VoiceRepeaterBlockEntity be) {
+            AudioId id = be.getAudio();
+            try {
+                IRecordedAudio audio = RevervoxMod.RECORDING_API.loadAudio(id.player(), id.audio()).get();
+                return Math.max(Mth.floor((audio.getDuration() / 22.0) * 16), 15);
+            } catch (Exception e) {
+                return 0;
+            }
+
+        }
+        return super.getAnalogOutputSignal(pState, pLevel, pPos);
     }
 }
