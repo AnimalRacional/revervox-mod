@@ -52,9 +52,20 @@ public class ItemRegistry {
             "revervox_bat_tooth",
             () -> new Item(new Item.Properties().stacksTo(16))
     );
-    public static final RegistryObject<Item> TAPE_RECORDER = register(
-            "tape_recorder",
-            () -> new TapeRecorderItem(new Item.Properties())
+
+    public static final RegistryObject<Item> TAPE_RECORDER_ON = register(
+            "tape_recorder_on",
+            () -> new Item(new Item.Properties().stacksTo(1))
+    );
+
+    public static final RegistryObject<Item> TAPE_RECORDER_OFF = register(
+            "tape_recorder_off",
+            () -> new Item(new Item.Properties().stacksTo(1))
+    );
+
+    public static final RegistryObject<Item> TAPE = register(
+            "tape",
+            () -> new TapeItem(new Item.Properties())
     );
 
     public static final RegistryObject<Item> ECHO_DARK_SURFACE_BLOCK = register(

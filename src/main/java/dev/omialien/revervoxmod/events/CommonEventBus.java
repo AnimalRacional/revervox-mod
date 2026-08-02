@@ -7,7 +7,7 @@ import dev.omialien.revervoxmod.commands.TriggerRevervoxBehindEventCommand;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
 import dev.omialien.revervoxmod.entity.RevervoxCooldownManager;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
-import dev.omialien.revervoxmod.items.TapeRecorderItem;
+import dev.omialien.revervoxmod.items.TapeItem;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
@@ -24,6 +24,7 @@ import dev.omialien.voicechatrecording.api.events.RecordingSetupEvent;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -58,9 +59,16 @@ public class CommonEventBus {
             ServerPlayer player = event.getServer().getPlayerList().getPlayer(audio.getPlayerUUID());
             if (player != null) {
                 ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                if (stack.getItem() == ItemRegistry.TAPE_RECORDER.get() && !TapeRecorderItem.hasRecording(stack)) {
+                if (stack.getItem() == ItemRegistry.TAPE_RECORDER_ON.get()) {
                     RevervoxMod.LOGGER.debug("Recorded audio in tape recorder!");
-                    TapeRecorderItem.record(AudioId.of(audio.getPlayerUUID(), audio.getId()), stack);
+                    TapeItem.record(AudioId.of(audio.getPlayerUUID(), audio.getId()), stack, player);
+                    CompoundTag tag = stack.getTag();
+                    ItemStack newStack = new ItemStack(ItemRegistry.TAPE_RECORDER_OFF.get());
+                    if (tag != null) {
+                        tag.remove(TapeItem.TAPE_COMPONENTS);
+                        newStack.setTag(tag);
+                    }
+                    player.setItemInHand(InteractionHand.MAIN_HAND, newStack);
                     audio.saveAudio(RevervoxMod.BLOCK_NAMESPACE);
                 }
             } else {

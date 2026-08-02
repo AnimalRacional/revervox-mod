@@ -1,6 +1,6 @@
 package dev.omialien.revervoxmod.items.recipes;
 
-import dev.omialien.revervoxmod.items.TapeRecorderItem;
+import dev.omialien.revervoxmod.items.TapeItem;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.RecipeSerializerRegistry;
 import net.minecraft.core.RegistryAccess;
@@ -13,18 +13,18 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-public class EmptyTapeRecorderRecipe extends CustomRecipe {
-    public EmptyTapeRecorderRecipe(ResourceLocation pId, CraftingBookCategory pCategory) {
+public class EmptyTapeRecipe extends CustomRecipe {
+    public EmptyTapeRecipe(ResourceLocation pId, CraftingBookCategory pCategory) {
         super(pId, pCategory);
     }
 
     @Override
-    public boolean matches(CraftingContainer pContainer, Level pLevel) {
+    public boolean matches(CraftingContainer pContainer, @NotNull Level pLevel) {
         ItemStack stack = ItemStack.EMPTY;
         for(int i = 0; i < pContainer.getContainerSize(); i++) {
             ItemStack item = pContainer.getItem(i);
             if (!item.isEmpty()) {
-                if (!stack.isEmpty() || item.getItem() != ItemRegistry.TAPE_RECORDER.get() || !TapeRecorderItem.hasRecording(item)) {
+                if (!stack.isEmpty() || item.getItem() != ItemRegistry.TAPE.get() || !TapeItem.hasRecording(item)) {
                     return false;
                 }
                 stack = item;
@@ -34,20 +34,20 @@ public class EmptyTapeRecorderRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer pContainer, RegistryAccess pRegistryAccess) {
+    public @NotNull ItemStack assemble(CraftingContainer pContainer, @NotNull RegistryAccess pRegistryAccess) {
         ItemStack stack = ItemStack.EMPTY;
         for(int i = 0; i < pContainer.getContainerSize(); i++) {
             ItemStack item = pContainer.getItem(i);
             if (!item.isEmpty()) {
-                if (!stack.isEmpty() || item.getItem() != ItemRegistry.TAPE_RECORDER.get() || !TapeRecorderItem.hasRecording(item)) {
+                if (!stack.isEmpty() || item.getItem() != ItemRegistry.TAPE.get() || !TapeItem.hasRecording(item)) {
                     return ItemStack.EMPTY;
                 }
                 stack = item;
             }
         }
         ItemStack res = stack.copy();
-        res.removeTagKey(TapeRecorderItem.PLAYER_ID);
-        res.removeTagKey(TapeRecorderItem.AUDIO_ID);
+        res.removeTagKey(TapeItem.PLAYER_ID);
+        res.removeTagKey(TapeItem.AUDIO_ID);
         return res;
     }
 
