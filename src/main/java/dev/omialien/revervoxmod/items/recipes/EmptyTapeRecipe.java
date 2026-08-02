@@ -45,7 +45,7 @@ public class EmptyTapeRecipe extends CustomRecipe {
                 stack = item;
             }
         }
-        ItemStack res = stack.copy();
+        ItemStack res = stack.copyWithCount(1);
         res.removeTagKey(TapeItem.PLAYER_ID);
         res.removeTagKey(TapeItem.AUDIO_ID);
         return res;
