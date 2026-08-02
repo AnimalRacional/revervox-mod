@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ExecutionException;
 
 public class VoiceRepeaterBlock extends BaseEntityBlock {
-    public static final BooleanProperty CURRENTLY_PLAYING = BooleanProperty.create("voice_repeater_playing");
+    public static final BooleanProperty CURRENTLY_PLAYING = BooleanProperty.create("tapebox_playing");
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public VoiceRepeaterBlock(Properties pProperties) {
         super(pProperties);

@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/cube_top",
   "textures": {
-    "side": "revervox_mod:block/tapebox",
+    "side": "revervox_mod:block/tapebox_on",
     "top": "revervox_mod:block/tapebox_top"
   }
 }
