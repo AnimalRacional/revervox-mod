@@ -1,7 +1,7 @@
 package dev.omialien.revervoxmod.blocks;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.items.TapeRecorderItem;
+import dev.omialien.revervoxmod.items.TapeItem;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.voicechatrecording.AudioId;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
@@ -17,12 +17,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ExecutionException;
@@ -36,13 +38,13 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+    public void randomTick(@NotNull BlockState pState, @NotNull ServerLevel pLevel, @NotNull BlockPos pPos, @NotNull RandomSource pRandom) {
         super.randomTick(pState, pLevel, pPos, pRandom);
         setPlaying(false, pState, pLevel, pPos);
     }
 
     @Override
-    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+    public void tick(@NotNull BlockState pState, @NotNull ServerLevel pLevel, @NotNull BlockPos pPos, @NotNull RandomSource pRandom) {
         super.tick(pState, pLevel, pPos, pRandom);
         setPlaying(false, pState, pLevel, pPos);
     }
@@ -56,7 +58,7 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void attack(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
+    public void attack(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer) {
         super.attack(pState, pLevel, pPos, pPlayer);
         if (pLevel instanceof ServerLevel level) {
             if (!VoiceRepeaterBlock.isPlaying(pState)) {
@@ -66,17 +68,17 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+    public InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         InteractionResult interact = super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
         if (isPlaying(pState)) {
             return interact;
         }
         ItemStack stack = pPlayer.getItemInHand(pHand);
-        if (stack.getItem() == ItemRegistry.TAPE_RECORDER.get() && TapeRecorderItem.hasRecording(stack)) {
+        if (stack.getItem() == ItemRegistry.TAPE.get() && TapeItem.hasRecording(stack)) {
             if (pLevel instanceof ServerLevel level && !interact.consumesAction()) {
-                AudioId id = TapeRecorderItem.getAudio(stack);
+                AudioId id = TapeItem.getAudio(stack);
                 if (level.getBlockEntity(pPos) instanceof VoiceRepeaterBlockEntity be) {
-                    be.setAudio(id);
+                    be.setAudio(id, stack.getTag());
                     pLevel.updateNeighborsAt(pPos, pState.getBlock());
                     stack.shrink(1);
                 }
@@ -114,7 +116,7 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState pState, Level pLevel, BlockPos pPos, Block pNeighborBlock, BlockPos pNeighborPos, boolean pMovedByPiston) {
+    public void neighborChanged(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Block pNeighborBlock, @NotNull BlockPos pNeighborPos, boolean pMovedByPiston) {
         super.neighborChanged(pState, pLevel, pPos, pNeighborBlock, pNeighborPos, pMovedByPiston);
         boolean powered = pLevel.hasNeighborSignal(pPos);
         if (powered != pState.getValue(POWERED)) {
@@ -126,19 +128,19 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+    protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> pBuilder) {
         super.createBlockStateDefinition(pBuilder);
         pBuilder.add(CURRENTLY_PLAYING, POWERED);
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+    public @Nullable BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
         RevervoxMod.LOGGER.debug("CALLED NEW BLOCK ENTITY");
         return new VoiceRepeaterBlockEntity(pPos, pState);
     }
 
     @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
+    public void onRemove(BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
         if (!pState.is(pNewState.getBlock())) {
             if(pLevel.getBlockEntity(pPos) instanceof VoiceRepeaterBlockEntity be) {
                 be.popOutTape();
@@ -148,12 +150,12 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
     }
 
     @Override
-    public boolean hasAnalogOutputSignal(BlockState pState) {
+    public boolean hasAnalogOutputSignal(@NotNull BlockState pState) {
         return true;
     }
 
     @Override
-    public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
+    public int getAnalogOutputSignal(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos) {
         if (pLevel.getBlockEntity(pPos) instanceof VoiceRepeaterBlockEntity be) {
             AudioId id = be.getAudio();
             try {
@@ -165,5 +167,10 @@ public class VoiceRepeaterBlock extends BaseEntityBlock {
 
         }
         return super.getAnalogOutputSignal(pState, pLevel, pPos);
+    }
+
+    @Override
+    public RenderShape getRenderShape(@NotNull BlockState pState) {
+        return RenderShape.MODEL;
     }
 }
