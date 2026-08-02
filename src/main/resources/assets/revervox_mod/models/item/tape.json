@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "revervox_mod:item/tape"
+    "layer0": "revervox_mod:item/tape",
+    "layer1": "revervox_mod:item/tape_overlay"
   }
 }

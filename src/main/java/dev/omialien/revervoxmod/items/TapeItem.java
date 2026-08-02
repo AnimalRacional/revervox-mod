@@ -25,15 +25,6 @@ public class TapeItem extends Item {
         super(pProperties);
     }
 
-    @Override
-    public boolean isFoil(@NotNull ItemStack pStack) {
-        if (super.isFoil(pStack)) {
-            return true;
-        }
-        CompoundTag tag = pStack.getTag();
-        return tag != null && tag.contains(PLAYER_ID);
-    }
-
     public static boolean hasRecording(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         return tag != null && tag.contains(PLAYER_ID);
