@@ -10,7 +10,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.UUID;
@@ -50,6 +52,11 @@ public class TapeRecorderItem extends Item {
                 PLAYERS_FINISHED_USING.put(player, player.level().getGameTime());
             }
         }
+    }
+
+    @Override
+    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
+        return UseAnim.TOOT_HORN;
     }
 
     public static boolean hasStoppedUsing(ServerPlayer sPlayer) {
