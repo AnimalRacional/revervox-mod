@@ -63,7 +63,9 @@ public class ClientEventBus {
                 UUID player = tag.getUUID(TapeItem.PLAYER_ID);
                 UUID audio = tag.getUUID(TapeItem.AUDIO_ID);
                 int hash = Objects.hash(player, audio);
-                return hash % 0xffffff;
+                if (color == 1){
+                    return hash % 0xffffff;
+                } else return -1;
             }
             return color == 1 ? 0 : -1;
         }, ItemRegistry.TAPE.get());
