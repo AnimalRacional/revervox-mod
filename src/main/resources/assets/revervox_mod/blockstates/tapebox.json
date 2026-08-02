@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
+    "tapebox_playing=false": {
       "model": "revervox_mod:block/tapebox"
+    },
+    "tapebox_playing=true": {
+      "model": "revervox_mod:block/tapebox_on"
     }
   }
 }
