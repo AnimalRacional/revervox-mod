@@ -1,6 +1,7 @@
 package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.items.recipes.CopyTapeRecipe;
 import dev.omialien.revervoxmod.items.recipes.EmptyTapeRecipe;
 import dev.omialien.revervoxmod.items.recipes.FillTapeRecorderRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -22,6 +23,10 @@ public class RecipeSerializerRegistry {
     public static final RegistryObject<RecipeSerializer<FillTapeRecorderRecipe>> FILL_RECORDER = REGISTRY.register(
             "fill_tape_recorder_recipe",
             () -> new SimpleCraftingRecipeSerializer<>(FillTapeRecorderRecipe::new)
+    );
+    public static final RegistryObject<RecipeSerializer<CopyTapeRecipe>> COPY_TAPE = REGISTRY.register(
+            "copy_tape_recipe",
+            () -> new SimpleCraftingRecipeSerializer<>(CopyTapeRecipe::new)
     );
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);
