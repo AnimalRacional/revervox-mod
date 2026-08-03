@@ -1,6 +1,24 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "revervox_mod:item/tape_recorder_on"
+  "loader": "forge:separate_transforms",
+  "gui_light": "front",
+  "base": {
+    "parent": "item/generated",
+    "textures": {
+      "layer0": "revervox_mod:item/tape_recorder_on"
+    }
+  },
+  "perspectives": {
+    "firstperson_righthand": {
+      "parent": "revervox_mod:item/tape_recorder_in_hand"
+    },
+    "firstperson_lefthand": {
+      "parent": "revervox_mod:item/tape_recorder_in_hand"
+    },
+    "thirdperson_righthand": {
+      "parent": "revervox_mod:item/tape_recorder_in_hand"
+    },
+    "thirdperson_lefthand": {
+      "parent": "revervox_mod:item/tape_recorder_in_hand"
+    }
   }
 }
