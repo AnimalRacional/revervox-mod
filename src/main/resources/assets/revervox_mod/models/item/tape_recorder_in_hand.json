@@ -1,0 +1,66 @@
+{
+  "credit": "Made with Blockbench",
+  "parent": "builtin/entity",
+  "display": {
+    "thirdperson_righthand": {
+      "translation": [
+        0,
+        -1.5,
+        0
+      ]
+    },
+    "thirdperson_lefthand": {
+      "translation": [
+        0,
+        -1.5,
+        0
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        -25.7199999999998,
+        -40.539999999999964,
+        -17.38000000000011
+      ]
+    },
+    "firstperson_lefthand": {
+      "rotation": [
+        -25.7199999999998,
+        -40.539999999999964,
+        -17.38000000000011
+      ]
+    },
+    "gui": {
+      "translation": [
+        0,
+        -7,
+        0
+      ],
+      "scale": [
+        1.7,
+        1.7,
+        1.7
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        -180,
+        2,
+        -180
+      ],
+      "translation": [
+        0.75,
+        -8.75,
+        0
+      ],
+      "scale": [
+        1.81640625,
+        1.81640625,
+        1.81640625
+      ]
+    }
+  },
+  "textures": {
+    "particle": "revervox_mod:item/tape_recorder_in_hand"
+  }
+}

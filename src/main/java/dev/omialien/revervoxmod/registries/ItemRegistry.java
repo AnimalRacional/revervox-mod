@@ -60,7 +60,7 @@ public class ItemRegistry {
 
     public static final RegistryObject<Item> TAPE_RECORDER_OFF = register(
             "tape_recorder_off",
-            () -> new Item(new Item.Properties().stacksTo(1))
+            () -> new TapeRecorderOffItem(new Item.Properties().stacksTo(1))
     );
 
     public static final RegistryObject<Item> TAPE = register(
