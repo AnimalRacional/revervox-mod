@@ -6,6 +6,7 @@ import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import dev.omialien.revervoxmod.registries.SoundRegistry;
+import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.client.Minecraft;
@@ -142,7 +143,11 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity {
             if(target != null){
                 IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
                 if(audio != null){
-                    AudioPlayingUtil.playLocationalAudio(audio, this.getEyePosition(), level, RevervoxMod.MOD_ID);
+                    AudioPlayingUtil.playLocationalAudio(
+                            audio, this.getEyePosition(), level,
+                            AudioEffect.pitch(1.5f).makeReverb(0.5f, 160, 2),
+                            RevervoxMod.MOD_ID, 32.0f
+                    );
                 }
             }
         }
