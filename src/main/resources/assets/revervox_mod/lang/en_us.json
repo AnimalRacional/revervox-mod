@@ -62,6 +62,10 @@
   "revervox_mod.configuration.revervoxGiveUpTime.tooltip": "How long (in milliseconds) you have to stop speaking for Revervox to lose track of you",
   "revervox_mod.configuration.revervoxForgetPain": "Revervox Forget Pain Timer",
   "revervox_mod.configuration.revervoxForgetPain.tooltip": "How many ticks it will take for Revervox to lose track of the person who last attacked it",
+  "revervox_mod.configuration.fakeRevervoxEventChance": "Fake Revervox Behind Event Chance",
+  "revervox_mod.configuration.fakeRevervoxEventChance.tooltip": "Chance of fake Revervox behind event occurring. Higher is less likely, lower is more likely",
+  "revervox_mod.configuration.enableFakeRevervoxEvent": "Enable Fake Revervox Behind Event",
+  "revervox_mod.configuration.enableFakeRevervoxEvent.tooltip": "Whether the Fake Revervox behind player event will occur (not seeing other players during it is intended)",
 
   "item.revervox_mod.thingy_spawn_egg": "Thingy Spawn Egg",
   "item.revervox_mod.revervox_bat_spawn_egg": "Revervox Bat Spawn Egg",
