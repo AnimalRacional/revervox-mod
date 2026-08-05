@@ -56,5 +56,12 @@
     "subtitle": "sounds.revervox_mod.revervox_scream",
     "category": "hostile",
     "sounds": [ "revervox_mod:revervox_scream" ]
+  },
+  "echo_dark_ambience": {
+    "subtitle": "sounds.revervox_mod.echo_dark_ambience",
+    "category": "ambient",
+    "sounds": [
+      {"name": "revervox_mod:echo_dark_ambience", "stream": true }
+    ]
   }
 }

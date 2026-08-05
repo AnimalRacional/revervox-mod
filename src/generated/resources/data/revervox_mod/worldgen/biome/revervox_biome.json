@@ -17,12 +17,6 @@
       "sound": "minecraft:ambient.cave",
       "tick_delay": 6000
     },
-    "music": {
-      "max_delay": 24000,
-      "min_delay": 12000,
-      "replace_current_music": false,
-      "sound": "revervox_mod:revervox_loop"
-    },
     "sky_color": 3147594,
     "water_color": 265774,
     "water_fog_color": 133407

@@ -3,14 +3,12 @@ package dev.omialien.revervoxmod.worldgen.biome;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.worldgen.RevervoxPlacedFeatures;
-import dev.omialien.revervoxmod.registries.SoundRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.Musics;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.*;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -70,8 +68,7 @@ public class RevervoxBiomes {
                         .grassColorOverride(0x7f03fc)
                         .foliageColorOverride(0xd203fc)
                         .fogColor(0x170721)
-                        .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS)
-                        .backgroundMusic(Musics.createGameMusic(SoundRegistry.REVERVOX_LOOP.getHolder().get())).build())
+                        .ambientMoodSound(AmbientMoodSettings.LEGACY_CAVE_SETTINGS).build())
                 .build();
     }
 }
