@@ -17,6 +17,7 @@ import dev.omialien.revervoxmod.util.PlayerVisibilityUtil;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.revervoxmod.worldgen.biome.EchoDarkBiomeHandler;
+import dev.omialien.revervoxmod.worldgen.biome.RevervoxBiomes;
 import dev.omialien.voicechatrecording.AudioId;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;
@@ -25,6 +26,7 @@ import dev.omialien.voicechatrecording.api.events.MicPacketReceivedEvent;
 import dev.omialien.voicechatrecording.api.events.RecordingSetupEvent;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Position;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ChunkMap;
@@ -37,6 +39,7 @@ import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
@@ -282,7 +285,12 @@ public class CommonEventBus {
         if (event.phase != TickEvent.Phase.END) return;
         if (event.player.level().isClientSide) return;
         Player player = event.player;
-        EchoDarkBiomeHandler.tickBiomeLogic(player);
+        Level level = player.level();
+        BlockPos pos = player.blockPosition();
+        Holder<Biome> biome = level.getBiome(pos);
+
+        boolean inEchoDark = biome.is(RevervoxBiomes.REVERVOX_BIOME);
+        if (inEchoDark) EchoDarkBiomeHandler.tickBiomeLogic(player);
     }
 
 
