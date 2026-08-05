@@ -18,6 +18,7 @@ import org.lwjgl.glfw.GLFW;
 @Mod.EventBusSubscriber(modid = RevervoxMod.MOD_ID, value = Dist.CLIENT)
 public class RevervoxBatStareEvents {
 
+    //TODO TEMPORARY, REMOVE LATER
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {
         if (event.getAction() == GLFW.GLFW_PRESS && event.getKey() == GLFW.GLFW_KEY_G) {

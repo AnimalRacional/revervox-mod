@@ -1,9 +1,11 @@
 package dev.omialien.revervoxmod.worldgen.biome;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.entity.client.RevervoxBatRenderHelper;
 import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
@@ -13,10 +15,30 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 public class EchoDarkBiomeHandler {
     private static int currentAudioDelay = 3;
     private final static int AUDIO_DELAY = 3; // in seconds
+    static Map<Player, Integer> PLAYER_TICKS_IN_DARKNESS = new WeakHashMap<>();
 
+    //TODO CORRE NO CLIENTE N SEI COMO FAZER NO SERVER E DPS DAR DANO
+    public static void tickBiomeLogicClient(Player player){
+        PLAYER_TICKS_IN_DARKNESS.put(player, PLAYER_TICKS_IN_DARKNESS.getOrDefault(player, 0) + 1);
+
+        if (PLAYER_TICKS_IN_DARKNESS.get(player) > 200) {
+            if (player.level().isClientSide && player instanceof AbstractClientPlayer acp) {
+                RevervoxMod.LOGGER.info("activating RevervoxBatRenderHelper on client");
+                RevervoxBatRenderHelper.activate(acp, 60);
+            }
+            PLAYER_TICKS_IN_DARKNESS.remove(player);
+            return;
+        }
+
+        int playerBlockLight = player.level().getBrightness(LightLayer.BLOCK, player.blockPosition());
+        if (playerBlockLight > 11) PLAYER_TICKS_IN_DARKNESS.remove(player);
+    }
 
     // can only be called on the server
     public static void tickBiomeLogic(Player player){

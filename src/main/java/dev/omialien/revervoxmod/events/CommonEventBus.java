@@ -283,13 +283,15 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        if (event.player.level().isClientSide) return;
         Player player = event.player;
         Level level = player.level();
         BlockPos pos = player.blockPosition();
         Holder<Biome> biome = level.getBiome(pos);
-
         boolean inEchoDark = biome.is(RevervoxBiomes.REVERVOX_BIOME);
+
+        if (inEchoDark) EchoDarkBiomeHandler.tickBiomeLogicClient(player);
+        if (event.player.level().isClientSide) return;
+
         if (inEchoDark) EchoDarkBiomeHandler.tickBiomeLogic(player);
     }
 
