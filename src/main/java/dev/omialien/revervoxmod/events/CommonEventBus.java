@@ -16,6 +16,7 @@ import dev.omialien.revervoxmod.util.AudioUtil;
 import dev.omialien.revervoxmod.util.PlayerVisibilityUtil;
 import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
+import dev.omialien.revervoxmod.worldgen.biome.EchoDarkBiomeHandler;
 import dev.omialien.voicechatrecording.AudioId;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;
@@ -33,6 +34,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluids;
@@ -274,6 +276,15 @@ public class CommonEventBus {
         PlayerStateManager.createState(event.getEntity().getUUID());
         RevervoxMod.AUDIOS.loadPlayerAudios(event.getEntity().getUUID());
     }
+
+    @SubscribeEvent
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        if (event.player.level().isClientSide) return;
+        Player player = event.player;
+        EchoDarkBiomeHandler.tickBiomeLogic(player);
+    }
+
 
     @SubscribeEvent
     public static void repeatOnKill(LivingDeathEvent e){
