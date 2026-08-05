@@ -23,7 +23,7 @@ public class RevervoxBatStareEvents {
         if (event.getAction() == GLFW.GLFW_PRESS && event.getKey() == GLFW.GLFW_KEY_G) {
             LocalPlayer p = Minecraft.getInstance().player;
             RevervoxMod.LOGGER.info("G pressed");
-            if (p != null) RevervoxBatRenderHelper.activate(p, 68);   // 3.25 seconds
+            if (p != null) RevervoxBatRenderHelper.activate(p, 64);   // 3.21 seconds
         }
     }
 

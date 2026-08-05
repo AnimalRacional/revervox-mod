@@ -19,9 +19,10 @@ public class RevervoxBatLayer extends RenderLayer<AbstractClientPlayer, PlayerMo
                        AbstractClientPlayer player, float limbSwing, float limbSwingAmount,
                        float partialTick, float ageInTicks, float netHeadYaw, float headPitch) {
 
-        if (player.isInvisible()) return;
+        if (player.isInvisible() || !RevervoxBatRenderHelper.isActive(player)) return;
         pose.pushPose();
         this.getParentModel().head.translateAndRotate(pose);
+        pose.translate(.5F, .7F, -0.5F);
         pose.scale(-1.0F, -1.0F, 1.0F);
         RevervoxBatRenderHelper.render(pose, buffer, player, partialTick, packedLight);
         pose.popPose();
