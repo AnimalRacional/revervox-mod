@@ -18,7 +18,7 @@ import dev.omialien.revervoxmod.voicechat.AudioStorage;
 import dev.omialien.revervoxmod.voicechat.PlayerStateManager;
 import dev.omialien.revervoxmod.worldgen.biome.EchoDarkBiomeHandler;
 import dev.omialien.revervoxmod.worldgen.biome.RevervoxBiomes;
-import dev.omialien.voicechatrecording.AudioId;
+import dev.omialien.voicechatrecording.api.AudioId;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.events.AudioLoadedEvent;
 import dev.omialien.voicechatrecording.api.events.AudioRecordedEvent;

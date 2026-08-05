@@ -6,6 +6,7 @@ import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +36,6 @@ public class EchoDarkBiomeHandler {
             return;
         }
         // TODO quantos mais players mais spam por isso prevenir isso;
-        // fazer aparecer em sitios diferentes o audio
         // vai ficando mais intenso (mais vozes)
         // dar trigger ao bat aparecer no ecrã quando muito tempo no escuro
 
@@ -44,16 +44,31 @@ public class EchoDarkBiomeHandler {
         int blockLight = serverLevel.getBrightness(LightLayer.BLOCK, serverPlayer.blockPosition());
 
         if (blockLight > 11) return;
-        Vec3 audioPos = serverPlayer.position();
+        Vec3 playerPos = serverPlayer.position();
+        RandomSource random = serverLevel.random;
+        Vec3 audioPos = randomPosInCircle(playerPos, 4, 20, random);
         IRecordedAudio audio = RevervoxMod.AUDIOS.getRandomAudio(false);
         if(audio != null){
             RevervoxMod.LOGGER.debug("playing EchoDarkBiome audio");
             AudioPlayingUtil.playLocationalAudio(
                     audio, audioPos, serverLevel,
-                    AudioEffect.random(),
+                    //AudioEffect.reverse().makeEcho(0.4f, 300, 4),
+                    //AudioEffect.reverse().makeGlitch(0.6f, 0.1f, 4).makeEcho(0.4f, 300, 4),
+                    //AudioEffect.stutter(0.1f, 5),
+                    AudioEffect.reverse().addRandomEffects().exclude(AudioEffect.Effect.REVERB).exclude(AudioEffect.Effect.ROBOT).exclude(AudioEffect.Effect.MULTI_PITCH),
                     RevervoxMod.MOD_ID, 32.0f
             );
             currentAudioDelay = AUDIO_DELAY;
         }
+    }
+
+    public static Vec3 randomPosInCircle(Vec3 center, double minRadiusSq, double radius, RandomSource random) {
+        double angle = random.nextDouble() * 2 * Math.PI;
+        double r = Math.sqrt(minRadiusSq + random.nextDouble() * (radius * radius - minRadiusSq));
+
+        double x = center.x + r * Math.cos(angle);
+        double z = center.z + r * Math.sin(angle);
+
+        return new Vec3(x, center.y, z);
     }
 }

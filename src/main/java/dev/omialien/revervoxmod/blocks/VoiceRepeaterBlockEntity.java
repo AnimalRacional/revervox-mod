@@ -2,7 +2,7 @@ package dev.omialien.revervoxmod.blocks;
 
 import dev.omialien.revervoxmod.registries.BlockEntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
-import dev.omialien.voicechatrecording.AudioId;
+import dev.omialien.voicechatrecording.api.AudioId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.item.ItemEntity;

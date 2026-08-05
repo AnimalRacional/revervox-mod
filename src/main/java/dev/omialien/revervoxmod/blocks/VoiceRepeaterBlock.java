@@ -3,7 +3,7 @@ package dev.omialien.revervoxmod.blocks;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.items.TapeItem;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
-import dev.omialien.voicechatrecording.AudioId;
+import dev.omialien.voicechatrecording.api.AudioId;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.core.BlockPos;
