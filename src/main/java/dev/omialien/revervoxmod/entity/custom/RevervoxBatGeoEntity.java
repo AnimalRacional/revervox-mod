@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.entity.custom;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
+import dev.omialien.revervoxmod.entity.client.RevervoxBatRenderHelper;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
@@ -11,6 +12,7 @@ import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.IRecordedPlayer;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -46,7 +48,9 @@ import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.Animation;
 import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -95,6 +99,14 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         return ANIMATION_TICKS + TRANSITION_TICKS + IDK_TICKS;
     }
 
+    public void stareAt(Player player) {
+        player.hurt(player.damageSources().magic(), 4.0F);
+
+        if (player.level().isClientSide && player instanceof AbstractClientPlayer acp) {
+            RevervoxBatRenderHelper.activate(acp, 64);
+        }
+    }
+
     @Override
     public boolean removeWhenFarAway(double pDistanceToClosestPlayer) {
         return pDistanceToClosestPlayer > 200.0D;
@@ -138,7 +150,9 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         });
         controller.triggerableAnim("attack.bite", DefaultAnimations.ATTACK_BITE);
         controllers.add(DefaultAnimations.genericFlyIdleController(this).transitionLength(5),
-                controller);
+                controller,
+                new AnimationController<>(this, "Stare", 0, state -> PlayState.STOP)
+                        .triggerableAnim("Stare", RawAnimation.begin().then("misc.stare", Animation.LoopType.PLAY_ONCE)));
     }
 
     @Override
