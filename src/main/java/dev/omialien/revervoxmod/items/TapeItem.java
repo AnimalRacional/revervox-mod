@@ -1,7 +1,7 @@
 package dev.omialien.revervoxmod.items;
 
 import dev.omialien.revervoxmod.registries.ItemRegistry;
-import dev.omialien.voicechatrecording.AudioId;
+import dev.omialien.voicechatrecording.api.AudioId;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
