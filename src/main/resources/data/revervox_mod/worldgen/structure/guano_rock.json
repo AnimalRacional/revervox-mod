@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:jigsaw",
+  "start_pool": "revervox_mod:guano_rocks",
+  "size": 1,
+  "start_height": {
+    "absolute": 1
+  },
+  "biomes": "#revervox_mod:has_structure_guano_rock",
+  "step": "underground_structures",
+  "spawn_overrides": {},
+  "max_distance_from_center": 80,
+  "use_expansion_hack": false
+}
