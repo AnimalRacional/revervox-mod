@@ -7,7 +7,7 @@
         "element_type": "minecraft:single_pool_element",
         "location": "revervox_mod:guano_rock_1",
         "processors": "minecraft:empty",
-        "projection": "terrain_matching"
+        "projection": "rigid"
       },
       "weight": 2
     },
@@ -16,7 +16,7 @@
         "element_type": "minecraft:single_pool_element",
         "location": "revervox_mod:guano_rock_2",
         "processors": "minecraft:empty",
-        "projection": "terrain_matching"
+        "projection": "rigid"
       },
       "weight": 2
     },
@@ -25,7 +25,7 @@
         "element_type": "minecraft:single_pool_element",
         "location": "revervox_mod:guano_rock_small_1",
         "processors": "minecraft:empty",
-        "projection": "terrain_matching"
+        "projection": "rigid"
       },
       "weight": 1
     },
@@ -34,7 +34,7 @@
         "element_type": "minecraft:single_pool_element",
         "location": "revervox_mod:guano_rock_small_2",
         "processors": "minecraft:empty",
-        "projection": "terrain_matching"
+        "projection": "rigid"
       },
       "weight": 1
     },
@@ -43,7 +43,7 @@
         "element_type": "minecraft:single_pool_element",
         "location": "revervox_mod:guano_rock_small_3",
         "processors": "minecraft:empty",
-        "projection": "terrain_matching"
+        "projection": "rigid"
       },
       "weight": 1
     }
