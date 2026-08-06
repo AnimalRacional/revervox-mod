@@ -1,6 +1,7 @@
 package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.commands.RevervoxBatPeekCommand;
 import dev.omialien.revervoxmod.commands.RevervoxCooldownCommand;
 import dev.omialien.revervoxmod.commands.SummonFakeEntityCommand;
 import dev.omialien.revervoxmod.commands.TriggerRevervoxBehindEventCommand;
@@ -157,6 +158,7 @@ public class CommonEventBus {
         RevervoxMod.TASKS.schedule(fakeRevervoxBehindEventRequest(
                 event.getServer().getLevel(Level.OVERWORLD)), RevervoxBehindEventTime);
         RevervoxMod.COOLDOWN = new RevervoxCooldownManager();
+        EchoDarkBiomeHandler.startup();
     }
 
     private static Runnable fakeBatEventSpawnRequest(ServerLevel level){
@@ -216,8 +218,8 @@ public class CommonEventBus {
         SummonFakeEntityCommand.register(event.getDispatcher());
         TriggerRevervoxBehindEventCommand.register(event.getDispatcher());
         RevervoxCooldownCommand.register(event.getDispatcher());
+        RevervoxBatPeekCommand.register(event.getDispatcher());
     }
-
 
     @SubscribeEvent
     public static void onRecordingApiInitialized(RecordingSetupEvent event) {
@@ -284,15 +286,18 @@ public class CommonEventBus {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         Player player = event.player;
+        if (player instanceof ServerPlayer sp) {
+            EchoDarkBiomeHandler.tickBatDamage(sp);
+        }
         Level level = player.level();
         BlockPos pos = player.blockPosition();
         Holder<Biome> biome = level.getBiome(pos);
         boolean inEchoDark = biome.is(RevervoxBiomes.REVERVOX_BIOME);
-
-        if (inEchoDark) EchoDarkBiomeHandler.tickBiomeLogicClient(player);
-        if (event.player.level().isClientSide) return;
-
-        if (inEchoDark) EchoDarkBiomeHandler.tickBiomeLogic(player);
+        if (inEchoDark) {
+            if (!event.side.isClient()) {
+                EchoDarkBiomeHandler.tickBiomeLogic(player);
+            }
+        }
     }
 
 
