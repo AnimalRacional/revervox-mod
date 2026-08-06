@@ -6,7 +6,7 @@ import dev.omialien.revervoxmod.worldgen.RevervoxPlacedFeatures;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.data.worldgen.BootstapContext;
-import net.minecraft.data.worldgen.placement.VegetationPlacements;
+import net.minecraft.data.worldgen.Carvers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.MobCategory;
@@ -22,12 +22,15 @@ public class RevervoxBiomes {
     }
 
     public static void globalOverworldGeneration(BiomeGenerationSettings.Builder builder) {
-        BiomeDefaultFeatures.addDefaultCarversAndLakes(builder);
+        builder.addCarver(GenerationStep.Carving.AIR, Carvers.CAVE);
+        builder.addCarver(GenerationStep.Carving.AIR, Carvers.CAVE_EXTRA_UNDERGROUND);
+        builder.addCarver(GenerationStep.Carving.AIR, Carvers.CANYON);
         BiomeDefaultFeatures.addDefaultCrystalFormations(builder);
         BiomeDefaultFeatures.addDefaultMonsterRoom(builder);
         BiomeDefaultFeatures.addDefaultUndergroundVariety(builder);
-        BiomeDefaultFeatures.addDefaultSprings(builder);
+        BiomeDefaultFeatures.addPlainGrass(builder);
         BiomeDefaultFeatures.addSurfaceFreezing(builder);
+        BiomeDefaultFeatures.addPlainVegetation(builder);
     }
 
     public static Biome revervoxBiome(BootstapContext<Biome> context) {
@@ -42,13 +45,8 @@ public class RevervoxBiomes {
                 new BiomeGenerationSettings.Builder(context.lookup(Registries.PLACED_FEATURE), context.lookup(Registries.CONFIGURED_CARVER));
         //we need to follow the same order as vanilla biomes for the BiomeDefaultFeatures
         globalOverworldGeneration(biomeBuilder);
-        BiomeDefaultFeatures.addMossyStoneBlock(biomeBuilder);
-        BiomeDefaultFeatures.addForestFlowers(biomeBuilder);
-        BiomeDefaultFeatures.addFerns(biomeBuilder);
         BiomeDefaultFeatures.addDefaultOres(biomeBuilder);
-        BiomeDefaultFeatures.addExtraGold(biomeBuilder);
-
-        biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION, VegetationPlacements.TREES_PLAINS);
+        BiomeDefaultFeatures.addDefaultSoftDisks(biomeBuilder);
 
         BiomeDefaultFeatures.addDefaultMushrooms(biomeBuilder);
         BiomeDefaultFeatures.addDefaultExtraVegetation(biomeBuilder);
@@ -56,6 +54,7 @@ public class RevervoxBiomes {
                 RevervoxPlacedFeatures.ECHO_DARK_GRASS_PLACED_KEY);
         biomeBuilder.addFeature(GenerationStep.Decoration.SURFACE_STRUCTURES,
                 RevervoxPlacedFeatures.GUANO_ROCK_PLACED_KEY);
+
 
         return new Biome.BiomeBuilder()
                 .hasPrecipitation(false)
