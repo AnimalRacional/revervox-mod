@@ -64,6 +64,7 @@ public class RevervoxMod {
         ItemRegistry.register(bus);
         CreativeTabRegistry.register(bus);
         ParticleRegistry.register(bus);
+        FeatureRegistry.register(bus);
         TriggerRegistry.init();
         RevervoxTerrablender.registerBiomes();
 

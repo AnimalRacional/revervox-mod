@@ -54,6 +54,8 @@ public class RevervoxBiomes {
         BiomeDefaultFeatures.addDefaultExtraVegetation(biomeBuilder);
         biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
                 RevervoxPlacedFeatures.ECHO_DARK_GRASS_PLACED_KEY);
+        biomeBuilder.addFeature(GenerationStep.Decoration.SURFACE_STRUCTURES,
+                RevervoxPlacedFeatures.GUANO_ROCK_PLACED_KEY);
 
         return new Biome.BiomeBuilder()
                 .hasPrecipitation(false)

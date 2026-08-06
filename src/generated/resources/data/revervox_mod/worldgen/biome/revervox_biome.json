@@ -23,15 +23,21 @@
   },
   "features": [
     [],
-    [],
     [
-      "minecraft:amethyst_geode"
+      "minecraft:lake_lava_underground",
+      "minecraft:lake_lava_surface"
+    ],
+    [
+      "minecraft:amethyst_geode",
+      "minecraft:forest_rock"
     ],
     [
       "minecraft:monster_room",
       "minecraft:monster_room_deep"
     ],
-    [],
+    [
+      "revervox_mod:guano_rock_placed"
+    ],
     [],
     [
       "minecraft:ore_dirt",
@@ -59,17 +65,18 @@
       "minecraft:ore_lapis_buried",
       "minecraft:ore_copper",
       "minecraft:underwater_magma",
-      "minecraft:disk_sand",
-      "minecraft:disk_clay",
-      "minecraft:disk_gravel"
+      "minecraft:ore_gold_extra"
     ],
     [],
     [
+      "minecraft:spring_water",
+      "minecraft:spring_lava"
+    ],
+    [
       "minecraft:glow_lichen",
-      "minecraft:patch_tall_grass_2",
+      "minecraft:forest_flowers",
+      "minecraft:patch_large_fern",
       "minecraft:trees_plains",
-      "minecraft:flower_plains",
-      "minecraft:patch_grass_plain",
       "minecraft:brown_mushroom_normal",
       "minecraft:red_mushroom_normal",
       "minecraft:patch_sugar_cane",

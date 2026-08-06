@@ -15,9 +15,14 @@ import net.minecraft.world.level.levelgen.placement.*;
 
 import java.util.List;
 
+import static dev.omialien.revervoxmod.worldgen.RevervoxConfiguredFeatures.GUANO_ROCK_CONFIGURED_KEY;
+
 public class RevervoxPlacedFeatures {
     public static final ResourceKey<PlacedFeature> ECHO_DARK_GRASS_PLACED_KEY =
             ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_grass_placed"));
+
+    public static final ResourceKey<PlacedFeature> GUANO_ROCK_PLACED_KEY =
+            ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "guano_rock_placed"));
 
     public static void bootstrap(BootstapContext<PlacedFeature> context) {
         HolderGetter<ConfiguredFeature<?, ?>> configured = context.lookup(Registries.CONFIGURED_FEATURE);
@@ -33,5 +38,16 @@ public class RevervoxPlacedFeatures {
                         RandomOffsetPlacement.vertical(ConstantInt.of(1)),
                         BiomeFilter.biome()
                 )));
+        context.register(
+                RevervoxPlacedFeatures.GUANO_ROCK_PLACED_KEY,
+                new PlacedFeature(
+                        configured.getOrThrow(GUANO_ROCK_CONFIGURED_KEY),
+                        List.of(
+                                CountPlacement.of(2),
+                                InSquarePlacement.spread(),
+                                PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT
+                        )
+                )
+        );
     }
 }
