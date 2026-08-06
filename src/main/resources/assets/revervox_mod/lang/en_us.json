@@ -43,5 +43,7 @@
   "advancements.revervox_mod.revervox_stunned.description": "Stun Revervox using a megaphone",
   "block.revervox_mod.echo_dark_surface_block": "Echo Dark Ground",
   "block.revervox_mod.echo_dark_grass": "Echo Dark Grass",
-  "block.revervox_mod.tapebox": "Tapebox"
+  "block.revervox_mod.tapebox": "Tapebox",
+  "block.revervox_mod.guano": "Guano",
+  "block.revervox_mod.guano_block": "Guano Block"
 }

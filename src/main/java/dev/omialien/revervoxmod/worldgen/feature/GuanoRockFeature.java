@@ -69,7 +69,7 @@ public class GuanoRockFeature extends Feature<NoneFeatureConfiguration> {
             boolean aboveIsAir = level.isEmptyBlock(pos.above());
 
             if (currentIsAir && belowIsSolid && aboveIsAir) {
-                return pos.above().immutable();
+                return pos.below().immutable();
             }
         }
         return null;

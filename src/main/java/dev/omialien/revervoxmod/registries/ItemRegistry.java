@@ -81,6 +81,16 @@ public class ItemRegistry {
             () -> new BlockItem(BlockRegistry.ECHO_DARK_GRASS.get(), new Item.Properties().stacksTo(64))
     );
 
+    public static final RegistryObject<Item> GUANO_BLOCK = register(
+            "guano_block",
+            () -> new BlockItem(BlockRegistry.GUANO_BLOCK.get(), new Item.Properties().stacksTo(64))
+    );
+
+    public static final RegistryObject<Item> GUANO = register(
+            "guano",
+            () -> new BlockItem(BlockRegistry.GUANO.get(), new Item.Properties().stacksTo(64))
+    );
+
     private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item, boolean inTab) {
         RegistryObject<T> reg = REGISTRY.register(name, item);
         if (inTab) {
