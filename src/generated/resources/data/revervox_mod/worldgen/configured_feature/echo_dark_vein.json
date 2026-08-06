@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:multiface_growth",
+  "config": {
+    "block": "minecraft:sculk_vein",
+    "can_be_placed_on": "revervox_mod:echo_dark_surface_block",
+    "can_place_on_ceiling": true,
+    "can_place_on_floor": true,
+    "can_place_on_wall": true,
+    "chance_of_spreading": 1.0,
+    "search_range": 60
+  }
+}

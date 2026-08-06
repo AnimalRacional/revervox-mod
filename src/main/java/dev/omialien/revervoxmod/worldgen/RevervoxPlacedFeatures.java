@@ -9,6 +9,7 @@ import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.*;
@@ -23,6 +24,8 @@ public class RevervoxPlacedFeatures {
 
     public static final ResourceKey<PlacedFeature> GUANO_ROCK_PLACED_KEY =
             ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "guano_rock_placed"));
+    public static final ResourceKey<PlacedFeature> ECHO_DARK_VEIN_KEY =
+            ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_vein"));
 
     public static void bootstrap(BootstapContext<PlacedFeature> context) {
         HolderGetter<ConfiguredFeature<?, ?>> configured = context.lookup(Registries.CONFIGURED_FEATURE);
@@ -49,5 +52,6 @@ public class RevervoxPlacedFeatures {
                         )
                 )
         );
+        PlacementUtils.register(context, ECHO_DARK_VEIN_KEY, configured.getOrThrow(RevervoxConfiguredFeatures.ECHO_DARK_VEIN_KEY), CountPlacement.of(UniformInt.of(204, 250)), InSquarePlacement.spread(), PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT);
     }
 }

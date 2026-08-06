@@ -1,4 +1,8 @@
-// 1.20.1	2026-08-06T21:29:43.9466105	Registries
-6384c458c53684ee8c664c2bc49258d6ec93d592 data/revervox_mod/worldgen/biome/revervox_biome.json
+// 1.20.1	2026-08-07T00:17:04.5697994	Registries
+40cbd14898e0a4d178cdf040848745129028abd3 data/revervox_mod/worldgen/biome/revervox_biome.json
 397c71e813abeef0592a05173368d46867a5c86c data/revervox_mod/worldgen/configured_feature/echo_dark_grass.json
+5e54776444286516e64d2a08c54b6c0b9e79d079 data/revervox_mod/worldgen/configured_feature/echo_dark_vein.json
+6ff4317ac6b73201d8070a3963836ed724c7cd5b data/revervox_mod/worldgen/configured_feature/guano_rock_configured.json
 550fb5d075bc35d1d54c784e395c96f7d22db7c9 data/revervox_mod/worldgen/placed_feature/echo_dark_grass_placed.json
+b7f454f5668fc9b34bd1ad4ef4d8dfc06b89d3be data/revervox_mod/worldgen/placed_feature/echo_dark_vein.json
+5b283077703a64c4fcf748068b8e95e87f3a5955 data/revervox_mod/worldgen/placed_feature/guano_rock_placed.json
