@@ -23,8 +23,9 @@ public class EchoTendrilFeature extends Feature<NoneFeatureConfiguration> {
     private static final int MAX_HEIGHT_VARIANCE = 4;
 
     private static final List<ResourceLocation> PIECES = List.of(
-            new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_1")
-    );
+            new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_1"),
+            new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_2")
+            );
 
     public EchoTendrilFeature(Codec<NoneFeatureConfiguration> codec) {
         super(codec);
