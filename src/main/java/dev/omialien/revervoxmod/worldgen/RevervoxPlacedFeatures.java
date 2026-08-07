@@ -24,8 +24,8 @@ public class RevervoxPlacedFeatures {
 
     public static final ResourceKey<PlacedFeature> GUANO_ROCK_PLACED_KEY =
             ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "guano_rock_placed"));
-    public static final ResourceKey<PlacedFeature> ECHO_DARK_VEIN_KEY =
-            ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_vein"));
+    public static final ResourceKey<PlacedFeature> ECHO_DARK_VEIN_PLACED_KEY =
+            ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_vein_placed"));
 
     public static void bootstrap(BootstapContext<PlacedFeature> context) {
         HolderGetter<ConfiguredFeature<?, ?>> configured = context.lookup(Registries.CONFIGURED_FEATURE);
@@ -52,6 +52,11 @@ public class RevervoxPlacedFeatures {
                         )
                 )
         );
-        PlacementUtils.register(context, ECHO_DARK_VEIN_KEY, configured.getOrThrow(RevervoxConfiguredFeatures.ECHO_DARK_VEIN_KEY), CountPlacement.of(UniformInt.of(204, 250)), InSquarePlacement.spread(), PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT);
+        PlacementUtils.register(
+                context,
+                ECHO_DARK_VEIN_PLACED_KEY,
+                configured.getOrThrow(RevervoxConfiguredFeatures.ECHO_DARK_VEIN_KEY),
+                CountPlacement.of(UniformInt.of(204, 250)),
+                InSquarePlacement.spread(), PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT);
     }
 }

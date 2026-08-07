@@ -2,11 +2,21 @@
   "type": "minecraft:multiface_growth",
   "config": {
     "block": "revervox_mod:echo_dark_vein",
-    "can_be_placed_on": "revervox_mod:echo_dark_surface_block",
+    "can_be_placed_on": [
+      "minecraft:stone",
+      "minecraft:andesite",
+      "minecraft:diorite",
+      "minecraft:granite",
+      "minecraft:dripstone_block",
+      "minecraft:calcite",
+      "minecraft:tuff",
+      "minecraft:deepslate",
+      "revervox_mod:echo_dark_surface_block"
+    ],
     "can_place_on_ceiling": true,
     "can_place_on_floor": true,
     "can_place_on_wall": true,
     "chance_of_spreading": 1.0,
-    "search_range": 60
+    "search_range": 20
   }
 }

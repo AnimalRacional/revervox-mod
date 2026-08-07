@@ -11,6 +11,7 @@ import net.minecraft.data.worldgen.placement.PlacementUtils;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.MultifaceGrowthConfiguration;
@@ -20,9 +21,11 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
 
 public class RevervoxConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_DARK_GRASS_KEY =
-            ResourceKey.create(Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_grass"));
+            ResourceKey.create(
+                    Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_grass"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> GUANO_ROCK_CONFIGURED_KEY =
-            ResourceKey.create(Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "guano_rock_configured"));
+            ResourceKey.create(
+                    Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "guano_rock_configured"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_DARK_VEIN_KEY =
             ResourceKey.create(
                     Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_vein")
@@ -40,6 +43,16 @@ public class RevervoxConfiguredFeatures {
                         NoneFeatureConfiguration.INSTANCE
                 )
         );
-        FeatureUtils.register(context, ECHO_DARK_VEIN_KEY, Feature.MULTIFACE_GROWTH, new MultifaceGrowthConfiguration(BlockRegistry.ECHO_DARK_VEIN_BLOCK.get(), 60, true, true, true, 1.0f, HolderSet.direct(Block::builtInRegistryHolder, BlockRegistry.ECHO_DARK_SURFACE_BLOCK.get())));
+        FeatureUtils.register(
+                context,
+                ECHO_DARK_VEIN_KEY,
+                Feature.MULTIFACE_GROWTH,
+                new MultifaceGrowthConfiguration(BlockRegistry.ECHO_DARK_VEIN_BLOCK.get(),
+                        20, true
+                        , true, true
+                        , 1.0f, HolderSet.direct(Block::builtInRegistryHolder,
+                        Blocks.STONE, Blocks.ANDESITE, Blocks.DIORITE, Blocks.GRANITE,
+                        Blocks.DRIPSTONE_BLOCK, Blocks.CALCITE, Blocks.TUFF, Blocks.DEEPSLATE
+                        , BlockRegistry.ECHO_DARK_SURFACE_BLOCK.get())));
     }
 }
