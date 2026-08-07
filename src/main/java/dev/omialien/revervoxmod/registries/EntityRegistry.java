@@ -28,8 +28,8 @@ public class EntityRegistry {
     public static final RegistryObject<EntityType<RevervoxFakeBatEntity>> REVERVOX_FAKE_BAT =
             REGISTRY.register("revervox_fake_bat", () -> EntityType.Builder.of(RevervoxFakeBatEntity::new, MobCategory.CREATURE)
                     .sized(0.5F, 1).build("revervox_bat"));
-    public static final RegistryObject<EntityType<StridorVoxEntity>> STRIDORVOX =
-            REGISTRY.register("stridorvox", () -> EntityType.Builder.of(StridorVoxEntity::new, MobCategory.MONSTER).sized(2.0f, 1.0f).build("stridorvox"));
+    public static final RegistryObject<EntityType<StridorvoxEntity>> STRIDORVOX =
+            REGISTRY.register("stridorvox", () -> EntityType.Builder.of(StridorvoxEntity::new, MobCategory.MONSTER).sized(1.4f, 1.2f).build("stridorvox"));
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);
     }

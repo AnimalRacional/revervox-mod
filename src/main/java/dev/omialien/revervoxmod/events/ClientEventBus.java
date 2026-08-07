@@ -46,7 +46,7 @@ public class ClientEventBus {
         EntityRenderers.register(EntityRegistry.REVERVOX.get(), RevervoxGeoRenderer::new);
         EntityRenderers.register(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoRenderer::new);
         EntityRenderers.register(EntityRegistry.REVERVOX_FAKE_BAT.get(), RevervoxFakeBatGeoRenderer::new);
-        EntityRenderers.register(EntityRegistry.STRIDORVOX.get(), StridorVoxGeoRenderer::new);
+        EntityRenderers.register(EntityRegistry.STRIDORVOX.get(), StridorvoxGeoRenderer::new);
     }
 
     @SubscribeEvent

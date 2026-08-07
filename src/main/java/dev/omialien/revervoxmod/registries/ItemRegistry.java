@@ -26,6 +26,9 @@ public class ItemRegistry {
             "revervox_bat_spawn_egg",
             () -> new ForgeSpawnEggItem(EntityRegistry.REVERVOX_BAT, 0xffe591, 0x3b3b3b,
                 new Item.Properties().stacksTo(64)));
+    public static final RegistryObject<ForgeSpawnEggItem> STRIDORVOX_SPAWN_EGG = register(
+            "stridorvox_spawn_egg",
+            () -> new ForgeSpawnEggItem(EntityRegistry.STRIDORVOX, 0x341d1b, 0xe78786, new Item.Properties().stacksTo((64))));
     public static final RegistryObject<RevervoxVoiceBoxItem> REVERVOX_VOICE_BOX = register(
             "revervox_voice_box",
             () -> new RevervoxVoiceBoxItem(new Item.Properties().stacksTo(1))

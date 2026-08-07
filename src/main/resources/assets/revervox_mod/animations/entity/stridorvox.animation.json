@@ -5,7 +5,7 @@
 			"loop": true,
 			"animation_length": 2,
 			"bones": {
-				"revervox": {
+				"stridorvox": {
 					"position": {
 						"0.0": {
 							"post": [0, -10, 0],

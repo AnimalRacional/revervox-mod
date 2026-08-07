@@ -26,7 +26,7 @@ public class ModEventBusEvents {
         event.put(EntityRegistry.REVERVOX.get(), RevervoxGeoEntity.createAttributes().build());
         event.put(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoEntity.createAttributes().build());
         event.put(EntityRegistry.REVERVOX_FAKE_BAT.get(), RevervoxFakeBatEntity.createAttributes().build());
-        event.put(EntityRegistry.STRIDORVOX.get(), StridorVoxEntity.createAttributes().build());
+        event.put(EntityRegistry.STRIDORVOX.get(), StridorvoxEntity.createAttributes().build());
     }
 
     @SubscribeEvent

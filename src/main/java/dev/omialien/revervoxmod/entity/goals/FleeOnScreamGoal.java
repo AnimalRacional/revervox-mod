@@ -53,11 +53,13 @@ public class FleeOnScreamGoal extends Goal {
     public void start() {
         super.start();
         this.pathNav.moveTo(this.path, this.walkSpeedModifier);
+        this.mob.setSprinting(true);
     }
 
     @Override
     public void stop() {
         this.screaming = null;
+        this.mob.setSprinting(false);
     }
 
     @Override
