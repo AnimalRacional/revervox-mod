@@ -5,6 +5,7 @@ import dev.omialien.revervoxmod.entity.goals.FleeOnScreamGoal;
 import dev.omialien.revervoxmod.entity.goals.RangeMeleeAttackGoal;
 import dev.omialien.revervoxmod.entity.goals.StalkGoal;
 import dev.omialien.revervoxmod.entity.goals.StridorvoxStealItemsGoal;
+import dev.omialien.revervoxmod.registries.RevervoxTags;
 import net.minecraft.core.Holder;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -36,7 +37,9 @@ import java.util.function.Predicate;
 public class StridorvoxEntity extends Monster implements GeoEntity, HearingEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     public static final Predicate<Holder<Item>> ALLOWED_ITEMS = (item) ->
-            item.is(ItemTags.SWORDS) || item.is(ItemTags.PICKAXES) || item.is(ItemTags.AXES) || item.is(ItemTags.SHOVELS) || item.is(ItemTags.PIGLIN_LOVED);
+            item.is(ItemTags.SWORDS) || item.is(ItemTags.PICKAXES)
+                    || item.is(ItemTags.AXES) || item.is(ItemTags.SHOVELS)
+                    || item.is(ItemTags.PIGLIN_LOVED) || item.is(RevervoxTags.Items.AUDIO_ON_KILL);
 
     public StridorvoxEntity(EntityType<? extends Monster> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
