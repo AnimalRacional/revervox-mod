@@ -90,6 +90,10 @@ public class ItemRegistry {
             "guano",
             () -> new BlockItem(BlockRegistry.GUANO.get(), new Item.Properties().stacksTo(64))
     );
+    public static final RegistryObject<BlockItem> ECHO_DARK_VEIN = register(
+            "echo_dark_vein",
+            () -> new BlockItem(BlockRegistry.ECHO_DARK_VEIN_BLOCK.get(), new Item.Properties())
+    );
 
     private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item, boolean inTab) {
         RegistryObject<T> reg = REGISTRY.register(name, item);

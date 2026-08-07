@@ -2,9 +2,11 @@ package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.blocks.EchoDarkGrassBlock;
+import dev.omialien.revervoxmod.blocks.EchoDarkVeinBlock;
 import dev.omialien.revervoxmod.blocks.VoiceRepeaterBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CarpetBlock;
+import net.minecraft.world.level.block.GlowLichenBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -32,7 +34,13 @@ public class BlockRegistry {
             "guano_block",
             () -> new Block(BlockBehaviour.Properties.of().sound(SoundType.STONE).strength(1.0f, 0.2f).randomTicks())
     );
-
+    public static final RegistryObject<EchoDarkVeinBlock> ECHO_DARK_VEIN_BLOCK = REGISTRY.register(
+            "echo_dark_vein",
+            () -> new EchoDarkVeinBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLACK)
+                    .replaceable().noCollission().strength(0.2F).sound(SoundType.SCULK_VEIN)
+                    .lightLevel(GlowLichenBlock.emission(7))
+                    .ignitedByLava().pushReaction(PushReaction.DESTROY))
+    );
     public static final RegistryObject<Block> GUANO = REGISTRY.register(
             "guano",
             () -> new CarpetBlock(BlockBehaviour.Properties.of().sound(SoundType.MUD).strength(1.0f, 0.2f).randomTicks())

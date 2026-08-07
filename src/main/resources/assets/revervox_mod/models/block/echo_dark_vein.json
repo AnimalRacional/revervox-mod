@@ -1,0 +1,17 @@
+{
+  "render_type": "minecraft:cutout",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "revervox_mod:block/echo_dark_vein",
+    "echo_dark_vein": "revervox_mod:block/echo_dark_vein"
+  },
+  "elements": [
+    {   "from": [ 0, 0, 0.1 ],
+      "to": [ 16, 16, 0.1 ],
+      "faces": {
+        "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#echo_dark_vein" },
+        "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#echo_dark_vein" }
+      }
+    }
+  ]
+}
