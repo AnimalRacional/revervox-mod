@@ -2,6 +2,8 @@ package dev.omialien.revervoxmod.particle;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Random;
 
@@ -12,6 +14,25 @@ public class ParticleManager {
 
     public static void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius, Entity entity) {
         addParticlesAroundSelf(pParticleOption, radius, 30, entity);
+    }
+
+    public static void addParticlesOnPos(ParticleOptions pParticleOption, double radius, int particleCount, Vec3 pos, Level level){
+        for(int i = 0; i < particleCount; i++) {
+            double offsetX = (new Random().nextDouble() - 0.5) * 2.0 * radius;
+            double offsetY = (new Random().nextDouble() - 0.5) * 2.0 * radius;
+            double offsetZ = (new Random().nextDouble() - 0.5) * 2.0 * radius;
+
+            double particleX = pos.x() + offsetX;
+            double particleY = pos.y() + 1.0 + offsetY;
+            double particleZ = pos.z() + offsetZ;
+
+            double velocityScale = radius * 0.1;
+            double velX = (new Random().nextDouble() - 0.5) * velocityScale;
+            double velY = (new Random().nextDouble() - 0.5) * velocityScale;
+            double velZ = (new Random().nextDouble() - 0.5) * velocityScale;
+
+            level.addParticle(pParticleOption, particleX, particleY, particleZ, velX, velY, velZ);
+        }
     }
 
     public static void addParticlesAroundSelf(ParticleOptions pParticleOption, double radius, int particleCount, Entity entity) {

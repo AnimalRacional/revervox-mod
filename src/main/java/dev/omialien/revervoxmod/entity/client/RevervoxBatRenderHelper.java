@@ -2,9 +2,12 @@ package dev.omialien.revervoxmod.entity.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
+import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
+import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.core.animation.AnimationController;
 
 import java.util.Map;
@@ -25,6 +28,11 @@ public class RevervoxBatRenderHelper {
         return until != null && player.level().getGameTime() < until;
     }
 
+    private static Vec3 batWorldPos(AbstractClientPlayer player) {
+        return player.getEyePosition()
+                .add(-0.5F, -0.7F, -0.4F);
+    }
+
     public static RevervoxBatGeoEntity getDummy(AbstractClientPlayer player) {
         RevervoxBatGeoEntity d = DUMMIES.computeIfAbsent(player,
                 p -> new RevervoxBatGeoEntity(EntityRegistry.REVERVOX_BAT.get(), p.level()));
@@ -34,6 +42,7 @@ public class RevervoxBatRenderHelper {
 
     public static void trigger(AbstractClientPlayer player, String animName) {
         RevervoxBatGeoEntity dummy = getDummy(player);
+        ParticleManager.addParticlesOnPos(ParticleRegistry.REVERVOX_PARTICLES.get(), 0.7D, 10, batWorldPos(player), player.level());
         AnimationController<?> controller = dummy.getAnimatableInstanceCache()
                 .getManagerForId(dummy.getId())
                 .getAnimationControllers()

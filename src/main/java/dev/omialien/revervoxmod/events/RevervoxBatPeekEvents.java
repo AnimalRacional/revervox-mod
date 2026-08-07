@@ -9,24 +9,12 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(modid = RevervoxMod.MOD_ID, value = Dist.CLIENT)
-public class RevervoxBatStareEvents {
-
-    //TODO TEMPORARY, REMOVE LATER
-    @SubscribeEvent
-    public static void onKey(InputEvent.Key event) {
-        if (event.getAction() == GLFW.GLFW_PRESS && event.getKey() == GLFW.GLFW_KEY_G) {
-            LocalPlayer p = Minecraft.getInstance().player;
-            RevervoxMod.LOGGER.info("G pressed");
-            if (p != null) RevervoxBatRenderHelper.activate(p, 64);   // 3.21 seconds
-        }
-    }
+public class RevervoxBatPeekEvents {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
