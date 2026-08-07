@@ -41,7 +41,6 @@ import java.util.function.Consumer;
 
 public class MegaphoneItem extends Item implements GeoItem {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private boolean usedItem = false;
     public MegaphoneItem(Properties properties) {
         super(properties);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
@@ -68,19 +67,13 @@ public class MegaphoneItem extends Item implements GeoItem {
     public void onUseTick(@NotNull Level level, @NotNull LivingEntity livingEntity, @NotNull ItemStack stack, int remainingUseDuration) {
         if (!(livingEntity instanceof Player player)) return;
 
-        if (!level.isClientSide && !usedItem) {
+        if (!level.isClientSide) {
             if ((!player.isCrouching() || !RevervoxModServerConfigs.CROUCH_PREVENTS_MEGAPHONE_BOOM.get()) && PlayerStateManager.isScreaming(player.getUUID())) {
                 doSonicBoom(level, player);
-                usedItem = true;
                 player.getCooldowns().addCooldown(this, RevervoxModServerConfigs.MEGAPHONE_COOLDOWN.get() * 20);
+                player.stopUsingItem();
             }
         }
-    }
-
-    @Override
-    public void onStopUsing(@NotNull ItemStack stack, @NotNull LivingEntity entity, int count) {
-        usedItem = false;
-        super.onStopUsing(stack, entity, count);
     }
 
     private void doSonicBoom(Level level, Player player) {
