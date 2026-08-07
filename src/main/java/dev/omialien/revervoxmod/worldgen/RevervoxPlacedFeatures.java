@@ -46,7 +46,8 @@ public class RevervoxPlacedFeatures {
                 new PlacedFeature(
                         configured.getOrThrow(ECHO_TENDRIL_CONFIGURED_KEY),
                         List.of(
-                                CountPlacement.of(2),
+                                RarityFilter.onAverageOnceEvery(2),
+                                CountPlacement.of(1),
                                 InSquarePlacement.spread(),
                                 PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT
                         )
