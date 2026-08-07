@@ -2,8 +2,11 @@ package dev.omialien.revervoxmod.items;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.items.client.TapeRecorderItemExtensions;
+import dev.omialien.revervoxmod.registries.ItemRegistry;
+import dev.omialien.voicechatrecording.api.AudioId;
+import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.IRecordedPlayer;
-import dev.omialien.voicechatrecording.voicechat.RecordedPlayer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -21,13 +24,11 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 public class TapeRecorderItem extends Item implements GeoItem {
-    public static Map<ServerPlayer, Long> PLAYERS_FINISHED_USING = new WeakHashMap<>();
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public TapeRecorderItem(Properties pProperties) {
@@ -40,7 +41,7 @@ public class TapeRecorderItem extends Item implements GeoItem {
         UUID player = pPlayer.getUUID();
         IRecordedPlayer recPlayer = RevervoxMod.RECORDING_API.getRecordedPlayer(player);
         if (!pLevel.isClientSide && recPlayer != null) {
-            ((RecordedPlayer)recPlayer).saveCurrentRecording();
+            recPlayer.forceFinishRecording();
         }
         pPlayer.startUsingItem(pUsedHand);
         return super.use(pLevel, pPlayer, pUsedHand);
@@ -58,8 +59,21 @@ public class TapeRecorderItem extends Item implements GeoItem {
             IRecordedPlayer recPlayer = RevervoxMod.RECORDING_API.getRecordedPlayer(player.getUUID());
             if (recPlayer != null) {
                 // TODO add stopRecording to public API
-                ((RecordedPlayer)recPlayer).saveCurrentRecording();
-                PLAYERS_FINISHED_USING.put(player, player.level().getGameTime());
+                Optional<IRecordedAudio> audioOpt = recPlayer.forceFinishRecording();
+                if (audioOpt.isEmpty()) { return; }
+                IRecordedAudio audio = audioOpt.get();
+                if (audio.getDuration() < 0.05) { return; }
+                TapeItem.record(AudioId.of(audio.getPlayerUUID(), audio.getId()), stack, player);
+                if (!player.getAbilities().instabuild) {
+                    CompoundTag tag = stack.getTag();
+                    ItemStack newStack = new ItemStack(ItemRegistry.TAPE_RECORDER_OFF.get());
+                    if (tag != null) {
+                        tag.remove(TapeItem.TAPE_COMPONENTS);
+                        newStack.setTag(tag);
+                    }
+                    player.setItemInHand(player.getUsedItemHand(), newStack);
+                }
+                audio.saveAudio(RevervoxMod.BLOCK_NAMESPACE);
             }
         }
     }
@@ -72,14 +86,6 @@ public class TapeRecorderItem extends Item implements GeoItem {
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new TapeRecorderItemExtensions(true));
-    }
-
-    public static boolean hasStoppedUsing(ServerPlayer sPlayer) {
-        if (PLAYERS_FINISHED_USING.containsKey(sPlayer)) {
-            Long time = PLAYERS_FINISHED_USING.get(sPlayer);
-            return time != null && time + 20 >= sPlayer.level().getGameTime();
-        }
-        return false;
     }
 
     @Override

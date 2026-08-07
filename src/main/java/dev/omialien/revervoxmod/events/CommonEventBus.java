@@ -61,27 +61,6 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void tickEvent(TickEvent.ServerTickEvent event){
         RevervoxMod.TASKS.tick();
-        while (!recordedAudios.isEmpty()) {
-            IRecordedAudio audio = recordedAudios.remove();
-            ServerPlayer player = event.getServer().getPlayerList().getPlayer(audio.getPlayerUUID());
-            if (player != null) {
-                ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                if (stack.getItem() == ItemRegistry.TAPE_RECORDER_ON.get() && (player.getTicksUsingItem() > 2 || TapeRecorderItem.hasStoppedUsing(player))) {
-                    RevervoxMod.LOGGER.debug("Recorded audio in tape recorder!");
-                    TapeItem.record(AudioId.of(audio.getPlayerUUID(), audio.getId()), stack, player);
-                    CompoundTag tag = stack.getTag();
-                    ItemStack newStack = new ItemStack(ItemRegistry.TAPE_RECORDER_OFF.get());
-                    if (tag != null) {
-                        tag.remove(TapeItem.TAPE_COMPONENTS);
-                        newStack.setTag(tag);
-                    }
-                    player.setItemInHand(InteractionHand.MAIN_HAND, newStack);
-                    audio.saveAudio(RevervoxMod.BLOCK_NAMESPACE);
-                }
-            } else {
-                RevervoxMod.LOGGER.warn("Offline player recorded audio: {}", audio.getPlayerUUID());
-            }
-        }
     }
 
     @SubscribeEvent
@@ -146,7 +125,6 @@ public class CommonEventBus {
 
     @SubscribeEvent
     public static void onRegisterEvents(ServerStartingEvent event) {
-        recordedAudios = new ArrayDeque<>();
         int BatEventTime = new Random().nextInt((int) (12000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()),
                 (int) (24000 * RevervoxModServerConfigs.FAKE_BAT_EVENT_CHANCE.get()));
         RevervoxMod.LOGGER.debug("Scheduling bat for {} ticks", BatEventTime);
@@ -228,7 +206,6 @@ public class CommonEventBus {
         RevervoxMod.AUDIOS = new AudioStorage();
     }
 
-    private static Queue<IRecordedAudio> recordedAudios = new ArrayDeque<>();
     @SubscribeEvent
     public static void onAudioRecordedEvent(AudioRecordedEvent event){
         if(event.getAudio().getFilterResult() == IRecordedAudio.FilterResult.PASSED){
@@ -239,7 +216,6 @@ public class CommonEventBus {
             RevervoxMod.LOGGER.debug("Audio recorded and stored!");
             RevervoxMod.AUDIOS.addAudio(event.getAudio());
         }
-        recordedAudios.add(event.getAudio());
     }
 
     @SubscribeEvent
