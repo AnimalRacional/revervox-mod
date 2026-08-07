@@ -9,8 +9,6 @@ import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
@@ -39,6 +37,7 @@ public class EchoDarkBiomeHandler {
         ServerLevel serverLevel = serverPlayer.serverLevel();
         int blockLight = serverLevel.getBrightness(LightLayer.BLOCK, serverPlayer.blockPosition());
         if (player.tickCount % 20 == 0) {
+            /*
             player.addEffect(new MobEffectInstance(
                     MobEffects.DARKNESS,
                     80,
@@ -47,10 +46,10 @@ public class EchoDarkBiomeHandler {
                     false,
                     false
             ));
+             */
             if (blockLight <= 11) {
                 // TODO quantos mais players mais spam por isso prevenir isso;
                 // vai ficando mais intenso (mais vozes)
-                // dar trigger ao bat aparecer no ecrã quando muito tempo no escuro
                 tickAudio(serverPlayer, serverLevel);
             }
         }

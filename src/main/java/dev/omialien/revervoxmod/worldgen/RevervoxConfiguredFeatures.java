@@ -23,9 +23,9 @@ public class RevervoxConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_DARK_GRASS_KEY =
             ResourceKey.create(
                     Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_grass"));
-    public static final ResourceKey<ConfiguredFeature<?, ?>> GUANO_ROCK_CONFIGURED_KEY =
+    public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_TENDRIL_CONFIGURED_KEY =
             ResourceKey.create(
-                    Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "guano_rock_configured"));
+                    Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_configured"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_DARK_VEIN_KEY =
             ResourceKey.create(
                     Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_vein")
@@ -37,9 +37,9 @@ public class RevervoxConfiguredFeatures {
                         PlacementUtils.onlyWhenEmpty(Feature.SIMPLE_BLOCK,
                                 new SimpleBlockConfiguration(BlockStateProvider.simple(BlockRegistry.ECHO_DARK_GRASS.get()))))));
         context.register(
-                GUANO_ROCK_CONFIGURED_KEY,
+                ECHO_TENDRIL_CONFIGURED_KEY,
                 new ConfiguredFeature<>(
-                        FeatureRegistry.GUANO_ROCK_FEATURE.get(),
+                        FeatureRegistry.ECHO_TENDRIL_FEATURE.get(),
                         NoneFeatureConfiguration.INSTANCE
                 )
         );
