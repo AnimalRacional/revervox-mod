@@ -1,10 +1,7 @@
 package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
-import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
-import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
-import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
+import dev.omialien.revervoxmod.entity.custom.*;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -31,6 +28,8 @@ public class EntityRegistry {
     public static final RegistryObject<EntityType<RevervoxFakeBatEntity>> REVERVOX_FAKE_BAT =
             REGISTRY.register("revervox_fake_bat", () -> EntityType.Builder.of(RevervoxFakeBatEntity::new, MobCategory.CREATURE)
                     .sized(0.5F, 1).build("revervox_bat"));
+    public static final RegistryObject<EntityType<StridorVoxEntity>> STRIDORVOX =
+            REGISTRY.register("stridorvox", () -> EntityType.Builder.of(StridorVoxEntity::new, MobCategory.MONSTER).sized(2.0f, 1.0f).build("stridorvox"));
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);
     }

@@ -55,6 +55,7 @@ public class MegaphoneItem extends Item implements GeoItem {
     }
 
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, Player player, @NotNull InteractionHand usedHand) {
+        PlayerStateManager.removeScreamingPlayer(player.getUUID());
         ItemStack itemstack = player.getItemInHand(usedHand);
         player.startUsingItem(usedHand);
         player.awardStat(Stats.ITEM_USED.get(this));
@@ -70,6 +71,7 @@ public class MegaphoneItem extends Item implements GeoItem {
                 doSonicBoom(level, player);
                 player.getCooldowns().addCooldown(this, RevervoxModServerConfigs.MEGAPHONE_COOLDOWN.get() * 20);
                 player.stopUsingItem();
+                PlayerStateManager.removeScreamingPlayer(player.getUUID());
             }
         }
     }

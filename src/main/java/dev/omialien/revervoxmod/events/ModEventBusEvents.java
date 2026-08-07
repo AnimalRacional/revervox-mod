@@ -3,10 +3,7 @@ package dev.omialien.revervoxmod.events;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.datagen.RevervoxWorldGenProvider;
 import dev.omialien.revervoxmod.datagen.RevervoxAdvancementProvider;
-import dev.omialien.revervoxmod.entity.custom.RevervoxBatGeoEntity;
-import dev.omialien.revervoxmod.entity.custom.RevervoxFakeBatEntity;
-import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
-import dev.omialien.revervoxmod.entity.custom.ThingyEntity;
+import dev.omialien.revervoxmod.entity.custom.*;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.worldgen.biome.surface.RevervoxSurfaceRules;
@@ -29,6 +26,7 @@ public class ModEventBusEvents {
         event.put(EntityRegistry.REVERVOX.get(), RevervoxGeoEntity.createAttributes().build());
         event.put(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoEntity.createAttributes().build());
         event.put(EntityRegistry.REVERVOX_FAKE_BAT.get(), RevervoxFakeBatEntity.createAttributes().build());
+        event.put(EntityRegistry.STRIDORVOX.get(), StridorVoxEntity.createAttributes().build());
     }
 
     @SubscribeEvent

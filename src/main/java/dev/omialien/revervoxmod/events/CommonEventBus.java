@@ -255,19 +255,20 @@ public class CommonEventBus {
     @SubscribeEvent
     public static void onMicrophonePacket(MicPacketReceivedEvent event){
         if (event.getPlayer() == null) return;
-        if (event.getPlayer().isUsingItem() && event.getPlayer().getUseItem().is(ItemRegistry.MEGAPHONE.get())) {
-            short[] packet = PlayerStateManager.getPlayerDecoder(event.getPlayer().getUUID()).decode(event.getPacket().getOpusEncodedData());
-            double packetRMS = AudioUtil.calculateRMS(packet);
-            if(!Double.isNaN(packetRMS)){
-                RevervoxMod.LOGGER.debug("Packet RMS: " + packetRMS);
-                event.getPacket().setOpusEncodedData(
-                        PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(AudioUtil.applyRadioEffect(packet, 50)));
-            }
-            if (packetRMS > 4000.0D){
-                PlayerStateManager.addScreamingPlayer(event.getPlayer().getUUID());
-            } else {
-                PlayerStateManager.removeScreamingPlayer(event.getPlayer().getUUID());
-            }
+        short[] packet = PlayerStateManager.getPlayerDecoder(event.getPlayer().getUUID()).decode(event.getPacket().getOpusEncodedData());
+        double packetRMS = AudioUtil.calculateRMS(packet);
+        if (packetRMS > 4000.0D){
+            PlayerStateManager.addScreamingPlayer(event.getPlayer().getUUID());
+        } else {
+            PlayerStateManager.removeScreamingPlayer(event.getPlayer().getUUID());
+        }
+        if (event.getPlayer().isUsingItem()
+                && event.getPlayer().getUseItem().is(ItemRegistry.MEGAPHONE.get())
+                && !Double.isNaN(packetRMS)
+        ) {
+            RevervoxMod.LOGGER.debug("Packet RMS: " + packetRMS);
+            event.getPacket().setOpusEncodedData(
+                    PlayerStateManager.getPlayerEncoder(event.getPlayer().getUUID()).encode(AudioUtil.applyRadioEffect(packet, 50)));
         }
     }
     @SubscribeEvent

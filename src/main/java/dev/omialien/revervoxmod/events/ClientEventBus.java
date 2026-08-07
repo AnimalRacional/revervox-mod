@@ -10,9 +10,8 @@ import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -47,6 +46,7 @@ public class ClientEventBus {
         EntityRenderers.register(EntityRegistry.REVERVOX.get(), RevervoxGeoRenderer::new);
         EntityRenderers.register(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoRenderer::new);
         EntityRenderers.register(EntityRegistry.REVERVOX_FAKE_BAT.get(), RevervoxFakeBatGeoRenderer::new);
+        EntityRenderers.register(EntityRegistry.STRIDORVOX.get(), StridorVoxGeoRenderer::new);
     }
 
     @SubscribeEvent
