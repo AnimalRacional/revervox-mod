@@ -1,8 +1,8 @@
 package dev.omialien.revervoxmod.entity.ai;
 
-import dev.omialien.revervoxmod.entity.custom.RevervoxGeoEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,7 +17,7 @@ import java.util.Objects;
 
 //Code is ported from forge version of Mowzie's mobs: https://github.com/BobMowzie/MowziesMobs
 public class MMPathNavigateGround extends GroundPathNavigation {
-    public MMPathNavigateGround(RevervoxGeoEntity entity, Level level) {
+    public MMPathNavigateGround(Mob entity, Level level) {
         super(entity, level);
     }
 
