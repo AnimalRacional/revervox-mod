@@ -2,12 +2,13 @@ package dev.omialien.revervoxmod.entity.custom;
 
 import dev.omialien.revervoxmod.entity.ai.MMEntityMoveHelper;
 import dev.omialien.revervoxmod.entity.goals.FleeOnScreamGoal;
+import dev.omialien.revervoxmod.entity.goals.RangeMeleeAttackGoal;
+import dev.omialien.revervoxmod.entity.goals.StalkGoal;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
@@ -43,12 +44,13 @@ public class StridorvoxEntity extends Monster implements GeoEntity, HearingEntit
         int goalPrio = 0;
         this.goalSelector.addGoal(goalPrio++, new FloatGoal(this));
         this.goalSelector.addGoal(goalPrio++, new FleeOnScreamGoal(this, 0.5d, 0.7d));
-        this.goalSelector.addGoal(goalPrio++, new MeleeAttackGoal(this, 0.7d, true));
+        this.goalSelector.addGoal(goalPrio++, new RangeMeleeAttackGoal(this, 0.7d, true, 10, 30));
+        this.goalSelector.addGoal(goalPrio++, new StalkGoal(this));
         this.goalSelector.addGoal(goalPrio++, new WaterAvoidingRandomStrollGoal(this, 0.5D));
         this.goalSelector.addGoal(goalPrio++, new RandomLookAroundGoal(this));
 
         int targetPrio = 0;
-        this.targetSelector.addGoal(goalPrio++, new NearestAttackableTargetGoal<Player>(this, Player.class, true, true));
+        this.targetSelector.addGoal(targetPrio++, new NearestAttackableTargetGoal<>(this, Player.class, true, true));
     }
 
     @Override
