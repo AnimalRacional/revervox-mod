@@ -6,12 +6,15 @@ import dev.omialien.revervoxmod.entity.goals.RangeMeleeAttackGoal;
 import dev.omialien.revervoxmod.entity.goals.StalkGoal;
 import dev.omialien.revervoxmod.entity.goals.StridorvoxStealItemsGoal;
 import dev.omialien.revervoxmod.registries.RevervoxTags;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -26,6 +29,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.constant.DefaultAnimations;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -101,5 +105,10 @@ public class StridorvoxEntity extends Monster implements GeoEntity, HearingEntit
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return geoCache;
+    }
+
+    public static boolean checkStridorvoxSpawnRules(EntityType<StridorvoxEntity> stridorvoxEntityEntityType, ServerLevelAccessor serverLevelAccessor, MobSpawnType mobSpawnType, BlockPos blockPos, RandomSource randomSource) {
+        //TODO spawn change config n stuff
+        return checkMobSpawnRules(stridorvoxEntityEntityType, serverLevelAccessor, mobSpawnType, blockPos, randomSource);
     }
 }

@@ -45,6 +45,10 @@ public class ModEventBusEvents {
                 SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 RevervoxGeoEntity::checkRevervoxSpawnRules,
                 SpawnPlacementRegisterEvent.Operation.REPLACE);
+        event.register(EntityRegistry.STRIDORVOX.get(),
+                SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                StridorvoxEntity::checkStridorvoxSpawnRules,
+                SpawnPlacementRegisterEvent.Operation.REPLACE);
     }
 
     @SubscribeEvent
