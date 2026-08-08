@@ -2,7 +2,6 @@ package dev.omialien.revervoxmod.entity.custom;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.config.RevervoxModServerConfigs;
-import dev.omialien.revervoxmod.entity.client.RevervoxBatRenderHelper;
 import dev.omialien.revervoxmod.entity.goals.TargetSpokeGoal;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
@@ -12,7 +11,6 @@ import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.IRecordedPlayer;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -97,14 +95,6 @@ public class RevervoxBatGeoEntity extends FlyingMob implements GeoEntity, Neutra
         int TRANSITION_TICKS = 5;
         int IDK_TICKS = 1;
         return ANIMATION_TICKS + TRANSITION_TICKS + IDK_TICKS;
-    }
-
-    public void stareAt(Player player) {
-        player.hurt(player.damageSources().magic(), 4.0F);
-
-        if (player.level().isClientSide && player instanceof AbstractClientPlayer acp) {
-            RevervoxBatRenderHelper.activate(acp, 64);
-        }
     }
 
     @Override

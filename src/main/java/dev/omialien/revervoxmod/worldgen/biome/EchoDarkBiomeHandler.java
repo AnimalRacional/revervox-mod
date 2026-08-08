@@ -2,13 +2,18 @@ package dev.omialien.revervoxmod.worldgen.biome;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
+import dev.omialien.revervoxmod.networking.packets.AddSoundInstancePacket;
 import dev.omialien.revervoxmod.networking.packets.TriggerBatPeekPacket;
+import dev.omialien.revervoxmod.registries.SoundRegistry;
 import dev.omialien.voicechatrecording.api.AudioEffect;
 import dev.omialien.voicechatrecording.api.IRecordedAudio;
 import dev.omialien.voicechatrecording.api.util.AudioPlayingUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
@@ -20,15 +25,16 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 
 public class EchoDarkBiomeHandler {
-    private static int currentAudioDelay = 3;
-    private final static int AUDIO_DELAY = 3; // in seconds
+    private static int currentAudioDelay;
+    private final static int AUDIO_DELAY = 5; // in seconds
+    private final static int BAT_PEAK_DELAY_TICKS = 300; // in ticks
     static Map<Player, Integer> PLAYER_TICKS_IN_DARKNESS = new WeakHashMap<>();
     static Map<UUID, Integer> TICKS_TO_BAT_DAMAGE = new HashMap<>();
 
     public static void startup() {
         PLAYER_TICKS_IN_DARKNESS = new WeakHashMap<>();
         TICKS_TO_BAT_DAMAGE = new HashMap<>();
-        currentAudioDelay = 3;
+        currentAudioDelay = AUDIO_DELAY;
     }
 
     // can only be called on the server
@@ -37,16 +43,16 @@ public class EchoDarkBiomeHandler {
         ServerLevel serverLevel = serverPlayer.serverLevel();
         int blockLight = serverLevel.getBrightness(LightLayer.BLOCK, serverPlayer.blockPosition());
         if (player.tickCount % 20 == 0) {
-            /*
+
             player.addEffect(new MobEffectInstance(
                     MobEffects.DARKNESS,
                     80,
-                    1,
+                    0,
                     false,
                     false,
                     false
             ));
-             */
+
             if (blockLight <= 11) {
                 // TODO quantos mais players mais spam por isso prevenir isso;
                 // vai ficando mais intenso (mais vozes)
@@ -62,6 +68,7 @@ public class EchoDarkBiomeHandler {
             if (--ticks <= 0) {
                 TICKS_TO_BAT_DAMAGE.remove(player.getUUID());
                 // TODO damage source
+                player.level().levelEvent(1039, player.blockPosition(), 0);
                 player.hurt(player.serverLevel().damageSources().generic(), 4.0f);
             } else {
                 TICKS_TO_BAT_DAMAGE.put(player.getUUID(), ticks);
@@ -76,9 +83,10 @@ public class EchoDarkBiomeHandler {
         }
         PLAYER_TICKS_IN_DARKNESS.put(player, PLAYER_TICKS_IN_DARKNESS.getOrDefault(player, 0) + 1);
 
-        if (PLAYER_TICKS_IN_DARKNESS.get(player) > 200) {
+        if (PLAYER_TICKS_IN_DARKNESS.get(player) > BAT_PEAK_DELAY_TICKS) {
+            RevervoxPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new AddSoundInstancePacket(player.getId(), SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundSource.HOSTILE, false));
             RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new TriggerBatPeekPacket(player.getUUID()));
-            TICKS_TO_BAT_DAMAGE.put(player.getUUID(), 46);
+            TICKS_TO_BAT_DAMAGE.put(player.getUUID(), 42);
             PLAYER_TICKS_IN_DARKNESS.remove(player);
         }
     }
@@ -99,7 +107,7 @@ public class EchoDarkBiomeHandler {
                     //AudioEffect.reverse().makeEcho(0.4f, 300, 4),
                     //AudioEffect.reverse().makeGlitch(0.6f, 0.1f, 4).makeEcho(0.4f, 300, 4),
                     //AudioEffect.stutter(0.1f, 5),
-                    AudioEffect.reverse().addRandomEffects().exclude(AudioEffect.Effect.REVERB).exclude(AudioEffect.Effect.ROBOT).exclude(AudioEffect.Effect.MULTI_PITCH),
+                    AudioEffect.reverse().addRandomEffects().exclude(AudioEffect.Effect.ROBOT).exclude(AudioEffect.Effect.MULTI_PITCH),
                     RevervoxMod.MOD_ID, 32.0f
             );
             currentAudioDelay = AUDIO_DELAY;

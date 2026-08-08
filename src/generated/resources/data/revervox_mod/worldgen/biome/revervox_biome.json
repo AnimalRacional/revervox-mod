@@ -9,8 +9,6 @@
   "downfall": 0.8,
   "effects": {
     "fog_color": 1509153,
-    "foliage_color": 13763580,
-    "grass_color": 8324092,
     "mood_sound": {
       "block_search_extent": 8,
       "offset": 2.0,
@@ -92,16 +90,16 @@
     "axolotls": [],
     "creature": [
       {
-        "type": "revervox_mod:revervox",
-        "maxCount": 5,
-        "minCount": 3,
-        "weight": 2
-      },
-      {
         "type": "revervox_mod:revervox_bat",
         "maxCount": 5,
         "minCount": 3,
-        "weight": 2
+        "weight": 1
+      },
+      {
+        "type": "minecraft:bat",
+        "maxCount": 5,
+        "minCount": 3,
+        "weight": 1
       }
     ],
     "misc": [],
