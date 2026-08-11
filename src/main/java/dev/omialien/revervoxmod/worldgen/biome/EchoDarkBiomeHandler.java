@@ -26,7 +26,7 @@ import java.util.WeakHashMap;
 
 public class EchoDarkBiomeHandler {
     private static int currentAudioDelay;
-    private final static int AUDIO_DELAY = 5; // in seconds
+    private final static int AUDIO_DELAY = 4; // in seconds
     private final static int BAT_PEAK_DELAY_TICKS = 300; // in ticks
     static Map<Player, Integer> PLAYER_TICKS_IN_DARKNESS = new WeakHashMap<>();
     static Map<UUID, Integer> TICKS_TO_BAT_DAMAGE = new HashMap<>();
@@ -52,7 +52,6 @@ public class EchoDarkBiomeHandler {
                     false,
                     false
             ));
-
             if (blockLight <= 11) {
                 // TODO quantos mais players mais spam por isso prevenir isso;
                 // vai ficando mais intenso (mais vozes)
@@ -84,11 +83,17 @@ public class EchoDarkBiomeHandler {
         PLAYER_TICKS_IN_DARKNESS.put(player, PLAYER_TICKS_IN_DARKNESS.getOrDefault(player, 0) + 1);
 
         if (PLAYER_TICKS_IN_DARKNESS.get(player) > BAT_PEAK_DELAY_TICKS) {
-            RevervoxPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new AddSoundInstancePacket(player.getId(), SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundSource.HOSTILE, false));
-            RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new TriggerBatPeekPacket(player.getUUID()));
-            TICKS_TO_BAT_DAMAGE.put(player.getUUID(), 42);
+            int randTicks = RandomSource.create().nextInt(0, 300);
+            RevervoxMod.TASKS.schedule(() -> sendBatPeekPacket(player), randTicks);
             PLAYER_TICKS_IN_DARKNESS.remove(player);
         }
+    }
+
+    private static void sendBatPeekPacket(ServerPlayer player) {
+        RevervoxPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), new AddSoundInstancePacket(player.getId(), SoundRegistry.REVERVOX_BAT_ALERT.get(), SoundSource.HOSTILE, false));
+        RevervoxPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new TriggerBatPeekPacket(player.getUUID()));
+        TICKS_TO_BAT_DAMAGE.put(player.getUUID(), 42);
+
     }
 
     private static void tickAudio(ServerPlayer serverPlayer, ServerLevel serverLevel) {

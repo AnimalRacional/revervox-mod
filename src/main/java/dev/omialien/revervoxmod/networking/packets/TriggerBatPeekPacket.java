@@ -2,6 +2,7 @@ package dev.omialien.revervoxmod.networking.packets;
 
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.entity.client.RevervoxBatRenderHelper;
+import dev.omialien.revervoxmod.sounds.EchoDarkSoundHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,6 +37,7 @@ public class TriggerBatPeekPacket {
             if (plr instanceof AbstractClientPlayer acp) {
                 RevervoxMod.LOGGER.info("activating RevervoxBatRenderHelper on client");
                 RevervoxBatRenderHelper.activate(acp, 60);
+                EchoDarkSoundHandler.resetHeartbeat();
             }
         });
         ctx.get().setPacketHandled(true);

@@ -21,6 +21,7 @@ public class SoundRegistry {
     public static final RegistryObject<SoundEvent> REVERVOX_STUN = registerSound("revervox_stun");
     public static final RegistryObject<SoundEvent> REVERVOX_SCREAM = registerSound("revervox_scream");
     public static final RegistryObject<SoundEvent> ECHO_DARK_AMBIENCE = registerSound("echo_dark_ambience");
+    public static final RegistryObject<SoundEvent> ECHO_DARK_HEARTBEAT = registerSound("echo_dark_heartbeat");
 
     private static RegistryObject<SoundEvent> registerSound(String name){
         return REGISTRY.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(RevervoxMod.MOD_ID, name)));

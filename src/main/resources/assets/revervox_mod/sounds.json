@@ -63,5 +63,10 @@
     "sounds": [
       {"name": "revervox_mod:echo_dark_ambience", "stream": true }
     ]
+  },
+  "echo_dark_heartbeat": {
+    "subtitle": "sounds.revervox_mod.echo_dark_heartbeat",
+    "category": "ambient",
+    "sounds": [ "revervox_mod:echo_dark_heartbeat" ]
   }
 }
