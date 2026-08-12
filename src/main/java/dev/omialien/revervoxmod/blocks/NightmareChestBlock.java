@@ -73,6 +73,8 @@
             nightmareInstances.setReturn(serverPlayer);
             int slot = nightmareInstances.acquire(id);
 
+            chest.triggerAnim("Chest", "nightmare_open");
+
             ServerLevel target;
             if (slot < 0) {
                 target = server.getLevel(RevervoxDimensions.PIT_LEVEL_KEY);

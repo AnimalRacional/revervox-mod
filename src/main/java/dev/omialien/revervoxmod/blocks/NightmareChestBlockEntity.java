@@ -6,6 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -15,6 +16,7 @@ import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.Animation;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.util.RenderUtils;
 
@@ -67,11 +69,24 @@ public class NightmareChestBlockEntity extends ChestBlockEntity implements GeoBl
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "NightmareChest", 0, state -> {
-            if (getOpenNess(state.getPartialTick()) > 0.01f)
-                return state.setAndContinue(isNightmare() ? NIGHTMARE_OPEN : OPEN);
-            return state.setAndContinue(CLOSED);
-        }));
+        controllers.add(new AnimationController<>(this, "Chest", 0, state -> PlayState.STOP)
+                .triggerableAnim("open", OPEN)
+                .triggerableAnim("nightmare_open", NIGHTMARE_OPEN)
+                .triggerableAnim("close", CLOSED));
+    }
+
+    @Override
+    public void startOpen(Player player) {
+        super.startOpen(player);
+        if (this.level != null && !this.level.isClientSide)
+            triggerAnim("Chest", isNightmare() ? "nightmare_open" : "open");
+    }
+
+    @Override
+    public void stopOpen(Player player) {
+        super.stopOpen(player);
+        if (this.level != null && !this.level.isClientSide)
+            triggerAnim("Chest", "close");
     }
 
     @Override
