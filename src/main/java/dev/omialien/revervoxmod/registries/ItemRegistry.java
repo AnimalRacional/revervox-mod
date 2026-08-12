@@ -81,7 +81,7 @@ public class ItemRegistry {
     );
     public static final RegistryObject<Item> ECHO_DARK_GRASS = register(
             "echo_dark_grass",
-            () -> new BlockItem(BlockRegistry.ECHO_DARK_GRASS.get(), new Item.Properties().stacksTo(64))
+            () -> new BlockItem(BlockRegistry.ECHO_DARK_GRASS.get(), new Item.Properties().stacksTo(64)), false
     );
 
     public static final RegistryObject<Item> GUANO_BLOCK = register(
@@ -96,6 +96,10 @@ public class ItemRegistry {
     public static final RegistryObject<BlockItem> ECHO_DARK_VEIN = register(
             "echo_dark_vein",
             () -> new BlockItem(BlockRegistry.ECHO_DARK_VEIN_BLOCK.get(), new Item.Properties())
+    );
+    public static final RegistryObject<Item> NIGHTMARE_CHEST = register(
+            "nightmare_chest",
+            () -> new NightmareChestItem(BlockRegistry.NIGHTMARE_CHEST.get(), new Item.Properties())
     );
 
     private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item, boolean inTab) {

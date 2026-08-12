@@ -1,6 +1,7 @@
 package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.blocks.NightmareChestBlockEntity;
 import dev.omialien.revervoxmod.blocks.VoiceRepeaterBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -14,6 +15,11 @@ public class BlockEntityRegistry {
             "tapebox",
             () -> BlockEntityType.Builder.of(
                     VoiceRepeaterBlockEntity::new, BlockRegistry.TAPEBOX.get()
+            ).build(null));
+    public static final RegistryObject<BlockEntityType<NightmareChestBlockEntity>> NIGHTMARE_CHEST = REGISTRY.register(
+            "nightmare_chest",
+            () -> BlockEntityType.Builder.of(
+                    NightmareChestBlockEntity::new, BlockRegistry.NIGHTMARE_CHEST.get()
             ).build(null));
 
     public static void register(IEventBus eventBus) {

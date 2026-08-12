@@ -1,14 +1,17 @@
 package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
+import dev.omialien.revervoxmod.blocks.client.NightmareChestRenderer;
 import dev.omialien.revervoxmod.entity.RevervoxBatLayer;
 import dev.omialien.revervoxmod.entity.client.*;
 import dev.omialien.revervoxmod.items.TapeItem;
 import dev.omialien.revervoxmod.particle.custom.RevervoxParticles;
 import dev.omialien.revervoxmod.particle.custom.RevervoxSonicBoomParticle;
+import dev.omialien.revervoxmod.registries.BlockEntityRegistry;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.nbt.CompoundTag;
@@ -47,6 +50,7 @@ public class ClientEventBus {
         EntityRenderers.register(EntityRegistry.REVERVOX_BAT.get(), RevervoxBatGeoRenderer::new);
         EntityRenderers.register(EntityRegistry.REVERVOX_FAKE_BAT.get(), RevervoxFakeBatGeoRenderer::new);
         EntityRenderers.register(EntityRegistry.STRIDORVOX.get(), StridorvoxGeoRenderer::new);
+        BlockEntityRenderers.register(BlockEntityRegistry.NIGHTMARE_CHEST.get(), NightmareChestRenderer::new);
     }
 
     @SubscribeEvent

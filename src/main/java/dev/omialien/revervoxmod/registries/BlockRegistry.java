@@ -3,11 +3,9 @@ package dev.omialien.revervoxmod.registries;
 import dev.omialien.revervoxmod.RevervoxMod;
 import dev.omialien.revervoxmod.blocks.EchoDarkGrassBlock;
 import dev.omialien.revervoxmod.blocks.EchoDarkVeinBlock;
+import dev.omialien.revervoxmod.blocks.NightmareChestBlock;
 import dev.omialien.revervoxmod.blocks.VoiceRepeaterBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.CarpetBlock;
-import net.minecraft.world.level.block.GlowLichenBlock;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -44,6 +42,11 @@ public class BlockRegistry {
     public static final RegistryObject<Block> GUANO = REGISTRY.register(
             "guano",
             () -> new CarpetBlock(BlockBehaviour.Properties.of().sound(SoundType.MUD).strength(1.0f, 0.2f).randomTicks())
+    );
+
+    public static final RegistryObject<Block> NIGHTMARE_CHEST = REGISTRY.register(
+            "nightmare_chest",
+            () -> new NightmareChestBlock(BlockBehaviour.Properties.of().sound(SoundType.MUD).noOcclusion())
     );
 
     public static void register(IEventBus eventBus) {
