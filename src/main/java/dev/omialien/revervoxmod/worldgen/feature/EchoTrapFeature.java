@@ -7,14 +7,14 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 
 import java.util.List;
 
-public class EchoTendrilFeature extends AbstractEchoDarkFeature{
+public class EchoTrapFeature extends AbstractEchoDarkFeature{
 
-    private static final int MAX_HEIGHT_VARIANCE = 4;
+    private static final int MAX_HEIGHT_VARIANCE = 1;
 
-    public EchoTendrilFeature(Codec<NoneFeatureConfiguration> codec) {
+    public EchoTrapFeature(Codec<NoneFeatureConfiguration> codec) {
         super(codec, List.of(
-                new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_1"),
-                new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_2")
+                new ResourceLocation(RevervoxMod.MOD_ID, "trap_0"),
+                new ResourceLocation(RevervoxMod.MOD_ID, "trap_1")
         ), MAX_HEIGHT_VARIANCE);
     }
 }

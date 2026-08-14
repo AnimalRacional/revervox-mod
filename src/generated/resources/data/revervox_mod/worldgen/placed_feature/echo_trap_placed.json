@@ -1,10 +1,6 @@
 {
-  "feature": "revervox_mod:echo_tendril_configured",
+  "feature": "revervox_mod:echo_trap_configured",
   "placement": [
-    {
-      "type": "minecraft:rarity_filter",
-      "chance": 3
-    },
     {
       "type": "minecraft:count",
       "count": 1

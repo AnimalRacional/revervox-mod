@@ -48,14 +48,17 @@ public class RevervoxBiomes {
         //we need to follow the same order as vanilla biomes for the BiomeDefaultFeatures
         globalOverworldGeneration(biomeBuilder);
 
+
+        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_STRUCTURES,
+                RevervoxPlacedFeatures.ECHO_TRAP_PLACED_KEY);
+        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION,
+                RevervoxPlacedFeatures.ECHO_TENDRIL_PLACED_KEY);
+        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION,
+                RevervoxPlacedFeatures.ECHO_DARK_VEIN_PLACED_KEY);
         biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
                 RevervoxPlacedFeatures.ECHO_DARK_GRASS_PLACED_KEY);
         biomeBuilder.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
                 RevervoxPlacedFeatures.ECHO_DARK_PLANT_PLACED_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.UNDERGROUND_DECORATION,
-                RevervoxPlacedFeatures.ECHO_DARK_VEIN_PLACED_KEY);
-        biomeBuilder.addFeature(GenerationStep.Decoration.SURFACE_STRUCTURES,
-                RevervoxPlacedFeatures.ECHO_TENDRIL_PLACED_KEY);
 
 
         return new Biome.BiomeBuilder()

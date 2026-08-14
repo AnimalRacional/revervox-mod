@@ -29,6 +29,9 @@ public class RevervoxConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_TENDRIL_CONFIGURED_KEY =
             ResourceKey.create(
                     Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_configured"));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_TRAP_CONFIGURED_KEY =
+            ResourceKey.create(
+                    Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_trap_configured"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_DARK_VEIN_KEY =
             ResourceKey.create(
                     Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_vein")
@@ -47,6 +50,13 @@ public class RevervoxConfiguredFeatures {
                 ECHO_TENDRIL_CONFIGURED_KEY,
                 new ConfiguredFeature<>(
                         FeatureRegistry.ECHO_TENDRIL_FEATURE.get(),
+                        NoneFeatureConfiguration.INSTANCE
+                )
+        );
+        context.register(
+                ECHO_TRAP_CONFIGURED_KEY,
+                new ConfiguredFeature<>(
+                        FeatureRegistry.ECHO_TRAP_FEATURE.get(),
                         NoneFeatureConfiguration.INSTANCE
                 )
         );

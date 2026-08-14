@@ -46,7 +46,7 @@ public class EchoDarkSoundHandler {
         if (inTargetBiome && inDarkness && echoDarkHeartbeatSound == null){
             echoDarkHeartbeatSound = new EchoDarkHeartbeat(player);
             soundManager.play(echoDarkHeartbeatSound);
-        } else if (!inDarkness && echoDarkHeartbeatSound != null) {
+        } else if ((!inDarkness && echoDarkHeartbeatSound != null) || (!inTargetBiome && echoDarkHeartbeatSound != null)) {
             echoDarkHeartbeatSound.startPitchFadeOut();
             echoDarkHeartbeatSound = null;
         }

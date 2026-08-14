@@ -17,6 +17,7 @@ import net.minecraft.world.level.levelgen.placement.*;
 import java.util.List;
 
 import static dev.omialien.revervoxmod.worldgen.RevervoxConfiguredFeatures.ECHO_TENDRIL_CONFIGURED_KEY;
+import static dev.omialien.revervoxmod.worldgen.RevervoxConfiguredFeatures.ECHO_TRAP_CONFIGURED_KEY;
 
 public class RevervoxPlacedFeatures {
     public static final ResourceKey<PlacedFeature> ECHO_DARK_GRASS_PLACED_KEY =
@@ -26,6 +27,8 @@ public class RevervoxPlacedFeatures {
 
     public static final ResourceKey<PlacedFeature> ECHO_TENDRIL_PLACED_KEY =
             ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_placed"));
+    public static final ResourceKey<PlacedFeature> ECHO_TRAP_PLACED_KEY =
+            ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_trap_placed"));
     public static final ResourceKey<PlacedFeature> ECHO_DARK_VEIN_PLACED_KEY =
             ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_vein_placed"));
 
@@ -35,7 +38,7 @@ public class RevervoxPlacedFeatures {
         context.register(ECHO_DARK_GRASS_PLACED_KEY, new PlacedFeature(
                 configured.getOrThrow(RevervoxConfiguredFeatures.ECHO_DARK_GRASS_KEY),
                 List.of(
-                        CountPlacement.of(90),
+                        CountPlacement.of(64),
                         InSquarePlacement.spread(),
                         PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT,
                         EnvironmentScanPlacement.scanningFor(Direction.DOWN,
@@ -63,7 +66,20 @@ public class RevervoxPlacedFeatures {
                                 RarityFilter.onAverageOnceEvery(3),
                                 CountPlacement.of(1),
                                 InSquarePlacement.spread(),
-                                PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT
+                                PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT,
+                                RandomOffsetPlacement.horizontal(ConstantInt.of(2))
+                        )
+                )
+        );
+        context.register(
+                RevervoxPlacedFeatures.ECHO_TRAP_PLACED_KEY,
+                new PlacedFeature(
+                        configured.getOrThrow(ECHO_TRAP_CONFIGURED_KEY),
+                        List.of(
+                                CountPlacement.of(1),
+                                InSquarePlacement.spread(),
+                                PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT,
+                                RandomOffsetPlacement.horizontal(ConstantInt.of(2))
                         )
                 )
         );
