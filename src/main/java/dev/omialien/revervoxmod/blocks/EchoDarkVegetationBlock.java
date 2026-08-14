@@ -9,9 +9,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class EchoDarkGrassBlock extends BushBlock {
+public class EchoDarkVegetationBlock extends BushBlock {
     protected static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 14, 14);
-    public EchoDarkGrassBlock(Properties pProperties) {
+    public EchoDarkVegetationBlock(Properties pProperties) {
         super(pProperties);
     }
 

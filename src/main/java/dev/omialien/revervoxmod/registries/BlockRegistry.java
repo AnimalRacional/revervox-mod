@@ -1,7 +1,7 @@
 package dev.omialien.revervoxmod.registries;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.blocks.EchoDarkGrassBlock;
+import dev.omialien.revervoxmod.blocks.EchoDarkVegetationBlock;
 import dev.omialien.revervoxmod.blocks.EchoDarkVeinBlock;
 import dev.omialien.revervoxmod.blocks.NightmareChestBlock;
 import dev.omialien.revervoxmod.blocks.VoiceRepeaterBlock;
@@ -26,7 +26,11 @@ public class BlockRegistry {
     );
     public static final RegistryObject<Block> ECHO_DARK_GRASS = REGISTRY.register(
             "echo_dark_grass",
-            () -> new EchoDarkGrassBlock(BlockBehaviour.Properties.of().replaceable().noCollission().mapColor(MapColor.PLANT).instabreak().sound(SoundType.SCULK).offsetType(BlockBehaviour.OffsetType.XZ).ignitedByLava().pushReaction(PushReaction.DESTROY))
+            () -> new EchoDarkVegetationBlock(BlockBehaviour.Properties.of().replaceable().noCollission().mapColor(MapColor.PLANT).instabreak().sound(SoundType.SCULK).offsetType(BlockBehaviour.OffsetType.XZ).ignitedByLava().pushReaction(PushReaction.DESTROY))
+    );
+    public static final RegistryObject<Block> ECHO_DARK_PLANT = REGISTRY.register(
+            "echo_dark_plant",
+            () -> new EchoDarkVegetationBlock(BlockBehaviour.Properties.of().replaceable().noCollission().mapColor(MapColor.PLANT).instabreak().sound(SoundType.SCULK).offsetType(BlockBehaviour.OffsetType.XZ).ignitedByLava().pushReaction(PushReaction.DESTROY))
     );
     public static final RegistryObject<Block> GUANO_BLOCK = REGISTRY.register(
             "guano_block",
@@ -48,7 +52,19 @@ public class BlockRegistry {
             "nightmare_chest",
             () -> new NightmareChestBlock(BlockBehaviour.Properties.of().sound(SoundType.MUD).noOcclusion())
     );
+    public static final RegistryObject<Block> ECHO_DARK_BRICKS = REGISTRY.register(
+            "echo_dark_bricks",
+            () -> new Block(BlockBehaviour.Properties.of().sound(SoundType.CALCITE).strength(1.0f, 0.2f).randomTicks())
+    );
 
+    public static final RegistryObject<Block> ECHO_DARK_BRICKS_STAIRS = REGISTRY.register(
+            "echo_dark_bricks_stairs",
+            () -> new StairBlock(() -> ECHO_DARK_BRICKS.get().defaultBlockState() ,BlockBehaviour.Properties.copy(BlockRegistry.ECHO_DARK_BRICKS.get()))
+    );
+    public static final RegistryObject<Block> ECHO_DARK_BRICKS_SLAB = REGISTRY.register(
+            "echo_dark_bricks_slab",
+            () -> new SlabBlock(BlockBehaviour.Properties.copy(BlockRegistry.ECHO_DARK_BRICKS.get()))
+    );
     public static void register(IEventBus eventBus) {
         REGISTRY.register(eventBus);
     }

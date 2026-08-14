@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "revervox_mod:block/echo_dark_bricks",
+    "top": "revervox_mod:block/echo_dark_bricks",
+    "side": "revervox_mod:block/echo_dark_bricks"
+  }
+}

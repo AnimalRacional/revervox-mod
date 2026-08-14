@@ -23,6 +23,9 @@ public class RevervoxConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_DARK_GRASS_KEY =
             ResourceKey.create(
                     Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_grass"));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_DARK_PLANT_KEY =
+            ResourceKey.create(
+                    Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_plant"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> ECHO_TENDRIL_CONFIGURED_KEY =
             ResourceKey.create(
                     Registries.CONFIGURED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_configured"));
@@ -36,6 +39,10 @@ public class RevervoxConfiguredFeatures {
                 FeatureUtils.simpleRandomPatchConfiguration(32,
                         PlacementUtils.onlyWhenEmpty(Feature.SIMPLE_BLOCK,
                                 new SimpleBlockConfiguration(BlockStateProvider.simple(BlockRegistry.ECHO_DARK_GRASS.get()))))));
+        context.register(ECHO_DARK_PLANT_KEY, new ConfiguredFeature<>(Feature.RANDOM_PATCH,
+                FeatureUtils.simpleRandomPatchConfiguration(32,
+                        PlacementUtils.onlyWhenEmpty(Feature.SIMPLE_BLOCK,
+                                new SimpleBlockConfiguration(BlockStateProvider.simple(BlockRegistry.ECHO_DARK_PLANT.get()))))));
         context.register(
                 ECHO_TENDRIL_CONFIGURED_KEY,
                 new ConfiguredFeature<>(

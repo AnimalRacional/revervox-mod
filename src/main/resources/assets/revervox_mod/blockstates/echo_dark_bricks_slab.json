@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=bottom": { "model": "revervox_mod:block/echo_dark_bricks_slab" },
+    "type=top": { "model": "revervox_mod:block/echo_dark_bricks_slab_top" },
+    "type=double": { "model": "revervox_mod:block/echo_dark_bricks" }
+  }
+}

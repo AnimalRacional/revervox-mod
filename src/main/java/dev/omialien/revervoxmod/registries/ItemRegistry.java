@@ -83,6 +83,10 @@ public class ItemRegistry {
             "echo_dark_grass",
             () -> new BlockItem(BlockRegistry.ECHO_DARK_GRASS.get(), new Item.Properties().stacksTo(64)), false
     );
+    public static final RegistryObject<Item> ECHO_DARK_PLANT = register(
+            "echo_dark_plant",
+            () -> new BlockItem(BlockRegistry.ECHO_DARK_PLANT.get(), new Item.Properties().stacksTo(64)), false
+    );
 
     public static final RegistryObject<Item> GUANO_BLOCK = register(
             "guano_block",
@@ -100,6 +104,18 @@ public class ItemRegistry {
     public static final RegistryObject<Item> NIGHTMARE_CHEST = register(
             "nightmare_chest",
             () -> new NightmareChestItem(BlockRegistry.NIGHTMARE_CHEST.get(), new Item.Properties())
+    );
+    public static final RegistryObject<Item> ECHO_DARK_BRICKS = register(
+            "echo_dark_bricks",
+            () -> new BlockItem(BlockRegistry.ECHO_DARK_BRICKS.get(), new Item.Properties().stacksTo(64))
+    );
+    public static final RegistryObject<Item> ECHO_DARK_BRICKS_STAIRS = register(
+            "echo_dark_bricks_stairs",
+            () -> new BlockItem(BlockRegistry.ECHO_DARK_BRICKS_STAIRS.get(), new Item.Properties().stacksTo(64))
+    );
+    public static final RegistryObject<Item> ECHO_DARK_BRICKS_SLAB = register(
+            "echo_dark_bricks_slab",
+            () -> new BlockItem(BlockRegistry.ECHO_DARK_BRICKS_SLAB.get(), new Item.Properties().stacksTo(64))
     );
 
     private static <T extends Item> RegistryObject<T> register(String name, Supplier<T> item, boolean inTab) {

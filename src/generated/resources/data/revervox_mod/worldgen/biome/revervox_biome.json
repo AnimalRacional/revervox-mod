@@ -77,7 +77,8 @@
       "minecraft:red_mushroom_normal",
       "minecraft:patch_sugar_cane",
       "minecraft:patch_pumpkin",
-      "revervox_mod:echo_dark_grass_placed"
+      "revervox_mod:echo_dark_grass_placed",
+      "revervox_mod:echo_dark_plant_placed"
     ],
     [
       "minecraft:freeze_top_layer"

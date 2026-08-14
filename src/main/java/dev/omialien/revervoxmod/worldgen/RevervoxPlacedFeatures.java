@@ -21,6 +21,8 @@ import static dev.omialien.revervoxmod.worldgen.RevervoxConfiguredFeatures.ECHO_
 public class RevervoxPlacedFeatures {
     public static final ResourceKey<PlacedFeature> ECHO_DARK_GRASS_PLACED_KEY =
             ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_grass_placed"));
+    public static final ResourceKey<PlacedFeature> ECHO_DARK_PLANT_PLACED_KEY =
+            ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_dark_plant_placed"));
 
     public static final ResourceKey<PlacedFeature> ECHO_TENDRIL_PLACED_KEY =
             ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(RevervoxMod.MOD_ID, "echo_tendril_placed"));
@@ -39,6 +41,18 @@ public class RevervoxPlacedFeatures {
                         EnvironmentScanPlacement.scanningFor(Direction.DOWN,
                                 BlockPredicate.solid(), BlockPredicate.ONLY_IN_AIR_PREDICATE, 12),
                         RandomOffsetPlacement.vertical(ConstantInt.of(1)),
+                        BiomeFilter.biome()
+                )));
+
+        context.register(ECHO_DARK_PLANT_PLACED_KEY, new PlacedFeature(
+                configured.getOrThrow(RevervoxConfiguredFeatures.ECHO_DARK_PLANT_KEY),
+                List.of(
+                        CountPlacement.of(60),
+                        InSquarePlacement.spread(),
+                        PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT,
+                        EnvironmentScanPlacement.scanningFor(Direction.DOWN,
+                                BlockPredicate.solid(), BlockPredicate.ONLY_IN_AIR_PREDICATE, 12),
+                        RandomOffsetPlacement.vertical(ConstantInt.of(2)),
                         BiomeFilter.biome()
                 )));
         context.register(

@@ -44,11 +44,15 @@
   "advancements.revervox_mod.revervox_ate_food.description": "Have Revervox eat your bait",
   "advancements.revervox_mod.revervox_stunned.title": "Red light!",
   "advancements.revervox_mod.revervox_stunned.description": "Stun Revervox using a megaphone",
-  "block.revervox_mod.echo_dark_surface_block": "Echo Dark Ground",
-  "block.revervox_mod.echo_dark_grass": "Echo Dark Grass",
-  "block.revervox_mod.echo_dark_vein": "Echo Dark Vein",
+  "block.revervox_mod.echo_dark_surface_block": "Echo Ground",
+  "block.revervox_mod.echo_dark_grass": "Echo Grass",
+  "block.revervox_mod.echo_dark_vein": "Echo Vein",
   "block.revervox_mod.tapebox": "Tapebox",
   "block.revervox_mod.guano": "Guano",
   "block.revervox_mod.guano_block": "Guano Block",
-  "block.revervox_mod.nightmare_chest": "Nightmare Chest"
+  "block.revervox_mod.nightmare_chest": "Nightmare Chest",
+  "block.revervox_mod.echo_dark_plant": "Echo Mushroom",
+  "block.revervox_mod.echo_dark_bricks": "Echo Bricks",
+  "block.revervox_mod.echo_dark_bricks_slab": "Echo Brick Slab",
+  "block.revervox_mod.echo_dark_bricks_stairs": "Echo Brick Stairs"
 }

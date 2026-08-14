@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "revervox_mod:block/echo_dark_bricks"
+  }
+}
