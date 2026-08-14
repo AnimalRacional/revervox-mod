@@ -47,7 +47,7 @@ public class RevervoxPlacedFeatures {
         context.register(ECHO_DARK_PLANT_PLACED_KEY, new PlacedFeature(
                 configured.getOrThrow(RevervoxConfiguredFeatures.ECHO_DARK_PLANT_KEY),
                 List.of(
-                        CountPlacement.of(60),
+                        CountPlacement.of(25),
                         InSquarePlacement.spread(),
                         PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT,
                         EnvironmentScanPlacement.scanningFor(Direction.DOWN,
@@ -60,7 +60,7 @@ public class RevervoxPlacedFeatures {
                 new PlacedFeature(
                         configured.getOrThrow(ECHO_TENDRIL_CONFIGURED_KEY),
                         List.of(
-                                RarityFilter.onAverageOnceEvery(4),
+                                RarityFilter.onAverageOnceEvery(3),
                                 CountPlacement.of(1),
                                 InSquarePlacement.spread(),
                                 PlacementUtils.RANGE_BOTTOM_TO_MAX_TERRAIN_HEIGHT

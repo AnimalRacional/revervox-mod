@@ -1,3 +1,6 @@
 {
-  "parent": "revervox_mod:block/echo_dark_grass"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "revervox_mod:block/echo_dark_grass"
+  }
 }

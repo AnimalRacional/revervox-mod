@@ -30,7 +30,7 @@ public class BlockRegistry {
     );
     public static final RegistryObject<Block> ECHO_DARK_PLANT = REGISTRY.register(
             "echo_dark_plant",
-            () -> new EchoDarkVegetationBlock(BlockBehaviour.Properties.of().replaceable().noCollission().mapColor(MapColor.PLANT).instabreak().sound(SoundType.SCULK).offsetType(BlockBehaviour.OffsetType.XZ).ignitedByLava().pushReaction(PushReaction.DESTROY))
+            () -> new EchoDarkVegetationBlock(BlockBehaviour.Properties.of().replaceable().lightLevel(state -> 12).noCollission().mapColor(MapColor.PLANT).instabreak().sound(SoundType.SCULK).offsetType(BlockBehaviour.OffsetType.XZ).ignitedByLava().pushReaction(PushReaction.DESTROY))
     );
     public static final RegistryObject<Block> GUANO_BLOCK = REGISTRY.register(
             "guano_block",

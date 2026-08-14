@@ -40,7 +40,7 @@ public class RevervoxConfiguredFeatures {
                         PlacementUtils.onlyWhenEmpty(Feature.SIMPLE_BLOCK,
                                 new SimpleBlockConfiguration(BlockStateProvider.simple(BlockRegistry.ECHO_DARK_GRASS.get()))))));
         context.register(ECHO_DARK_PLANT_KEY, new ConfiguredFeature<>(Feature.RANDOM_PATCH,
-                FeatureUtils.simpleRandomPatchConfiguration(32,
+                FeatureUtils.simpleRandomPatchConfiguration(8,
                         PlacementUtils.onlyWhenEmpty(Feature.SIMPLE_BLOCK,
                                 new SimpleBlockConfiguration(BlockStateProvider.simple(BlockRegistry.ECHO_DARK_PLANT.get()))))));
         context.register(

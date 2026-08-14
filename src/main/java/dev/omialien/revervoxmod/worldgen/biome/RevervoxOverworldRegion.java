@@ -39,7 +39,7 @@ public class RevervoxOverworldRegion extends Region {
                 .erosion(ParameterUtils.Erosion.EROSION_4)
                 .depth(Climate.Parameter.point(0.95F)) // Biome height that it can generate
                 .weirdness(ParameterUtils.Weirdness.MID_SLICE_NORMAL_DESCENDING) // Separate into blobs
-                .offset(0.17F) // Biome global size
+                .offset(0.25F) // Biome global size
                 .build().forEach(point -> builder.add(point, RevervoxBiomes.REVERVOX_BIOME));
 
         // Add our points to the mapper
