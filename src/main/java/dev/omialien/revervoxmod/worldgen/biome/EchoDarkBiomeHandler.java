@@ -40,13 +40,15 @@ public class EchoDarkBiomeHandler {
     // can only be called on the server
     public static void tickBiomeLogic(Player player){
         ServerPlayer serverPlayer = (ServerPlayer) player;
+        if (player.isCreative() || player.isSpectator()) {
+            return;
+        }
         ServerLevel serverLevel = serverPlayer.serverLevel();
         int blockLight = serverLevel.getBrightness(LightLayer.BLOCK, serverPlayer.blockPosition());
         if (player.tickCount % 20 == 0) {
-
             player.addEffect(new MobEffectInstance(
                     MobEffects.DARKNESS,
-                    80,
+                    40,
                     0,
                     false,
                     false,
