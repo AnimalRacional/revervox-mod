@@ -7,6 +7,7 @@ import dev.omialien.revervoxmod.advancements.RevervoxStunnedTrigger;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
 import dev.omialien.revervoxmod.worldgen.biome.RevervoxBiomes;
+import dev.omialien.revervoxmod.worldgen.dimension.RevervoxDimensions;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.FrameType;
@@ -15,9 +16,11 @@ import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.ForgeAdvancementProvider;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +68,29 @@ public class RevervoxAdvancementProvider extends ForgeAdvancementProvider {
                     )
                     .addCriterion("find_biome", PlayerTrigger.TriggerInstance.located(LocationPredicate.inBiome(RevervoxBiomes.REVERVOX_BIOME)))
                     .save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/find_biome"), existingFileHelper);
+            Advancement.Builder fallTrapBuilder = Advancement.Builder.advancement()
+                    .parent(findBiome)
+                    .display(
+                            new ItemStack(ItemRegistry.NIGHTMARE_CHEST.get()),
+                            Component.translatable("advancements.revervox_mod.fall_trap.title"),
+                            Component.translatable("advancements.revervox_mod.fall_trap.description"),
+                            null,
+                            FrameType.TASK,
+                            true,
+                            false,
+                            false
+                    )
+                    .requirements(RequirementsStrategy.OR);
+            for (ResourceKey<Level> a : RevervoxDimensions.HOUSE_LEVELS) {
+                fallTrapBuilder = fallTrapBuilder.addCriterion(
+                        a.location().toString(),
+                        ChangeDimensionTrigger.TriggerInstance.changedDimensionTo(a));
+            }
+            fallTrapBuilder.addCriterion(
+                    RevervoxDimensions.PIT_LEVEL_KEY.location().toString(),
+                    ChangeDimensionTrigger.TriggerInstance.changedDimensionTo(RevervoxDimensions.PIT_LEVEL_KEY)
+            );
+            Advancement fallTrap = fallTrapBuilder.save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/fall_trap"), existingFileHelper);
             Advancement revervoxHears = Advancement.Builder.advancement()
                     .parent(root)
                     .display(
@@ -87,7 +113,6 @@ public class RevervoxAdvancementProvider extends ForgeAdvancementProvider {
                     .addCriterion("revervox_hears", RevervoxHearTrigger.TriggerInstance.getInstance())
                     .requirements(RequirementsStrategy.OR)
                     .save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/revervox_hears"), existingFileHelper);
-
             Advancement getEar = Advancement.Builder.advancement()
                     .parent(revervoxHears)
                     .display(

@@ -1,0 +1,53 @@
+{
+  "parent": "revervox_mod:revervox/find_biome",
+  "criteria": {
+    "revervox_mod:house_0": {
+      "conditions": {
+        "to": "revervox_mod:house_0"
+      },
+      "trigger": "minecraft:changed_dimension"
+    },
+    "revervox_mod:house_1": {
+      "conditions": {
+        "to": "revervox_mod:house_1"
+      },
+      "trigger": "minecraft:changed_dimension"
+    },
+    "revervox_mod:house_2": {
+      "conditions": {
+        "to": "revervox_mod:house_2"
+      },
+      "trigger": "minecraft:changed_dimension"
+    },
+    "revervox_mod:pit": {
+      "conditions": {
+        "to": "revervox_mod:pit"
+      },
+      "trigger": "minecraft:changed_dimension"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.revervox_mod.fall_trap.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "revervox_mod:nightmare_chest"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.revervox_mod.fall_trap.title"
+    }
+  },
+  "requirements": [
+    [
+      "revervox_mod:house_0",
+      "revervox_mod:house_1",
+      "revervox_mod:house_2",
+      "revervox_mod:pit"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

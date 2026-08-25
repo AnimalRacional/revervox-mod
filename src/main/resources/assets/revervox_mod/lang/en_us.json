@@ -46,6 +46,8 @@
   "advancements.revervox_mod.revervox_stunned.description": "Stun Revervox using a megaphone",
   "advancements.revervox_mod.find_biome.title": "thgiL dniF",
   "advancements.revervox_mod.find_biome.description": "Find the Echoing Dark. Make sure to bring some lights...",
+  "advancements.revervox_mod.fall_trap.title": "Home not-so-sweet home",
+  "advancements.revervox_mod.fall_trap.description": "Fall into a Nightmare Chest's trap",
   "block.revervox_mod.echo_dark_surface_block": "Echo Ground",
   "block.revervox_mod.echo_dark_grass": "Echo Grass",
   "block.revervox_mod.echo_dark_vein": "Echo Vein",
