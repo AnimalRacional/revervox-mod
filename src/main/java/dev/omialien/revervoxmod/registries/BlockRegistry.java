@@ -15,7 +15,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class BlockRegistry {
-    private static final DeferredRegister<Block> REGISTRY = DeferredRegister.create(ForgeRegistries.BLOCKS, RevervoxMod.MOD_ID);
+    public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create(ForgeRegistries.BLOCKS, RevervoxMod.MOD_ID);
     public static final RegistryObject<VoiceRepeaterBlock> TAPEBOX = REGISTRY.register(
             "tapebox",
             () -> new VoiceRepeaterBlock(BlockBehaviour.Properties.of().strength(1.0f, 0.2f).randomTicks())

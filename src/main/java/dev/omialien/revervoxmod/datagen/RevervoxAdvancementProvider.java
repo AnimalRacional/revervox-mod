@@ -37,7 +37,7 @@ public class RevervoxAdvancementProvider extends ForgeAdvancementProvider {
     private static final class AdvancementGenerator implements ForgeAdvancementProvider.AdvancementGenerator {
 
         @Override
-        public void generate(HolderLookup.Provider provider, Consumer<Advancement> consumer, @NotNull ExistingFileHelper existingFileHelper) {
+        public void generate(HolderLookup.@NotNull Provider provider, @NotNull Consumer<Advancement> consumer, @NotNull ExistingFileHelper existingFileHelper) {
             System.out.println("GENERATING ADVANCEMENTS!");
             RevervoxMod.LOGGER.debug("GENERATING ADVANCEMENTS!");
             Advancement root = Advancement.Builder.advancement()

@@ -1,15 +1,19 @@
 package dev.omialien.revervoxmod.events;
 
 import dev.omialien.revervoxmod.RevervoxMod;
-import dev.omialien.revervoxmod.datagen.RevervoxWorldGenProvider;
 import dev.omialien.revervoxmod.datagen.RevervoxAdvancementProvider;
+import dev.omialien.revervoxmod.datagen.RevervoxBlockLootProvider;
+import dev.omialien.revervoxmod.datagen.RevervoxWorldGenProvider;
 import dev.omialien.revervoxmod.entity.custom.*;
 import dev.omialien.revervoxmod.networking.RevervoxPacketHandler;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.worldgen.biome.surface.RevervoxSurfaceRules;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
@@ -17,6 +21,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import terrablender.api.SurfaceRuleManager;
+
+import java.util.Collections;
+import java.util.List;
 
 @Mod.EventBusSubscriber(modid = RevervoxMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEventBusEvents {
@@ -58,5 +65,10 @@ public class ModEventBusEvents {
         DataGenerator gen = event.getGenerator();
         gen.addProvider(event.includeServer(), new RevervoxAdvancementProvider(gen.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper()));
         gen.addProvider(event.includeServer(), new RevervoxWorldGenProvider(gen.getPackOutput(), event.getLookupProvider()));
+        gen.addProvider(event.includeServer(), (DataProvider.Factory<LootTableProvider>) output -> new LootTableProvider(
+                output,
+                Collections.emptySet(),
+                List.of(new LootTableProvider.SubProviderEntry(RevervoxBlockLootProvider::new, LootContextParamSets.BLOCK))
+        ));
     }
 }
