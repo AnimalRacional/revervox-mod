@@ -1,0 +1,42 @@
+{
+  "parent": "revervox_mod:revervox/root",
+  "criteria": {
+    "find_biome": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "location": {
+                "biome": "revervox_mod:revervox_biome"
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:location"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "description": {
+      "translate": "advancements.revervox_mod.find_biome.description"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "revervox_mod:echo_dark_surface_block"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.revervox_mod.find_biome.title"
+    }
+  },
+  "requirements": [
+    [
+      "find_biome"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -6,6 +6,7 @@ import dev.omialien.revervoxmod.advancements.RevervoxHearTrigger;
 import dev.omialien.revervoxmod.advancements.RevervoxStunnedTrigger;
 import dev.omialien.revervoxmod.registries.EntityRegistry;
 import dev.omialien.revervoxmod.registries.ItemRegistry;
+import dev.omialien.revervoxmod.worldgen.biome.RevervoxBiomes;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.FrameType;
@@ -50,6 +51,20 @@ public class RevervoxAdvancementProvider extends ForgeAdvancementProvider {
                     .addCriterion("layer", PlayerTrigger.TriggerInstance.located(LocationPredicate.Builder.location().setY(MinMaxBounds.Doubles.atMost(0)).build()))
                     .requirements(RequirementsStrategy.OR)
                     .save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/root"), existingFileHelper);
+            Advancement findBiome = Advancement.Builder.advancement()
+                    .parent(root)
+                    .display(
+                            new ItemStack(ItemRegistry.ECHO_DARK_SURFACE_BLOCK.get()),
+                            Component.translatable("advancements.revervox_mod.find_biome.title"),
+                            Component.translatable("advancements.revervox_mod.find_biome.description"),
+                            null,
+                            FrameType.TASK,
+                            true,
+                            true,
+                            false
+                    )
+                    .addCriterion("find_biome", PlayerTrigger.TriggerInstance.located(LocationPredicate.inBiome(RevervoxBiomes.REVERVOX_BIOME)))
+                    .save(consumer, ResourceLocation.fromNamespaceAndPath(RevervoxMod.MOD_ID, "revervox/find_biome"), existingFileHelper);
             Advancement revervoxHears = Advancement.Builder.advancement()
                     .parent(root)
                     .display(
