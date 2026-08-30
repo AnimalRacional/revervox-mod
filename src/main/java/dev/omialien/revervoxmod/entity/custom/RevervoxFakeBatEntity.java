@@ -2,6 +2,8 @@ package dev.omialien.revervoxmod.entity.custom;
 
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import dev.omialien.revervoxmod.RevervoxMod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import dev.omialien.revervoxmod.networking.packets.SoundInstancePacket;
 import dev.omialien.revervoxmod.particle.ParticleManager;
 import dev.omialien.revervoxmod.registries.ParticleRegistry;
@@ -202,6 +204,7 @@ public class RevervoxFakeBatEntity extends FlyingMob implements GeoEntity {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public boolean isInvisible() {
         if(level().isClientSide){
             if(Minecraft.getInstance().player != null){

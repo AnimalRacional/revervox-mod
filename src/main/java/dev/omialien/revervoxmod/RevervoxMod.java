@@ -93,7 +93,12 @@ public class RevervoxMod {
         if(audio == null){
             audio = RevervoxMod.AUDIOS.getRandomAudio(false);
         }
-        if(audio == null){ return; }
+        if(audio == null){
+            if (player instanceof ServerPlayer serverPlayer) {
+                PlayerVisibilityUtil.restorePlayerVision(serverPlayer);
+            }
+            return;
+        }
         IRecordedAudio finalAudio = audio;
         TASKS.schedule(() -> AudioPlayingUtil.playFromEntity(finalAudio, revervox, RevervoxMod.MOD_ID), 5);// small delay in case it disappears instantly
         revervox.setPos(revervoxPos.x, revervoxPos.y, revervoxPos.z);
